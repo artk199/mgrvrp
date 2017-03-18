@@ -1,0 +1,46 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4 alert alert-success">
+            <div class="row">
+                <div class="col-md-offset-1 col-md-5">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Depots
+                        </div>
+                        <ul class="list-group">
+                            <div ng-repeat="depot in ctrl.depots">
+                                <li class="list-group-item" ng-bind-template="{{depot.x}} , {{depot.y}}"></li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Departures
+                        </div>
+                        <ul class="list-group">
+                            <div ng-repeat="departure in ctrl.departures">
+                                <li class="list-group-item" ng-bind-template="{{departure.x}} , {{departure.y}}"></li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-8">
+            <div class="row">
+                <button type="submit" class="btn btn-primary" ng-click="ctrl.clearMap()">Clear</button>
+                <button type="submit" class="btn btn-primary" ng-click="ctrl.loadRoutes()">Calculate</button>
+            </div>
+            <div class="row">
+                <canvas class="thumbnail" id="main-canvas" ng-mousedown="ctrl.clickMap($event)" oncontextmenu="return false" width="800px" height="800px">
+                    Sorry, your browser doesn't support the &lt;canvas&gt; element.
+                </canvas>
+            </div>
+
+        </div>
+    </div>
+</div>
+
