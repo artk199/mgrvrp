@@ -1,0 +1,68 @@
+<div class="container-fluid">
+    <div class="row well">
+        <div class="col-md-2">
+            <depot-picker depot="ctrl.depot"> </depot-picker>
+            <customers-picker customers="ctrl.customers"></customers-picker>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Current element
+                </div>
+                <div class="panel-body">
+                    <div ng-if='fabric.selectedObject'>
+                        <div ng-switch='fabric.selectedObject.type'>
+                            <div ng-switch-when='depot'>
+                                <div class="form-group input-group input-group-sm">
+                                    <span class="input-group-addon" id="depot-name">name</span>
+                                    <input type='number' class="form-control" aria-describedby="basic-addon3" ng-model="fabric.selectedObject.name" />
+                                </div>
+                            </div>
+                            <div ng-switch-when='customer'>
+                                <div class="form-group input-group input-group-sm">
+                                    <span class="input-group-addon" id="basic-addon3">name</span>
+                                    <input type='number' class="form-control" aria-describedby="basic-addon3" ng-model="fabric.selectedObject.name" />
+                                </div>
+                                <div class="form-group input-group input-group-sm">
+                                    <span class="input-group-addon" id="demand-label">demand</span>
+                                    <input type='number' class="form-control" aria-describedby="cap-label" ng-model="fabric.selectedObject.demand" />
+                                </div>
+                                <div class="form-group input-group input-group-sm">
+                                    <span class="input-group-addon" id="customer-x">x</span>
+                                    <input type='number' class="form-control" disabled aria-describedby="cap-label" ng-model="fabric.selectedObject.left" />
+                                </div>
+                                <div class="form-group input-group input-group-sm">
+                                    <span class="input-group-addon" id="customer-y">y</span>
+                                    <input type='number' class="form-control" disabled aria-describedby="cap-label" ng-model="fabric.selectedObject.top" />
+                                </div>
+                                <button type="submit" class="btn btn-danger" ng-click="ctrl.removeObject()">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <button type="submit" class="btn btn-primary" ng-click="ctrl.clearMap()">Clear</button>
+                <button type="submit" class="btn btn-primary" ng-click="ctrl.loadRoutes()">Calculate</button>
+            </div>
+            <div class="row">
+                <canvas fabric='fabric'></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Log
+                </div>
+                <div class="panel-body">
+                    <samp>Tutaj bedzie log...
+                        <ul ng-repeat="data in ctrl.wssData track by $index" >
+                            <li> {{ data }} </li>
+                        </ul>
+                    </samp>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
