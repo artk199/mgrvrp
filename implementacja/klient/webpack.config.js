@@ -6,7 +6,6 @@ module.exports = {
     app: ['webpack/hot/dev-server' ,"./app/app.js"]
   },
   output: {
-    path: path.resolve(__dirname, "build2"),
     filename: "bundle.js"
   },
   plugins: [

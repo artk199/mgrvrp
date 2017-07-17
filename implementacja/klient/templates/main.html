@@ -51,18 +51,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Log
-                </div>
-                <div class="panel-body">
-                    <samp>Tutaj bedzie log...
-                        <ul ng-repeat="data in ctrl.wssData track by $index" >
-                            <li> {{ data }} </li>
-                        </ul>
-                    </samp>
-                </div>
-            </div>
+            <log-panel></log-panel>
         </div>
     </div>
 </div>
