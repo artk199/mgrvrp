@@ -1,4 +1,6 @@
 ---
+server:
+  port: 9090
 grails:
     profile: web
     cors:
@@ -28,15 +30,10 @@ endpoints:
 
 ---
 grails:
+    plugin:
+        springsecurity:
+            active: false
     mime:
-        disable:
-            accept:
-                header:
-                    userAgents:
-                        - Gecko
-                        - WebKit
-                        - Presto
-                        - Trident
         types:
             all: '*/*'
             atom: application/atom+xml

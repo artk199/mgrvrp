@@ -13,7 +13,7 @@ import com.graphhopper.jsprit.core.util.Solutions
 import grails.transaction.Transactional
 
 @Transactional
-class VrpService {
+class VrpService{
 
     VehicleRoutingProblemSolution calculateRoutes(Location startLocation,List<Location> locations) {
         /*

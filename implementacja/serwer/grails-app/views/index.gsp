@@ -1,28 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <title><g:if env="development">Grails Runtime Exception</g:if><g:else>Error</g:else></title>
-        <meta name="layout" content="main">
-        <g:if env="development"><asset:stylesheet src="errors.css"/></g:if>
-    </head>
-    <body>
-        <g:if env="development">
-            <g:if test="${Throwable.isInstance(exception)}">
-                <g:renderException exception="${exception}" />
-            </g:if>
-            <g:elseif test="${request.getAttribute('javax.servlet.error.exception')}">
-                <g:renderException exception="${request.getAttribute('javax.servlet.error.exception')}" />
-            </g:elseif>
-            <g:else>
-                <ul class="errors">
-                        INDEXXX
-                </ul>
-            </g:else>
-        </g:if>
-        <g:else>
-            <ul class="errors">
-                <li>An error has occurred</li>
-            </ul>
-        </g:else>
-    </body>
+<head>
+    <meta name="layout" content="main"/>
+
+    <asset:javascript src="sockjs.js"/>
+    <asset:javascript src="jquery.js"/>
+    <asset:javascript src="stomp.js"/>
+
+    <script type="text/javascript">
+        $(function() {
+            var socket = new SockJS("http://localhost:9090/stomp");
+            var client = Stomp.over(socket);
+
+            var headers = {
+                Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                passcode: 'mypasscode'
+            };
+
+            client.connect(headers, function() {
+                client.subscribe("/topic/hello", function(message) {
+                    $("#helloDiv").append(message.body);
+                });
+            });
+
+            $("#helloButton").click(function() {
+                client.send("/app/hello", {}, JSON.stringify("world"));
+            });
+        });
+    </script>
+</head>
+<body>
+<button id="helloButton">hello</button>
+<div id="helloDiv"></div>
+</body>
 </html>
