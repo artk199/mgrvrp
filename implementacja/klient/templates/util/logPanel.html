@@ -1,0 +1,14 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Log
+    </div>
+    <button ng-click="ctrl.wssData.push('hehe')"> dodaj </button>
+    <div class="panel-body">
+        <samp>Tutaj bedzie log...
+          {{wssData}}
+            <ul ng-repeat="data in wssData track by $index" >
+                <li> {{ data }} </li>
+            </ul>
+        </samp>
+    </div>
+</div>

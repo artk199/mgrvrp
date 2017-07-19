@@ -12,24 +12,20 @@ import java.io.IOException;
 @Priority(Integer.MIN_VALUE)
 public class CorsFilter extends OncePerRequestFilter {
 
-    public CorsFilter() {
-
-        System.out.println("DZIALAM KURDE MOL");
-    }
+    public CorsFilter() {}
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
             throws ServletException, IOException {
-        System.out.println("SPRAWDZAM CORSA");
         String origin = req.getHeader("Origin");
 
         boolean options = "OPTIONS".equals(req.getMethod());
-        //if (options) {
-         //   if (origin == null) return;
+        if (options) {
+            if (origin == null) return;
             resp.addHeader("Access-Control-Allow-Headers", "origin, authorization, accept, content-type, x-requested-with");
             resp.addHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS");
             resp.addHeader("Access-Control-Max-Age", "3600");
-        //}
+        }
 
         resp.addHeader("Access-Control-Allow-Origin", origin == null ? "*" : origin);
         resp.addHeader("Access-Control-Allow-Credentials", "true");

@@ -9,12 +9,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 class VrpController{
 
     SimpMessagingTemplate brokerMessagingTemplate
-    SavingsAlgorithmService savingsAlgorithmService
+    //SavingsAlgorithmService savingsAlgorithmService
     VrpService vrpService
 
     def index() {
 
-        savingsAlgorithmService.start()
+        //savingsAlgorithmService.start()
         render "OK"
         return;
         def json = request.JSON;
@@ -55,6 +55,8 @@ class VrpController{
     @MessageMapping("/hello")
     @SendTo("/topic/hello")
     protected String hello(String world) {
+        println "world"
+        //brokerMessagingTemplate.convertAndSend "/topic/hello", world
         return "hello from controller, ${world}!"
     }
 
