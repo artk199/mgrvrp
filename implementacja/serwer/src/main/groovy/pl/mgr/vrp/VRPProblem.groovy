@@ -1,10 +1,16 @@
 package pl.mgr.vrp
 
-/**
- * Created by Artur on 24.06.2017.
- */
-class VRPProblem {
+import grails.validation.Validateable
 
-    VRPLocation depot;
-    List<VRPLocation> customers;
+class VRPProblem implements Validateable {
+
+    List<VRPDepot> depots
+    List<VRPCustomer> customers
+    VRPFleet fleet
+
+    static constraints = {
+        depots nullable: false, size: 1..10000000
+        customers nullable: false, size: 1..10000000
+        fleet nullable: false
+    }
 }

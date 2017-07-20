@@ -1,11 +1,11 @@
 package pl.mgr.vrp
 
-import com.graphhopper.jsprit.core.util.Coordinate
-
-/**
- * Created by Artur on 24.06.2017.
- */
 class VRPLocation {
+
+    VRPLocation(){}
+    VRPLocation(double x,double y){
+        coordinates = new Coordinate(x:x,y:y)
+    }
     Coordinate coordinates
 }
 
