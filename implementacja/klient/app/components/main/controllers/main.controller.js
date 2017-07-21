@@ -1,4 +1,4 @@
-module.exports = function($http,$scope, Fabric, FabricCanvas, FabricConstants, Keypress, VrpService){
+module.exports = function($http,$scope, Fabric, FabricCanvas, FabricConstants, Keypress, VRPService){
 
       var ctrl = this;
       ctrl.addCustomer = addCustomer;
@@ -94,15 +94,15 @@ module.exports = function($http,$scope, Fabric, FabricCanvas, FabricConstants, K
       $scope.init = function() {
           $scope.fabric = new Fabric({
               canvas: $scope.cnv,
-              canvasWidth: 800,
-              canvasHeight: 800,
-              canvasOriginalWidth:800,
-              canvasOriginalHeight:800,
+              canvasWidth: 500,
+              canvasHeight: 500,
+              canvasOriginalWidth:500,
+              canvasOriginalHeight:500,
               JSONExportProperties: FabricConstants.JSONExportProperties,
               textDefaults: FabricConstants.textDefaults,
               json: {}
           });
-          $scope.fabric.setCanvasSize(800,800);
+          $scope.fabric.setCanvasSize(500,500);
           $scope.cnv = FabricCanvas.getCanvas();
           $scope.fabric.setCanvas($scope.cnv);
           addDepot();
