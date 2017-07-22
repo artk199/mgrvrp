@@ -11,11 +11,17 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleType
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl
 import com.graphhopper.jsprit.core.util.Solutions
 import grails.transaction.Transactional
+import pl.mgr.vrp.VRPLocation
+import pl.mgr.vrp.VRPProblem
+import pl.mgr.vrp.VRPRoute
+import pl.mgr.vrp.VRPService
+import pl.mgr.vrp.VRPSolution
 
 @Transactional
-class VrpService{
+class JspritVRPService extends VRPService {
 
-    VehicleRoutingProblemSolution calculateRoutes(Location startLocation,List<Location> locations) {
+
+    private VehicleRoutingProblemSolution calculateRoutes(Location startLocation, List<Location> locations) {
         /*
          *  Define vehicle
          */
@@ -69,5 +75,40 @@ class VrpService{
         VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions)
 
         return bestSolution;
+    }
+
+    @Override
+    protected VRPSolution caluculateSolution(VRPProblem problem) {
+        def depot = Location.newInstance(problem.depots[0].coordinates.x,problem.depots[0].coordinates.y)
+        List<Location> customers = []
+        for (def c in problem.customers) {
+            customers.add(Location.newInstance(c.coordinates.x, c.coordinates.y))
+        }
+        def solution = calculateRoutes(depot,customers)
+        return translateSolution(solution)
+    }
+
+    private VRPSolution translateSolution(VehicleRoutingProblemSolution s) {
+        VRPSolution solution = new VRPSolution()
+        s.routes.each { it ->
+            VRPRoute r = new VRPRoute()
+            r.start = new VRPLocation(
+                    it.start.location.coordinate.x,
+                    it.start.location.coordinate.y
+            )
+            r.end = new VRPLocation(
+                    it.end.location.coordinate.x,
+                    it.end.location.coordinate.y
+            )
+            r.route = []
+            it.activities.each { activity ->
+                r.route += new VRPLocation(
+                        activity.location.coordinate.x,
+                        activity.location.coordinate.y
+                )
+            }
+            solution.routes += r
+        }
+        return solution
     }
 }

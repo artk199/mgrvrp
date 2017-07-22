@@ -26,7 +26,7 @@ class TestJob {
 
         //Note the lack of the leading /user compared to what the webpage subscribes to
         // - this is added automatically
-        brokerMessagingTemplate.convertAndSend "/topic/hello", builder
+        //brokerMessagingTemplate.convertAndSend "/topic/hello", builder
         //brokerMessagingTemplate.convertAndSend "/topic/hello", builder
         //brokerMessagingTemplate.convertAndSend "/app/hello", "cos"
 

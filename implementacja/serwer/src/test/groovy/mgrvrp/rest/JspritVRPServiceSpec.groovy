@@ -6,7 +6,8 @@ import spock.lang.Specification
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-class VrpServiceSpec extends Specification {
+@TestFor(JspritVRPService)
+class JspritVRPServiceSpec extends Specification {
 
     def setup() {
     }
@@ -15,7 +16,7 @@ class VrpServiceSpec extends Specification {
     }
 
     void "test something"() {
-        expect: "fix me"
-        true == false
+        expect:"fix me"
+            true == false
     }
 }

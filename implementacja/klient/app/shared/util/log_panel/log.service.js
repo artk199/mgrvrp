@@ -4,7 +4,7 @@ module.exports = function($log){
    srv.logs = [];
 
    srv.info = function(message){
-     let msg = "[INFO] " + message;
+     let msg = "[INFO] " + JSON.stringify(message);;
      $log.info(msg);
      srv.logs.push(msg);
    }
