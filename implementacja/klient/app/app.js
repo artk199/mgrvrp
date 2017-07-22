@@ -1,7 +1,8 @@
 require("./components/main/main.js");
+require("./components/map/map.js");
 require("./shared/vrp/vrp.js");
 require("./shared/util/log_panel/logPanel.js");
-require("./shared/map/map.js");
+
 
 var app = angular.module('mgrApp', [
   'pl.artk.vrp.main',

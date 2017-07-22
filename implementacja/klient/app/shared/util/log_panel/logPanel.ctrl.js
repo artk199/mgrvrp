@@ -3,13 +3,13 @@ module.exports = function($stomp, $scope, $log,logger,$interval){
     let ctrl = this;
     ctrl.logger = logger;
 
-    $interval(function () {
-      $scope.$apply();
-    }, 1000);
+    // $interval(function () {
+    //   $scope.$apply();
+    // }, 1000);
 
-    ctrl.test = function() {
-      logger.info("Hejjj");
-    }
+    // ctrl.test = function() {
+    //   logger.info("Hejjj");
+    // }
 
     $scope.wssData = ['ss'];
 

@@ -1,10 +1,12 @@
-module.exports = function(){
+module.exports = function($log){
 
    var srv = this;
    srv.logs = [];
 
    srv.info = function(message){
-     srv.logs.push("[INFO] " + message);
+     let msg = "[INFO] " + message;
+     $log.info(msg);
+     srv.logs.push(msg);
    }
 
 }
