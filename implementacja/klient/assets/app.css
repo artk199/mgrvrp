@@ -15,15 +15,16 @@
   content: "]";
 }
 
-.menu > li {
+.menu>li {
   display: inline;
 }
 
-.menu > li + li:before {
+.menu>li+li:before {
   content: "|";
   padding-right: 0.3em;
 }
 
-.log{
+.log {
   font-size: 12px;
+  max-height: 300px;
 }

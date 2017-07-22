@@ -7,6 +7,7 @@ class VRPProblem implements Validateable {
     List<VRPDepot> depots
     List<VRPCustomer> customers
     VRPFleet fleet
+    Map properties
 
     static constraints = {
         depots nullable: false, size: 1..10000000
