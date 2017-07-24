@@ -15,11 +15,13 @@ import pl.mgr.vrp.VRPLocation
 import pl.mgr.vrp.VRPProblem
 import pl.mgr.vrp.VRPRoute
 import pl.mgr.vrp.VRPService
+import pl.mgr.vrp.VRPSingleRoute
 import pl.mgr.vrp.VRPSolution
 
 @Transactional
 class JspritVRPService extends VRPService {
 
+    GraphHopperOSMService graphHopperOSMService
 
     private VehicleRoutingProblemSolution calculateRoutes(Location startLocation, List<Location> locations) {
         /*
@@ -101,12 +103,17 @@ class JspritVRPService extends VRPService {
                     it.end.location.coordinate.y
             )
             r.route = []
+            def lastLocation = r.start
             it.activities.each { activity ->
-                r.route += new VRPLocation(
+                VRPLocation location = new VRPLocation(
                         activity.location.coordinate.x,
                         activity.location.coordinate.y
                 )
+                VRPSingleRoute route = graphHopperOSMService.calculateRoute(lastLocation,location)
+                r.route += route
+                lastLocation = location
             }
+            r.route += graphHopperOSMService.calculateRoute(lastLocation,r.end)
             solution.routes += r
         }
         return solution

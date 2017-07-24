@@ -1,8 +1,9 @@
 package pl.mgr.vrp
 
-class VRPRoute {
+class VRPSingleRoute {
 
     VRPLocation start
     VRPLocation end
-    List<VRPSingleRoute> route
+    List<VRPLocation> route = []
+
 }

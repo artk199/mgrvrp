@@ -22,28 +22,30 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
   ctrl.solve = function() {
     VRPService.solve().then(
       function success(response) {
-        console.log(response.data.routes);
-        angular.forEach(response.data.routes, function(route, key) {
+        console.log(response.routes);
+        let colors = ['black','blue','brown','gray','green','orange','pink','purple','red','white','yellow']
+        let i = 0;
+        angular.forEach(response.routes, function(route, key) {
           logger.info("Route #" + key + " starts at: " + route.start);
-          let lastItem = route.start;
+
           angular.forEach(route.route, function(value, key) {
-            MapMarkerService.drawPath(
-              lastItem.coordinates.x,
-              lastItem.coordinates.y,
-              value.coordinates.x,
-              value.coordinates.y,
-              ctrl.map
-            );
-            lastItem = value;
+            let lastItem = null;
+            angular.forEach(value.route, function(singleRoute, key) {
+              if(lastItem != null){
+                MapMarkerService.drawPath(
+                  lastItem.coordinates.x,
+                  lastItem.coordinates.y,
+                  singleRoute.coordinates.x,
+                  singleRoute.coordinates.y,
+                  ctrl.map,
+                  colors[i%colors.length]
+                );
+              }
+              lastItem = singleRoute;
+            });
           });
-          MapMarkerService.drawPath(
-            lastItem.coordinates.x,
-            lastItem.coordinates.y,
-            route.end.coordinates.x,
-            route.end.coordinates.y,
-            ctrl.map
-          );
-          logger.info("Route #" + key + " ends at: " + route.end);
+          logger.info("Route #" + key + " ends at: " + JSON.stringify(route.end));
+          i++;
         });
       },
       function error(error) {

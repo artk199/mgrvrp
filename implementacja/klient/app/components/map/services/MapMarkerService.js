@@ -15,15 +15,15 @@ module.exports = function() {
   /**
   Rysuje linie na mapie
   **/
-  this.drawPath = function(srcLat,srcLng,dstLat,dstLng,map) {
+  this.drawPath = function(srcLat,srcLng,dstLat,dstLng,map,color) {
     var pointA = new L.LatLng(srcLat, srcLng);
     var pointB = new L.LatLng(dstLat, dstLng);
     var pointList = [pointA, pointB];
 
     var firstpolyline = new L.Polyline(pointList, {
-      color: 'green',
-      weight: 2,
-      opacity: 0.5,
+      color: color,
+      weight: 4,
+      opacity: 1,
       smoothFactor: 1
     });
     firstpolyline.addTo(map);
