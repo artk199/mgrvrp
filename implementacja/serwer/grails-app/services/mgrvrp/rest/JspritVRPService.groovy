@@ -109,13 +109,24 @@ class JspritVRPService extends VRPService {
                         activity.location.coordinate.x,
                         activity.location.coordinate.y
                 )
-                VRPSingleRoute route = graphHopperOSMService.calculateRoute(lastLocation,location)
+                VRPSingleRoute route = new VRPSingleRoute(start:lastLocation,end:location)
                 r.route += route
                 lastLocation = location
             }
-            r.route += graphHopperOSMService.calculateRoute(lastLocation,r.end)
+            r.route += new VRPSingleRoute(start:lastLocation,end:r.end)
             solution.routes += r
         }
+        logStep(solution)
+        solution.routes.each {
+
+            it.route.each { r ->
+                r.route = graphHopperOSMService.calculateRoute(r.start,r.end).route
+                sleep(100)
+                logStep(solution)
+            }
+
+        }
+
         return solution
     }
 }

@@ -1,5 +1,6 @@
 module.exports = function() {
 
+  let paths = [];
   /**
   Dodaje marker na mape
   **/
@@ -20,14 +21,20 @@ module.exports = function() {
     var pointB = new L.LatLng(dstLat, dstLng);
     var pointList = [pointA, pointB];
 
-    var firstpolyline = new L.Polyline(pointList, {
+    var path = new L.Polyline(pointList, {
       color: color,
-      weight: 4,
-      opacity: 1,
+      weight: 3,
+      opacity: 0.7,
       smoothFactor: 1
     });
-    firstpolyline.addTo(map);
-    console.log("Rysuje linie.");
+    paths.push(path);
+    path.addTo(map);
+  }
+
+  this.clearPaths = function(){
+    angular.forEach(paths,function(path){
+      path.remove();
+    })
   }
 
 }

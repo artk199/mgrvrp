@@ -28,3 +28,31 @@
   font-size: 12px;
   max-height: 300px;
 }
+
+.hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: background-color 0.5s;
+    z-index: 9999;
+    border-radius: 5px;
+}
+
+.loader {
+    border: 16px solid rgba(#454545, 0.42); /* Light grey */
+    border-top: 16px solid #59768a; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    margin: auto;
+    margin-top: 200px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
