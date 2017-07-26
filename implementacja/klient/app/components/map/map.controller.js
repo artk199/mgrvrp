@@ -1,22 +1,37 @@
-module.exports = function(VRPService, $window, MapLeafletService, MapMarkerService, logger) {
+module.exports = function(VRPService, $window, MapLeafletService, MapMarkerService, logger,$scope) {
 
   let ctrl = this;
   ctrl.map;
   ctrl.loading = false;
+  ctrl.selectedObject = {
+    object: {}
+  };
+  ctrl.depot = {
+    point: {},
+    marker: {},
+    type:"depot"
+  }
 
   function setUp() {
     ctrl.map = MapLeafletService.setUpMap();
 
     $window.addDepot = function(lat, lng) {
-      let depot = VRPService.addDepot(lat, lng);
-      MapMarkerService.addMarker(lat, lng, ctrl.map);
+      ctrl.map.removeLayer(ctrl.depot.marker);
+      ctrl.depot.point = VRPService.addDepot(lat, lng);
+      ctrl.depot.marker = MapMarkerService.addMarker(ctrl.depot.point, ctrl.map, "Depot");
+      ctrl.depot.marker.on('click', function(){
+        ctrl.selectedObject.object = ctrl.depot;
+        $scope.$apply();
+      });
       ctrl.map.closePopup();
+      $scope.$apply();
     }
 
     $window.addCustomer = function(lat, lng) {
       let customer = VRPService.addCustomer(lat, lng);
-      MapMarkerService.addMarker(lat, lng, ctrl.map, "customer");
+      MapMarkerService.addMarker(customer, ctrl.map, "Customer");
       ctrl.map.closePopup();
+      $scope.$apply();
     }
   }
 
@@ -28,7 +43,8 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
         ctrl.loading = false;
       },
       function error(error) {
-        logger.info("Error.");
+        logger.error(error);
+        ctrl.loading = false;
       },
       handleSolution
     );

@@ -35,15 +35,15 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(255, 255, 255, 0.5);
     transition: background-color 0.5s;
     z-index: 9999;
     border-radius: 5px;
 }
 
 .loader {
-    border: 16px solid rgba(#454545, 0.42); /* Light grey */
-    border-top: 16px solid #59768a; /* Blue */
+    border: 16px solid rgba(168, 168, 168, 0.44);
+    border-top: 16px solid rgba(0, 115, 194, 0.82);
     border-radius: 50%;
     width: 120px;
     height: 120px;

@@ -9,4 +9,12 @@ module.exports = function($log){
      srv.logs.push(msg);
    }
 
+   srv.error = function(error){
+     let msg = "[ERROR] " + JSON.stringify(error);
+     $log.info(msg);
+     srv.logs.push(msg);
+   }
+
+
+
 }

@@ -1,23 +1,5 @@
 <div class="container-fluid">
-  <div class="row well">
-    <div class="col-md-2">
-      <depot-picker depot="ctrl.depot"> </depot-picker>
-      <customers-picker customers="ctrl.customers"></customers-picker>
-      <properties-panel selected-object="fabric.selectedObject"></properties-panel>
-    </div>
-    <div class="col-md-10">
-      <div class="row">
-        <uib-tabset active="active">
-          <uib-tab index="1" heading="Mapa">
-            <map></map>
-          </uib-tab>
-          <uib-tab index="0" heading="Canvas">
-            <canvas fabric='fabric'></canvas>
-          </uib-tab>
-        </uib-tabset>
-      </div>
-    </div>
-  </div>
+  <map></map>
   <div class="row well">
     <log-panel></log-panel>
   </div>

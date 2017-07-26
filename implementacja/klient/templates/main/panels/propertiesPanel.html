@@ -1,10 +1,11 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         Current element
+        {{selectedObject}}
     </div>
     <div class="panel-body">
         <div ng-if='selectedObject'>
-            <div ng-switch='selectedObject.type'>
+            <div ng-switch='selectedObject.object.type'>
                 <div ng-switch-when='depot'>
                     <div class="form-group input-group input-group-sm">
                         <span class="input-group-addon" id="depot-name">name</span>

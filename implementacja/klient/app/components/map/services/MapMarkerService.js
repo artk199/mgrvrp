@@ -4,11 +4,12 @@ module.exports = function() {
   /**
   Dodaje marker na mape
   **/
-  this.addMarker = function(lat,lng,map,id=0) {
-    let marker = L.marker([lat, lng],{'draggable':true}).addTo(map);
-    marker.bindTooltip("Depot #"+id).openTooltip();
+  this.addMarker = function(point,map,prefix) {
+    let marker = L.marker([point.coordinates.x, point.coordinates.y],{'draggable':true}).addTo(map);
+    marker.bindTooltip(prefix+" #"+point.id).openTooltip();
     marker.on('dragend', function(event){
-      alert(";))");
+      point.coordinates.x = event.target._latlng.lat;
+      point.coordinates.y = event.target._latlng.lng;
     });
     return marker
   }

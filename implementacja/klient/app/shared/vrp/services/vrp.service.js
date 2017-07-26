@@ -15,25 +15,35 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
   };
 
   this.problem = defaultProblem;
-
+  
   this.addDepot = function(lat, lng) {
-    srv.problem.depots.push({
+    this.problem.depots = []
+    let depot = {
       coordinates: {
         x: lat,
         y: lng
-      }
-    });
+      },
+      id: 0
+    }
+    srv.problem.depots.push(depot);
     logger.info("Adding deport at " + lat + " " + lng);
+    return depot;
   };
 
   this.addCustomer = function(lat, lng) {
-    srv.problem.customers.push({
+    let id = 0;
+    if(srv.problem.customers.length > 0)
+      id = srv.problem.customers[srv.problem.customers.length-1].id+1
+    let customer = {
       coordinates: {
         x: lat,
         y: lng
-      }
-    });
+      },
+      id: id
+    }
+    srv.problem.customers.push(customer);
     logger.info("Adding customer at " + lat + " " + lng);
+    return customer;
   }
 
   this.solve = function() {
@@ -43,9 +53,12 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
       function(frame) {
         var subscription =
           $stomp.subscribe('/topic/hello', function(payload, headers, res) {
-            handleMessage(payload,deferred,subscription);
+            handleMessage(payload, deferred, subscription);
           }, {});
         $stomp.send('/app/vrp', srv.problem, {});
+      },
+      function() {
+        deferred.reject("Błąd połączenia z serwerem.");
       });
     return deferred.promise;
   }
@@ -55,7 +68,7 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
     srv.problem = defaultProblem;
   }
 
-  function handleMessage(payload,deferred,subscription) {
+  function handleMessage(payload, deferred, subscription) {
     if (payload.content.type === 'END') {
       subscription.unsubscribe();
       deferred.resolve(payload.content.message);
