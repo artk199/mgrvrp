@@ -52,7 +52,7 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
 
   function handleSolution(response) {
     MapMarkerService.clearPaths();
-    console.log(response.routes);
+    console.log(response);
     let colors = ['black','blue','brown','gray','green','orange','pink','purple','red','white','yellow'];
     let i = 0;
     angular.forEach(response.routes, function(route, key) {

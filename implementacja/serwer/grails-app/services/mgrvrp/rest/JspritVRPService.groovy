@@ -80,7 +80,7 @@ class JspritVRPService extends VRPService {
     }
 
     @Override
-    protected VRPSolution caluculateSolution(VRPProblem problem) {
+    protected VRPSolution calculateSolution(VRPProblem problem) {
         def depot = Location.newInstance(problem.depots[0].coordinates.x,problem.depots[0].coordinates.y)
         List<Location> customers = []
         for (def c in problem.customers) {

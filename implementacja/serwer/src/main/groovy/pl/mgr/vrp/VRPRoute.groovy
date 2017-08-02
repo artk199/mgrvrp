@@ -4,5 +4,6 @@ class VRPRoute {
 
     VRPLocation start
     VRPLocation end
-    List<VRPSingleRoute> route
+    List<VRPSingleRoute> route = []
+    
 }

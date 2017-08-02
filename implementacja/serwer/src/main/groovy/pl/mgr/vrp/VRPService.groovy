@@ -11,10 +11,10 @@ abstract class VRPService {
     @Autowired
     SimpMessagingTemplate brokerMessagingTemplate
 
-    abstract protected VRPSolution caluculateSolution(VRPProblem problem)
+    abstract protected VRPSolution calculateSolution(VRPProblem problem)
 
     VRPSolution solve(VRPProblem problem){
-        VRPSolution solution = caluculateSolution(problem)
+        VRPSolution solution = calculateSolution(problem)
         sendEndSignal(solution)
         return solution
     }
