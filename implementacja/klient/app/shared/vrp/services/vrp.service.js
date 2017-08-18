@@ -39,6 +39,7 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
         x: lat,
         y: lng
       },
+      demand: 50,
       id: id
     }
     srv.problem.customers.push(customer);

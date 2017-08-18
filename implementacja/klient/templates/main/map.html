@@ -3,19 +3,23 @@
     <div class="loader"></div>
   </div>
   <div class="row wrapper">
-    <div class="col-md-3">
+    <div class="col-md-3 properties-panel">
       <hr />
       <uib-accordion close-others="false">
         <div uib-accordion-group is-open="true" class="panel-default" heading="Settings">
-          <div class="form-group">
-            <label for="sel1">Geographical distance :</label>
+          <div class="form-group input-group input-group-sm">
+            <span class="input-group-addon">Maximum capacity</span>
+            <input type='number' class="form-control" aria-describedby="cap-label" ng-model="ctrl.settings.capacity" />
+          </div>
+          <div class="form-group input-group input-group-sm">
+            <span class="input-group-addon">Geographical distance</span>
             <select class="form-control" id="geo_distance" ng-model="ctrl.settings.geo_distance">
               <option value="spherical">Spherical</option>
               <option value="ellipsoidal">Ellipsoidal</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="sel1">Algorithm:</label>
+          <div class="form-group input-group input-group-sm">
+            <span class="input-group-addon">Algorithm</span>
             <select class="form-control" id="algorithm" ng-model="ctrl.settings.algorithm">
               <option value="jsprit">Jsprit</option>
               <option value="random">Random Path</option>

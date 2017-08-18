@@ -6,12 +6,11 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
 
   ctrl.settings = {
     algorithm: "jsprit",
-    geo_distance: "spherical"
+    geo_distance: "spherical",
+    capacity: 200
   }
 
-  ctrl.selectedObject = {
-    object: {}
-  };
+  ctrl.selectedObject = {};
   ctrl.depot = {
     point: {},
     marker: {},
@@ -26,16 +25,27 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
       ctrl.depot.point = VRPService.addDepot(lat, lng);
       ctrl.depot.marker = MapMarkerService.addMarker(ctrl.depot.point, ctrl.map, "Depot");
       ctrl.depot.marker.on('click', function() {
-        ctrl.selectedObject.object = ctrl.depot;
+        ctrl.selectedObject = ctrl.depot;
         $scope.$apply();
       });
+      ctrl.selectedObject = ctrl.depot;
       ctrl.map.closePopup();
       $scope.$apply();
     }
 
     $window.addCustomer = function(lat, lng) {
-      let customer = VRPService.addCustomer(lat, lng);
-      MapMarkerService.addMarker(customer, ctrl.map, "Customer");
+      let customer = {
+        point: {},
+        marker: {},
+        type: "customer"
+      }
+      customer.point = VRPService.addCustomer(lat, lng);
+      customer.marker = MapMarkerService.addMarker(customer.point, ctrl.map, "Customer");
+      customer.marker.on('click', function() {
+        ctrl.selectedObject = customer;
+        $scope.$apply();
+      });
+      ctrl.selectedObject = customer;
       ctrl.map.closePopup();
       $scope.$apply();
     }

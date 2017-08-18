@@ -38,18 +38,21 @@ class SavingsAlgorithmService extends VRPService  {
 
             if(!rI && !rJ){
                 //Jeżeli żaden z punktów (i,j) nie został dodany do ścieżki to tworzymy nową zawierającą i oraz j
-                solution.routes += createRoute(problem.depot,problem.depot,customer1,customer2)
+                VRPRoute createdRoute = createRoute(problem.depot,problem.depot,customer1,customer2)
+                if(validateCapacity(createdRoute,problem.maxCapacity)){
+                    solution.routes += createdRoute
+                }
                 log.info "Tworzenie nowej trasy..."
             }else if(!rI && !isInner(rJ, customer2)){
                 log.info "Dodawanie do drugiej trasy..."
-                addCustomerToRoute(rJ,customer2,customer1)
+                addCustomerToRoute(rJ,customer2,customer1,problem)
             }else if(!rJ && !isInner(rI, customer1)){
                 log.info "Dodawanie do pierwszej trasy..."
-                addCustomerToRoute(rI,customer1,customer2)
+                addCustomerToRoute(rI,customer1,customer2,problem)
             }else if((rJ != rI) && rJ && rI && !isInner(rJ,customer2) && !isInner(rI,customer1)){
                 log.info "Laczenie dwoch tras..."
                 VRPRoute merged = mergeRoutes(rI,customer1,rJ,customer2)
-                if(merged) {
+                if(merged && validateCapacity(merged,problem.maxCapacity)) {
                     removeRoute(solution.routes, rI)
                     removeRoute(solution.routes, rJ)
                     solution.routes += merged
@@ -61,6 +64,14 @@ class SavingsAlgorithmService extends VRPService  {
         }
         calculateDriveRoute(solution)
         solution
+    }
+
+    boolean validateCapacity(VRPRoute route, double maxCapacity) {
+        double sum = 0
+        route.points.each {
+            sum += it.demand
+        }
+        return sum <= maxCapacity
     }
 
     def removeRoute(List<VRPRoute> vrpRoutes, VRPRoute route) {
@@ -88,11 +99,15 @@ class SavingsAlgorithmService extends VRPService  {
         return merged
     }
 
-    def addCustomerToRoute(VRPRoute route, VRPCustomer c1, VRPCustomer c2) {
-        if(isLast(route,c1)){
-            route.points += c2
+    def addCustomerToRoute(VRPRoute route, VRPCustomer c1, VRPCustomer c2,VRPProblem problem) {
+        if(validateCapacity(route,problem.maxCapacity-c2.demand)) {
+            if (isLast(route, c1)) {
+                route.points += c2
+            } else {
+                route.points.plus(0, c2)
+            }
         }else{
-            route.points.plus(0,c2)
+            log.info "Nie mozna dodac punktu, przekroczona pojemnosc"
         }
     }
 

@@ -20,7 +20,9 @@ class VrpController{
     protected def index(String problem) {
         log.debug "Uruchomiono proces rozwiazywania VRP"
         def jsonSlurper = new JsonSlurper()
-        VRPProblem vrpProblem = VRPProblem.create(jsonSlurper.parseText(problem)['problem'])
+        Map parsedProblem = jsonSlurper.parseText(problem)
+        VRPProblem vrpProblem = VRPProblem.create(parsedProblem['problem'])
+        vrpProblem.maxCapacity = parsedProblem['settings']['capacity']
         validateVRPProblem(vrpProblem)
         VRPService vrpService = savingsAlgorithmService
         vrpService.solve(vrpProblem)
