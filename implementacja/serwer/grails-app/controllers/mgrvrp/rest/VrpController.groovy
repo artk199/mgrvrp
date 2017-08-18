@@ -22,12 +22,9 @@ class VrpController{
         log.debug "Uruchomiono proces rozwiazywania VRP"
         VRPService vrpService = savingsAlgorithmService
         def jsonSlurper = new JsonSlurper()
-
         Map parsedProblem = jsonSlurper.parseText(problem)
         VRPProblem vrpProblem = VRPProblem.create(parsedProblem['problem'])
         vrpProblem.maxCapacity = parsedProblem['settings']['capacity']
-
-        validateVRPProblem(vrpProblem)
         switch (parsedProblem['settings']['algorithm']){
             case 'jsprit':
                 vrpService = jspritVRPService
@@ -39,19 +36,6 @@ class VrpController{
                 vrpService = savingsAlgorithmService
         }
         vrpService.solve(vrpProblem)
-    }
-
-    private void validateVRPProblem(VRPProblem vrpProblem) {
-        if (!vrpProblem)
-            throw new VRPControllerException("Brak podanego problemu")
-
-        if (!vrpProblem.validate()) {
-            String message = ""
-            vrpProblem.errors.fieldErrors.each {
-                message += "${it.field} : ${it.rejectedValue}\n"
-            }
-            throw new VRPControllerException("Niepoprawny format problemu:\n ${message}")
-        }
     }
 
     def handleVRPControllerException(VRPControllerException exception){

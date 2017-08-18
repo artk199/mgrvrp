@@ -1,6 +1,6 @@
 <div>
   <div ng-if='selectedObject'>
-    <div ng-if='selectedObject.type !== undefined'>
+    <div ng-if='selectedObject.type == "customer" || selectedObject.type == "depot"'>
       <div class="form-group input-group input-group-sm">
         <span class="input-group-addon" id="basic-addon3">ID</span>
         <input type='number' disabled class="form-control" ng-model="selectedObject.point.id" />
@@ -16,6 +16,14 @@
       <div class="form-group input-group input-group-sm">
         <span class="input-group-addon" id="customer-y">y</span>
         <input type='number' class="form-control" disabled aria-describedby="cap-label" ng-model="selectedObject.point.coordinates.y" />
+      </div>
+    </div>
+    <div ng-if='selectedObject.type == "path"'>
+      <div class="form-group input-group input-group-sm">
+        <span class="input-group-addon" id="customer-x">Customers</span>
+        <div class="form-control">
+          <span ng-repeat="cust in selectedObject.path.points">{{cust.id}}{{$last ? '' : ', '}}</input>
+        </div>
       </div>
     </div>
   </div>

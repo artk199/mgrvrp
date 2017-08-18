@@ -13,7 +13,7 @@
           </div>
           <div class="form-group input-group input-group-sm">
             <span class="input-group-addon">Geographical distance</span>
-            <select class="form-control" id="geo_distance" ng-model="ctrl.settings.geo_distance">
+            <select class="form-control" disabled id="geo_distance" ng-model="ctrl.settings.geo_distance">
               <option value="spherical">Spherical</option>
               <option value="ellipsoidal">Ellipsoidal</option>
             </select>
@@ -21,9 +21,9 @@
           <div class="form-group input-group input-group-sm">
             <span class="input-group-addon">Algorithm</span>
             <select class="form-control" id="algorithm" ng-model="ctrl.settings.algorithm">
-              <option value="jsprit">Jsprit</option>
-              <option value="random">Random Path</option>
-              <option value="savings">Savings</option>
+              <option value="jsprit">Meta-heuristic (jsprit library)</option>
+              <option value="random">Random solution</option>
+              <option value="savings">Clarke and Wright savings</option>
             </select>
           </div>
         </div>

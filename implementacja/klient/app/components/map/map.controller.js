@@ -5,7 +5,7 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
   ctrl.loading = false;
 
   ctrl.settings = {
-    algorithm: "jsprit",
+    algorithm: "savings",
     geo_distance: "spherical",
     capacity: 200
   }
@@ -71,15 +71,15 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
     console.log(response);
     angular.forEach(response.routes, function(route, idx) {
       let from = route.start;
-      drawDriveRoute(route.driveRoute,idx);
+      drawDriveRoute(route,idx);
     });
   }
 
-  function drawDriveRoute(driveRoute,idx){
+  function drawDriveRoute(route,idx){
     let colors = ['black', 'blue', 'brown', 'gray', 'green', 'orange', 'pink', 'purple', 'red', 'white', 'yellow'];
-    let from = driveRoute[0];
-    angular.forEach(driveRoute, function(to, key) {
-      MapMarkerService.drawPath(
+    let from = route.driveRoute[0];
+    angular.forEach(route.driveRoute, function(to, key) {
+      let path = MapMarkerService.drawPath(
         from.coordinates.x,
         from.coordinates.y,
         to.coordinates.x,
@@ -87,6 +87,13 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
         ctrl.map,
         colors[idx % colors.length]
       );
+      path.on('click', function() {
+        ctrl.selectedObject = {
+          path: route,
+          type: 'path'
+        };
+        $scope.$apply();
+      });
       from = to;
     });
 

@@ -70,6 +70,10 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
   }
 
   function handleMessage(payload, deferred, subscription) {
+    if (payload.content.type === 'RUNTIME_ERROR') {
+      subscription.unsubscribe();
+      deferred.reject(payload.content.message);
+    }
     if (payload.content.type === 'END') {
       subscription.unsubscribe();
       deferred.resolve(payload.content.message);

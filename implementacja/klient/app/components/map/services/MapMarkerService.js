@@ -30,6 +30,7 @@ module.exports = function() {
     });
     paths.push(path);
     path.addTo(map);
+    return path;
   }
 
   this.clearPaths = function(){

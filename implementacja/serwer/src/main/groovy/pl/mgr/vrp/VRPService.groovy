@@ -21,9 +21,30 @@ abstract class VRPService {
     abstract protected VRPSolution calculateSolution(VRPProblem problem)
 
     VRPSolution solve(VRPProblem problem){
-        VRPSolution solution = calculateSolution(problem)
-        sendEndSignal(solution)
-        return solution
+        try {
+            validateVRPProblem(problem)
+            VRPSolution solution = calculateSolution(problem)
+            calculateDriveRoute(solution)
+            sendEndSignal(solution)
+            return solution
+        }catch (IllegalArgumentException ex){
+            log.error(ex.message)
+            logRuntimeError(ex.message)
+        }catch (Exception e){
+            e.printStackTrace()
+            logRuntimeError("Nieznany blad...")
+        }
+        return null
+    }
+
+    def logRuntimeError(String _message) {
+        def builder = new JsonBuilder()
+        builder {
+            type "RUNTIME_ERROR"
+            message _message
+            timestamp new Date()
+        }
+        send(builder)
     }
 
     def sendEndSignal(VRPSolution solution) {
@@ -34,6 +55,20 @@ abstract class VRPService {
             timestamp new Date()
         }
         send(builder)
+    }
+
+    private void validateVRPProblem(VRPProblem vrpProblem) {
+        if (!vrpProblem)
+            throw new IllegalArgumentException("Brak podanego problemu")
+
+        if (!vrpProblem.validate()) {
+            String message = ""
+            vrpProblem.errors.fieldErrors.each {
+                message += "${it.field} : ${it.rejectedValue}\n"
+            }
+            log.error message
+            throw new IllegalArgumentException("Niepoprawny format problemu.")
+        }
     }
 
     void logInfo(String info){
