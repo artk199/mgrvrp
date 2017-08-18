@@ -1,11 +1,11 @@
 package mgrvrp.rest
 
 import grails.transaction.Transactional
-import pl.mgr.vrp.VRPLocation
-import pl.mgr.vrp.VRPProblem
+import pl.mgr.vrp.model.VRPLocation
+import pl.mgr.vrp.model.VRPProblem
 
 @Transactional
-class VRPUtilService {
+class RoutingUtilService {
 
     private final double R = 6371.009
 

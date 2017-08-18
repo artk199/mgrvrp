@@ -1,14 +1,14 @@
 package mgrvrp.rest
 
 import grails.test.mixin.TestFor
-import pl.mgr.vrp.VRPLocation
+import pl.mgr.vrp.model.VRPLocation
 import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(VRPUtilService)
-class VRPUtilServiceSpec extends Specification {
+@TestFor(RoutingUtilService)
+class RoutingUtilServiceSpec extends Specification {
 
     def setup() {
     }

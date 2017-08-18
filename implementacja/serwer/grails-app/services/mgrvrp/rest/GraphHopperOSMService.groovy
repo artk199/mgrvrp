@@ -5,10 +5,8 @@ import com.graphhopper.GHResponse
 import com.graphhopper.GraphHopper
 import com.graphhopper.reader.osm.GraphHopperOSM
 import com.graphhopper.routing.util.EncodingManager
-import grails.transaction.Transactional
-import pl.mgr.vrp.VRPLocation
-import pl.mgr.vrp.VRPRoute
-import pl.mgr.vrp.VRPSingleRoute
+import pl.mgr.vrp.model.VRPLocation
+import pl.mgr.vrp.model.VRPPoint
 
 import javax.annotation.PostConstruct
 
@@ -25,7 +23,7 @@ class GraphHopperOSMService {
         graphHopper.importOrLoad()
     }
 
-    VRPSingleRoute calculateRoute(VRPLocation l1, VRPLocation l2){
+    List<VRPPoint> calculateRoute(VRPLocation l1, VRPLocation l2){
         GHRequest request = new GHRequest(
                 l1.coordinates.x,
                 l1.coordinates.y,
@@ -38,14 +36,11 @@ class GraphHopperOSMService {
             throw new RuntimeException("Route has errors!")
         }
         def best = route.getBest()
-        VRPSingleRoute singleRoute = new VRPSingleRoute()
-        singleRoute.start = l1
-        singleRoute.end = l2
+        def result = []
         best.points.each {
-            VRPLocation location = new VRPLocation(it.lat,it.lon)
-            singleRoute.route += location
+            result += new VRPPoint(it.lat,it.lon)
         }
-        return singleRoute
+        return result
     }
 
 }

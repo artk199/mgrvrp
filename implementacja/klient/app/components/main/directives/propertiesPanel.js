@@ -4,7 +4,8 @@ module.exports = function(){
     templateUrl: 'templates/main/panels/propertiesPanel.html',
     scope: {
       selectedObject: "="
-    }
+    },
+    replace: true
   }
 
 }

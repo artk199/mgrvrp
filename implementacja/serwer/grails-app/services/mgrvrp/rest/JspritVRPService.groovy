@@ -11,12 +11,13 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleType
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl
 import com.graphhopper.jsprit.core.util.Solutions
 import grails.transaction.Transactional
-import pl.mgr.vrp.VRPLocation
-import pl.mgr.vrp.VRPProblem
-import pl.mgr.vrp.VRPRoute
+import pl.mgr.vrp.model.VRPLocation
+
 import pl.mgr.vrp.VRPService
-import pl.mgr.vrp.VRPSingleRoute
-import pl.mgr.vrp.VRPSolution
+import pl.mgr.vrp.model.VRPProblem
+import pl.mgr.vrp.model.VRPRoute
+import pl.mgr.vrp.model.VRPPoint
+import pl.mgr.vrp.model.VRPSolution
 
 @Transactional
 class JspritVRPService extends VRPService {
@@ -24,27 +25,20 @@ class JspritVRPService extends VRPService {
     GraphHopperOSMService graphHopperOSMService
 
     private VehicleRoutingProblemSolution calculateRoutes(Location startLocation, List<Location> locations) {
-        /*
-         *  Define vehicle
-         */
-        //define index of weight capacity
+
         final int WEIGHT_INDEX = 0
 
-        //define vehicle type with weight capacity 2
         VehicleTypeImpl.Builder vehicleTypeBuilder =
                 VehicleTypeImpl.Builder.newInstance('vehicleType')
                         .addCapacityDimension(WEIGHT_INDEX, 5)
         VehicleType vehicleType = vehicleTypeBuilder.build()
 
-        //define vehicle
+
         VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance('vehicle')
         vehicleBuilder.setStartLocation(startLocation)
         vehicleBuilder.setType(vehicleType)
         VehicleImpl vehicle = vehicleBuilder.build()
 
-        /*
-         *  Define deliveries
-         */
         List<Service> services = [];
         locations.eachWithIndex{ entry, i ->
             services += Service.Builder.newInstance("${i}")
@@ -53,30 +47,16 @@ class JspritVRPService extends VRPService {
                     .build()
         }
 
-        /*
-         *  define a vehicle routing problem
-         */
         VehicleRoutingProblem.Builder problemBuilder = VehicleRoutingProblem.Builder.newInstance()
         problemBuilder.addVehicle(vehicle)
         problemBuilder.addAllJobs(services)
         VehicleRoutingProblem problem = problemBuilder.build()
 
-        /*
-         * get the algorithm out-of-the-box
-         */
         VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(problem)
-
-        /*
-         *  search a solution
-         */
         Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions()
-
-        /*
-         *  use the static helper-method to get the best solution
-         */
         VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions)
 
-        return bestSolution;
+        return bestSolution
     }
 
     @Override
@@ -102,31 +82,22 @@ class JspritVRPService extends VRPService {
                     it.end.location.coordinate.x,
                     it.end.location.coordinate.y
             )
-            r.route = []
+            r.points = []
             def lastLocation = r.start
             it.activities.each { activity ->
                 VRPLocation location = new VRPLocation(
                         activity.location.coordinate.x,
                         activity.location.coordinate.y
                 )
-                VRPSingleRoute route = new VRPSingleRoute(start:lastLocation,end:location)
-                r.route += route
+                VRPPoint route = new VRPPoint()
+                r.points += route
                 lastLocation = location
             }
-            r.route += new VRPSingleRoute(start:lastLocation,end:r.end)
+            r.points += new VRPPoint()
             solution.routes += r
         }
         logStep(solution)
-        solution.routes.each {
-
-            it.route.each { r ->
-                r.route = graphHopperOSMService.calculateRoute(r.start,r.end).route
-                sleep(100)
-                logStep(solution)
-            }
-
-        }
-
+        calculateDriveRoute(solution)
         return solution
     }
 }

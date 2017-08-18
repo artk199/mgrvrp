@@ -15,7 +15,7 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
   };
 
   this.problem = defaultProblem;
-  
+
   this.addDepot = function(lat, lng) {
     this.problem.depots = []
     let depot = {
@@ -46,7 +46,7 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
     return customer;
   }
 
-  this.solve = function() {
+  this.solve = function(settings) {
     var deferred = $q.defer();
     let promise = this;
     $stomp.connect('http://localhost:9090/stomp').then(
@@ -55,7 +55,7 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
           $stomp.subscribe('/topic/hello', function(payload, headers, res) {
             handleMessage(payload, deferred, subscription);
           }, {});
-        $stomp.send('/app/vrp', srv.problem, {});
+        $stomp.send('/app/vrp', { problem: srv.problem, settings: settings }, {});
       },
       function() {
         deferred.reject("Błąd połączenia z serwerem.");

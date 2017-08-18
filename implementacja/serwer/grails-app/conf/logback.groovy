@@ -21,6 +21,10 @@ appender('STDOUT', ConsoleAppender) {
     }
 }
 
+
+logger("mgrvrp.rest", ALL, ['STDOUT'], false)
+logger("pl.mgr.vrp", ALL, ['STDOUT'], false)
+
 def targetDir = BuildSettings.TARGET_DIR
 if (Environment.isDevelopmentMode() && targetDir != null) {
     appender("FULL_STACKTRACE", FileAppender) {
