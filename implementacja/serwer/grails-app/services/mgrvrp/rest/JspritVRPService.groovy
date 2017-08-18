@@ -22,30 +22,20 @@ import pl.mgr.vrp.model.VRPSolution
 @Transactional
 class JspritVRPService extends VRPService {
 
+    final int WEIGHT_INDEX = 0
     GraphHopperOSMService graphHopperOSMService
 
-    private VehicleRoutingProblemSolution calculateRoutes(Location startLocation, List<Location> locations) {
-
-        final int WEIGHT_INDEX = 0
+    private VehicleRoutingProblemSolution calculateRoutes(Location startLocation, List<Service> services, double maxCapacity) {
 
         VehicleTypeImpl.Builder vehicleTypeBuilder =
                 VehicleTypeImpl.Builder.newInstance('vehicleType')
-                        .addCapacityDimension(WEIGHT_INDEX, 5)
+                        .addCapacityDimension(WEIGHT_INDEX, (int)maxCapacity)
         VehicleType vehicleType = vehicleTypeBuilder.build()
-
 
         VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance('vehicle')
         vehicleBuilder.setStartLocation(startLocation)
         vehicleBuilder.setType(vehicleType)
         VehicleImpl vehicle = vehicleBuilder.build()
-
-        List<Service> services = [];
-        locations.eachWithIndex{ entry, i ->
-            services += Service.Builder.newInstance("${i}")
-                    .addSizeDimension(WEIGHT_INDEX, 1)
-                    .setLocation(entry)
-                    .build()
-        }
 
         VehicleRoutingProblem.Builder problemBuilder = VehicleRoutingProblem.Builder.newInstance()
         problemBuilder.addVehicle(vehicle)
@@ -62,11 +52,16 @@ class JspritVRPService extends VRPService {
     @Override
     protected VRPSolution calculateSolution(VRPProblem problem) {
         def depot = Location.newInstance(problem.depots[0].coordinates.x,problem.depots[0].coordinates.y)
-        List<Location> customers = []
+
+        List<Service> services = []
         for (def c in problem.customers) {
-            customers.add(Location.newInstance(c.coordinates.x, c.coordinates.y))
+            services += Service.Builder.newInstance("${c.id}")
+                    .addSizeDimension(WEIGHT_INDEX, (int)c.demand)
+                    .setLocation(Location.newInstance(c.coordinates.x, c.coordinates.y))
+                    .build()
         }
-        def solution = calculateRoutes(depot,customers)
+
+        def solution = calculateRoutes(depot,services,problem.maxCapacity)
         return translateSolution(solution)
     }
 
@@ -83,21 +78,17 @@ class JspritVRPService extends VRPService {
                     it.end.location.coordinate.y
             )
             r.points = []
-            def lastLocation = r.start
             it.activities.each { activity ->
-                VRPLocation location = new VRPLocation(
+                VRPPoint point = new VRPPoint(
                         activity.location.coordinate.x,
                         activity.location.coordinate.y
                 )
-                VRPPoint route = new VRPPoint()
-                r.points += route
-                lastLocation = location
+                r.points += point
             }
-            r.points += new VRPPoint()
             solution.routes += r
         }
         logStep(solution)
-        calculateDriveRoute(solution)
+        calculateNormalRoute(solution)
         return solution
     }
 }

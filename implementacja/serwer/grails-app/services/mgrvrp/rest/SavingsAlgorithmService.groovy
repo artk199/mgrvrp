@@ -60,9 +60,8 @@ class SavingsAlgorithmService extends VRPService  {
             }else{
                 //log.info "Nie moge nic zrobic z oszczednoscia: ${saving}"
             }
-            calculateNormalRoute(solution)
         }
-        calculateDriveRoute(solution)
+        calculateNormalRoute(solution)
         solution
     }
 

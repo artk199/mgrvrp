@@ -15,16 +15,29 @@ class VrpController{
 
     JspritVRPService jspritVRPService
     SavingsAlgorithmService savingsAlgorithmService
+    RandomRoutesService randomRoutesService
 
     @MessageMapping("/vrp")
     protected def index(String problem) {
         log.debug "Uruchomiono proces rozwiazywania VRP"
+        VRPService vrpService = savingsAlgorithmService
         def jsonSlurper = new JsonSlurper()
+
         Map parsedProblem = jsonSlurper.parseText(problem)
         VRPProblem vrpProblem = VRPProblem.create(parsedProblem['problem'])
         vrpProblem.maxCapacity = parsedProblem['settings']['capacity']
+
         validateVRPProblem(vrpProblem)
-        VRPService vrpService = savingsAlgorithmService
+        switch (parsedProblem['settings']['algorithm']){
+            case 'jsprit':
+                vrpService = jspritVRPService
+                break
+            case 'random':
+                vrpService = randomRoutesService
+                break
+            case 'savings':
+                vrpService = savingsAlgorithmService
+        }
         vrpService.solve(vrpProblem)
     }
 
