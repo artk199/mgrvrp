@@ -9,7 +9,7 @@ module.exports = function() {
   return {
     restrict: 'E',
     templateUrl: 'templates/util/logPanel.html',
-    controller: "",
+    controller: LogPanelCtrl,
     controllerAs: 'ctrl',
     bindToController: true,
     scope: {}
