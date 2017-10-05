@@ -12,6 +12,13 @@
             <input type='number' class="form-control" aria-describedby="cap-label" ng-model="ctrl.settings.capacity" />
           </div>
           <div class="form-group input-group input-group-sm">
+            <span class="input-group-addon">Distance calculation</span>
+            <select class="form-control" id="distance" ng-model="ctrl.settings.distance">
+              <option value="air">Air</option>
+              <option value="road">Road</option>
+            </select>
+          </div>
+          <div ng-if="ctrl.settings.distance == 'air'" class="form-group input-group input-group-sm">
             <span class="input-group-addon">Geographical distance</span>
             <select class="form-control" disabled id="geo_distance" ng-model="ctrl.settings.geo_distance">
               <option value="spherical">Spherical</option>

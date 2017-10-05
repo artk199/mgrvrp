@@ -4,11 +4,7 @@ module.exports = function(VRPService, $window, MapLeafletService, MapMarkerServi
   ctrl.map;
   ctrl.loading = false;
 
-  ctrl.settings = {
-    algorithm: "savings",
-    geo_distance: "spherical",
-    capacity: 200
-  }
+  ctrl.settings = VRPService.getSettings();
 
   ctrl.selectedObject = {};
   ctrl.depot = {

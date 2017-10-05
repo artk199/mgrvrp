@@ -11,7 +11,7 @@ buildscript {
 }
 
 version "0.1"
-group "mgrvrp.rest"
+group "pl.mgr.vrp"
 
 apply plugin: "eclipse"
 apply plugin: "idea"
@@ -56,8 +56,8 @@ dependencies {
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
 
 
-    compile group: 'com.graphhopper', name: 'jsprit-core', version: '1.7'
-    compile group: 'com.graphhopper', name: 'graphhopper-reader-osm', version: '0.8.0'
+    compile (group: 'com.graphhopper', name: 'jsprit-core', version: '1.7') { exclude module: "slf4j-log4j12"}
+    compile (group: 'com.graphhopper', name: 'graphhopper-reader-osm', version: '0.8.0') { exclude module: "slf4j-log4j12"}
 
     compile 'org.grails.plugins:quartz:2.0.12'
     compile 'org.grails.plugins:grails-spring-websocket:2.3.0'

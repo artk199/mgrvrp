@@ -3,18 +3,25 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
   let srv = this;
 
   let config = {
-    serviceURL: "http://localhost:9090/vrp"
+    serviceURL: "http://46.41.150.128:8080/vrp"
   };
 
   let defaultProblem = {
     depots: [],
     customers: [],
-    fleet: {
-      size: 5
+    settings: {
+      algorithm: "savings",
+      distance: "air",
+      geo_distance: "spherical",
+      capacity: 200
     }
   };
 
   this.problem = defaultProblem;
+
+  this.getSettings = function(){
+    return srv.problem.settings;
+  }
 
   this.addDepot = function(lat, lng) {
     this.problem.depots = []
@@ -50,13 +57,13 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
   this.solve = function(settings) {
     var deferred = $q.defer();
     let promise = this;
-    $stomp.connect('http://localhost:9090/stomp').then(
+    $stomp.connect('http://46.41.150.128:8080/stomp').then(
       function(frame) {
         var subscription =
           $stomp.subscribe('/topic/hello', function(payload, headers, res) {
             handleMessage(payload, deferred, subscription);
           }, {});
-        $stomp.send('/app/vrp', { problem: srv.problem, settings: settings }, {});
+        $stomp.send('/app/vrp', srv.problem, {});
       },
       function() {
         deferred.reject("Błąd połączenia z serwerem.");
@@ -86,7 +93,6 @@ module.exports = function VRPService(logger, $http, $stomp, $q) {
     }
     console.log(payload);
   }
-
 
 
 }

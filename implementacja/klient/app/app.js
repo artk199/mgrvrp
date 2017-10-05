@@ -1,7 +1,7 @@
-require("./components/main/main.js");
-require("./components/map/map.js");
-require("./shared/vrp/vrp.js");
-require("./shared/util/log_panel/logPanel.js");
+require("./components/main/main.module.js");
+require("./components/map/map.module.js");
+require("./shared/vrp/vrp.module.js");
+require("./shared/util/log_panel/log-panel.module.js");
 
 
 var app = angular.module('mgrApp', [

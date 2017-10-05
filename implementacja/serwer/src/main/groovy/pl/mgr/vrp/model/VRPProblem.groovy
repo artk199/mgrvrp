@@ -7,8 +7,7 @@ class VRPProblem implements Validateable {
 
     List<VRPDepot> depots
     List<VRPCustomer> customers
-    double maxCapacity
-    VRPFleet fleet
+    Map settings
 
     static VRPProblem create(def params) {
         VRPProblem problem = new VRPProblem(params)
@@ -24,10 +23,18 @@ class VRPProblem implements Validateable {
         return depots[0]
     }
 
+    double getMaxCapacity(){
+        return settings['capacity']?:Double.MAX_VALUE
+    }
+
+    String getDistanceType() {
+        return settings['distance']?:'air'
+    }
+
     static constraints = {
         depots nullable: false, size: 1..10000000
         customers nullable: false, size: 1..10000000
-        //TODO://Dodac walidator maxCap vs customers
-        fleet nullable: false
     }
+
+
 }

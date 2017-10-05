@@ -17,6 +17,7 @@ public class CorsFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain chain)
             throws ServletException, IOException {
+        System.out.println("CORSUJE!!!!");
         String origin = req.getHeader("Origin");
 
         boolean options = "OPTIONS".equals(req.getMethod());
