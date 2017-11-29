@@ -1,0 +1,13 @@
+<h3 mat-dialog-title>Add intrest point</h3>
+<mat-dialog-content>
+    <mat-form-field>
+      <input matInput placeholder="Name" required value="" [(ngModel)]="name">
+      <mat-hint align="start">At position: x:{{data.coordinate.x | number:'1.4-4'}}, y:{{data.coordinate.y |
+        number:'1.4-4'}}
+      </mat-hint>
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button [disabled]="name == ''" mat-dialog-close (click)="addCustomer()">Add customer</button>
+  <button mat-raised-button [disabled]="name == ''" mat-dialog-close (click)="addDepot()">Add depot</button>
+</mat-dialog-actions>

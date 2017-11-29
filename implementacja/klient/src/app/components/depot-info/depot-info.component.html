@@ -1,0 +1,25 @@
+<mat-list *ngIf="depot" dense>
+  <mat-list-item>
+    <mat-icon matListIcon>info</mat-icon>
+    <h3 matLine> Name </h3>
+    <p matLine>
+      <span> {{depot.name}} </span>
+    </p></mat-list-item>
+  <mat-list-item>
+    <mat-icon matListIcon>place</mat-icon>
+    <h3 matLine> X </h3>
+    <p matLine>
+      <span> {{depot.coordinates.x}} </span>
+    </p>
+  </mat-list-item>
+  <mat-list-item>
+    <mat-icon matListIcon>place</mat-icon>
+    <h3 matLine> Y </h3>
+    <p matLine>
+      <span> {{depot.coordinates.y}} </span>
+    </p>
+  </mat-list-item>
+</mat-list>
+<div *ngIf="!depot">
+  None.
+</div>

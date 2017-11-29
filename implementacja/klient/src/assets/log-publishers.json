@@ -1,0 +1,10 @@
+[
+  {
+    "loggerName": "console",
+    "isActive": true
+  },
+  {
+    "loggerName": "localstorage",
+    "isActive": true
+  }
+]

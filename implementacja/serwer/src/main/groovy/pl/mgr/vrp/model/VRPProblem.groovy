@@ -12,23 +12,23 @@ class VRPProblem implements Validateable {
     static VRPProblem create(def params) {
         VRPProblem problem = new VRPProblem(params)
         problem.customers = problem.customers.collect {
-            if(it instanceof LazyMap)
+            if (it instanceof LazyMap)
                 return new VRPCustomer(it)
             it
         }
         problem
     }
 
-    VRPDepot getDepot(){
+    VRPDepot getDepot() {
         return depots[0]
     }
 
-    double getMaxCapacity(){
-        return settings['capacity']?:Double.MAX_VALUE
+    double getMaxCapacity() {
+        return settings['capacity'] ?: Double.MAX_VALUE
     }
 
     String getDistanceType() {
-        return settings['distance']?:'air'
+        return settings['distance'] ?: 'air'
     }
 
     static constraints = {

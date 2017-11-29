@@ -1,0 +1,23 @@
+mat-card {
+  margin: 10px;
+}
+
+.main-menu {
+  position: absolute;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 33vw;
+  height: 83vh;
+}
+
+.tabs-content {
+  width: calc(100% + 48px);
+  margin: 0 -24px 16px -24px;
+  margin-top: -24px !important;
+}
+
+.tabs-card {
+  height: 80%;
+}
+
