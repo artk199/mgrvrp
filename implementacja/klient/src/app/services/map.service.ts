@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
 import * as L from 'leaflet';
-import {VrpAddDialogComponent} from '../components/map/map.component';
 import {Coordinate} from '../domain/Coordinate';
-import {MatDialog} from '@angular/material';
 import {VRPCustomer} from '../domain/VRPCustomer';
 import {VRPDepot} from '../domain/VRPDepot';
 
@@ -32,12 +30,26 @@ export class MapService {
    * - dodaje menu dodawania nowego customera/depotu po kliknieciu na mapę
    */
   public setupMap() {
+
     this._map = L.map(this.MAP_ID, {
       zoomControl: false
     }).setView([this.options.baseLat, this.options.baseLng], this.options.baseZoom);
+
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this._map);
+
+    L.control.zoom({
+      position: 'topright'
+    }).addTo(this._map);
+  }
+
+  public changeToSimplePlane(){
+    this._map.remove();
+    this._map = L.map(this.MAP_ID, {
+      crs: L.CRS.Simple,
+      zoomControl: false
+    }).setView([50, 50], 5);
 
     L.control.zoom({
       position: 'topright'
