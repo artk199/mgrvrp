@@ -1,0 +1,17 @@
+<mat-table #table [dataSource]="dataSource">
+
+  <ng-container matColumnDef="id">
+    <mat-header-cell *matHeaderCellDef> ID</mat-header-cell>
+    <mat-cell *matCellDef="let problem"> {{problem.id}}</mat-cell>
+  </ng-container>
+
+  <ng-container matColumnDef="size">
+    <mat-header-cell *matHeaderCellDef> Size:</mat-header-cell>
+    <mat-cell *matCellDef="let problem">{{problem.customers.length}}</mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
+  <mat-row *matRowDef="let problem; columns: displayedColumns;"></mat-row>
+
+</mat-table>

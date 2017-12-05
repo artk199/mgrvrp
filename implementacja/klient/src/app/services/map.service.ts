@@ -8,7 +8,6 @@ import {VRPDepot} from '../domain/VRPDepot';
 export class MapService {
 
   public MAP_ID = 'mapid';
-
   private options = {
     baseLat: 54.3745016,
     baseLng: 18.6115296,

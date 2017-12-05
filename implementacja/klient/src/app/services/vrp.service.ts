@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {VRPDepot} from '../domain/VRPDepot';
+import {VRPProblem} from '../domain/VRPProblem';
 import {MapService} from './map.service';
 
 /**
@@ -11,11 +12,16 @@ import {MapService} from './map.service';
 @Injectable()
 export class VRPService {
 
+
+  currentProblem: VRPProblem = new VRPProblem("1");
+
+
   constructor(private mapService: MapService) {
   }
 
-  private customers: BehaviorSubject<VRPCustomer[]> = new BehaviorSubject<VRPCustomer[]>([]);
-  private depots: BehaviorSubject<VRPDepot[]> = new BehaviorSubject<VRPDepot[]>([]);
+  private problems: BehaviorSubject<VRPProblem[]> = new BehaviorSubject<VRPProblem[]>([this.currentProblem]);
+  private customers: BehaviorSubject<VRPCustomer[]> = new BehaviorSubject<VRPCustomer[]>(this.currentProblem.customers);
+  private depots: BehaviorSubject<VRPDepot[]> = new BehaviorSubject<VRPDepot[]>(this.currentProblem.depots);
 
   get depotsData(): VRPDepot[] {
     return this.depots.value;
@@ -67,4 +73,7 @@ export class VRPService {
     this.mapService.addDepotToMap(depot);
   }
 
+  getProblems(){
+    return this.problems;
+  }
 }
