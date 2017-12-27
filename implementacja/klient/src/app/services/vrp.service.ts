@@ -76,4 +76,26 @@ export class VRPService {
   getProblems(){
     return this.problems;
   }
+
+  //Dodaje nowy problem do listy problemow ostatnio rozwiązywanych
+  addProblem(problem: VRPProblem) {
+    //Dodanie do listy problemów
+    let copiedData = this.problems.value.slice();
+    copiedData.push(problem);
+    this.problems.next(copiedData);
+
+    //Wyczyszczenie mapy + listy depotów + customerów
+    this.mapService.clearMap();
+    this.depots.next([]);
+    this.customers.next([]);
+
+    for(let customer of problem.customers){
+      this.addCustomer(customer);
+    }
+
+    for(let depot of problem.depots){
+      this.addDepot(depot);
+    }
+  }
+
 }

@@ -56,6 +56,14 @@ export class MapService {
   }
 
   /**
+   * Usuwa i tworzy od nowa mapę - hard reset
+   */
+  public clearMap(){
+    this._map.remove();
+    this.setupMap();
+  }
+
+  /**
    * Dodaje marker na mape
    */
   public addCustomerToMap(customer: VRPCustomer) {

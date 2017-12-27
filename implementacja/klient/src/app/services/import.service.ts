@@ -4,6 +4,7 @@ import {VRPService} from './vrp.service';
 import {VRPCustomer} from '../domain/VRPCustomer';
 import {Coordinate} from '../domain/Coordinate';
 import {VRPDepot} from '../domain/VRPDepot';
+import {VRPProblem} from '../domain/VRPProblem';
 
 @Injectable()
 export class ImportService {
@@ -66,14 +67,19 @@ export class ImportService {
           break;
       }
     }
+
+    let problem = new VRPProblem('!'); //TODO: Set unique ID
+
     for(let node of nodes){
       if(node.isDepot){
         let d = new VRPDepot(node.id, new Coordinate(node.x,node.y));
-        this.vRPService.addDepot(d);
+        problem.setDepot(d);
       }else{
         let c = new VRPCustomer(node.id,new Coordinate(node.x,node.y));
-        this.vRPService.addCustomer(c);
+        problem.addCustomer(c);
       }
     }
+
+    this.vRPService.addProblem(problem);
   }
 }
