@@ -62,8 +62,10 @@ export class MapService {
    * Usuwa i tworzy od nowa mapę - hard reset
    */
   public clearMap(){
-    this._map.remove();
-    this.setupMap();
+    let s = this;
+    s._map.eachLayer(function (layer) {
+      s._map.removeLayer(layer);
+    });
   }
 
   /**
@@ -91,7 +93,8 @@ export class MapService {
   private addMarker(coordinates: Coordinate, icon, name) {
     const opts = {
       draggable: true,
-      icon: icon
+      icon: icon,
+      title: ''
     };
     const marker = L.marker(
       [coordinates.x, coordinates.y], opts).addTo(this._map);

@@ -7,12 +7,11 @@ import 'rxjs/add/observable/of';
 
 @Component({
   selector: 'vrp-customers-list',
-  templateUrl: './customers-list.component.html',
-  styleUrls: ['./customers-list.component.css']
+  templateUrl: './customers-list.component.html'
 })
 export class CustomersListComponent implements OnInit {
 
-  displayedColumns = ['actions', 'id', 'coords', 'demand'];
+  displayedColumns = ['id', 'coords', 'demand', 'actions'];
   dataSource;
 
   constructor(private vrpService: VRPService) {
@@ -20,6 +19,10 @@ export class CustomersListComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  deleteCustomer(customer){
+    this.vrpService.deleteCustomer(customer);
   }
 
 }

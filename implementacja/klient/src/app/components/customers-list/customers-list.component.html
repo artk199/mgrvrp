@@ -6,7 +6,10 @@
 
   <ng-container matColumnDef="coords">
     <mat-header-cell *matHeaderCellDef> Coords</mat-header-cell>
-    <mat-cell *matCellDef="let customer"> x: {{customer.coordinates.x | number:'1.5-5'}}, y: {{customer.coordinates.y | number:'1.5-5'}} </mat-cell>
+    <mat-cell *matCellDef="let customer">
+      <pre>x: {{customer.coordinates.x | number:'1.5-5'}}
+y: {{customer.coordinates.y | number:'1.5-5'}}</pre>
+    </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="demand">
@@ -16,7 +19,10 @@
 
   <ng-container matColumnDef="actions">
     <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
-    <mat-cell *matCellDef="let customer"> <mat-icon>edit</mat-icon>
+    <mat-cell *matCellDef="let customer">
+      <div class="button-row">
+        <button mat-button (click)="deleteCustomer(customer)">Delete</button>
+      </div>
     </mat-cell>
   </ng-container>
 

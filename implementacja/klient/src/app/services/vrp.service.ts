@@ -47,9 +47,7 @@ export class VRPService {
    */
   addCustomer(customer: VRPCustomer) {
     this.currentProblem.addCustomer(customer);
-    const copiedData = this.customersData.slice();
-    copiedData.push(customer);
-    this.customers.next(copiedData);
+    this.customers.next(this.currentProblem.customers);
     this.mapService.addCustomerToMap(customer);
   }
 
@@ -117,10 +115,6 @@ export class VRPService {
 
   }
 
-  public getCurrentProblem(){
-    return this.currentProblem;
-  }
-
   private refreshMap() {
     this.mapService.clearMap();
     for (let customer of this.customersData) {
@@ -130,5 +124,18 @@ export class VRPService {
     for (let depot of this.depotsData) {
       this.mapService.addDepotToMap(depot);
     }
+  }
+
+  /**
+   * Usuwa customera z aktualnego problemu
+   * @param {VRPCustomer} customer
+   */
+  deleteCustomer(customer: VRPCustomer) {
+    var index = this.currentProblem.customers.indexOf(customer, 0);
+    if (index > -1) {
+      this.currentProblem.customers.splice(index, 1);
+    }
+    this.customers.next(this.currentProblem.customers);
+    this.refreshMap(); //TODO: Usunac tylko aktualny marker! jak? dunno.
   }
 }
