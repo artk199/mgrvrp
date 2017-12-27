@@ -1,17 +1,37 @@
-<mat-table #table [dataSource]="dataSource">
+<div>
+  <mat-table #table [dataSource]="dataSource">
 
-  <ng-container matColumnDef="id">
-    <mat-header-cell *matHeaderCellDef> ID</mat-header-cell>
-    <mat-cell *matCellDef="let problem"> {{problem.id}}</mat-cell>
-  </ng-container>
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef> ID</mat-header-cell>
+      <mat-cell *matCellDef="let problem"> {{problem.id}}</mat-cell>
+    </ng-container>
 
-  <ng-container matColumnDef="size">
-    <mat-header-cell *matHeaderCellDef> Size:</mat-header-cell>
-    <mat-cell *matCellDef="let problem">{{problem.customers.length}}</mat-cell>
-  </ng-container>
+    <ng-container matColumnDef="size">
+      <mat-header-cell *matHeaderCellDef> Size:</mat-header-cell>
+      <mat-cell *matCellDef="let problem">{{problem.customers.length}}</mat-cell>
+    </ng-container>
 
-  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef> Actions:</mat-header-cell>
+      <mat-cell *matCellDef="let problem">
+        <div class="button-row" *ngIf="problem.id != currentProblem.id">
+          <button mat-button (click)="loadProblem(problem)">Load</button>
+        </div>
+      </mat-cell>
+    </ng-container>
 
-  <mat-row *matRowDef="let problem; columns: displayedColumns;"></mat-row>
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
 
-</mat-table>
+    <mat-row *matRowDef="let problem; columns: displayedColumns;" [class.current-problem]="problem.id == currentProblem.id"></mat-row>
+
+  </mat-table>
+
+  <div class="button-row" class="add-panel">
+    <button mat-button>Add new</button>
+  </div>
+
+  <div class="add-panel">
+    <input name="vrp-upload" id="vrp-upload" type="file" (change)="uploadFile($event)" accept=".vrp"/>
+  </div>
+
+</div>

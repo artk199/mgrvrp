@@ -8,7 +8,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {VrpComponent} from './vrp.component';
 import {MainMenuComponent} from './components/main-menu/main-menu.component';
-import {FileImportComponent} from './components/file-import/file-import.component';
 import {CustomersListComponent} from './components/customers-list/customers-list.component';
 import {BaseInfoComponent} from './components/base-info/base-info.component';
 import {MapComponent, VrpAddDialogComponent} from './components/map/map.component';
@@ -30,7 +29,6 @@ import {ProblemsComponent} from './components/problems/problems.component';
     MapComponent,
     VrpAddDialogComponent,
     DepotInfoComponent,
-    FileImportComponent,
     ProblemsComponent
   ],
   imports: [

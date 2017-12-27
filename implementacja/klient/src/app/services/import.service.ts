@@ -13,7 +13,7 @@ export class ImportService {
 
   }
 
-  public importVRPFile(s) {
+  public importVRPFile(s, id) {
 
     this.mapService.changeToSimplePlane();
     const lines = s.split('\n');
@@ -68,7 +68,7 @@ export class ImportService {
       }
     }
 
-    let problem = new VRPProblem('!'); //TODO: Set unique ID
+    let problem = new VRPProblem(id);
 
     for(let node of nodes){
       if(node.isDepot){

@@ -15,6 +15,7 @@ export class MapService {
   };
 
   private _map: any = null;
+  private _clickEvent: any;
 
   get map(): any {
     return this._map;
@@ -41,6 +42,8 @@ export class MapService {
     L.control.zoom({
       position: 'topright'
     }).addTo(this._map);
+
+    this._map.on('click',this._clickEvent);
   }
 
   public changeToSimplePlane(){
@@ -100,4 +103,7 @@ export class MapService {
     return marker;
   }
 
+  setupClickEvent(fnc) {
+    this._clickEvent = fnc;
+  }
 }

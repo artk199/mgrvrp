@@ -13,7 +13,7 @@ import {MapService} from './map.service';
 export class VRPService {
 
 
-  currentProblem: VRPProblem = new VRPProblem("1");
+  currentProblem: VRPProblem = new VRPProblem('1');
 
 
   constructor(private mapService: MapService) {
@@ -46,6 +46,7 @@ export class VRPService {
    * @param {VRPCustomer} customer - odbiorca która ma zostać dodany
    */
   addCustomer(customer: VRPCustomer) {
+    this.currentProblem.addCustomer(customer);
     const copiedData = this.customersData.slice();
     copiedData.push(customer);
     this.customers.next(copiedData);
@@ -67,35 +68,67 @@ export class VRPService {
    * @param {VRPDepot} depot - nowy magazyn
    */
   addDepot(depot: VRPDepot) {
+    this.currentProblem.setDepot(depot);
     let copiedData = this.depotsData.slice();
     copiedData = [depot];
     this.depots.next(copiedData);
     this.mapService.addDepotToMap(depot);
   }
 
-  getProblems(){
+  getProblems() {
     return this.problems;
   }
 
-  //Dodaje nowy problem do listy problemow ostatnio rozwiązywanych
+  /**
+   * Dodaje nowy problem do listy problemow ostatnio rozwiązywanych
+   */
   addProblem(problem: VRPProblem) {
     //Dodanie do listy problemów
     let copiedData = this.problems.value.slice();
     copiedData.push(problem);
     this.problems.next(copiedData);
-
-    //Wyczyszczenie mapy + listy depotów + customerów
-    this.mapService.clearMap();
-    this.depots.next([]);
-    this.customers.next([]);
-
-    for(let customer of problem.customers){
-      this.addCustomer(customer);
-    }
-
-    for(let depot of problem.depots){
-      this.addDepot(depot);
-    }
+    this.loadProblem(problem.id);
   }
 
+  /**
+   * Pokazuje na mapie wybrany problem
+   * @param id - id problemu
+   */
+  loadProblem(id) {
+
+    if (this.currentProblem.id === id) {
+      console.log('Problem juz wczytany');
+      return;
+    }
+
+    let problem: VRPProblem = this.problems.value.find(x => x.id == id);
+
+    if (problem) {
+      console.log('Wczytywanie problemu:');
+      console.log(problem);
+      this.currentProblem = problem;
+      this.customers.next(problem.customers);
+      this.depots.next(problem.depots);
+      this.refreshMap();
+
+    } else {
+      console.log('Nie mozna wczytac problemu - nie znaleziono problemu o podanym ID.');
+    }
+
+  }
+
+  public getCurrentProblem(){
+    return this.currentProblem;
+  }
+
+  private refreshMap() {
+    this.mapService.clearMap();
+    for (let customer of this.customersData) {
+      this.mapService.addCustomerToMap(customer);
+    }
+
+    for (let depot of this.depotsData) {
+      this.mapService.addDepotToMap(depot);
+    }
+  }
 }

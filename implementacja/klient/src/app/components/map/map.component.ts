@@ -17,6 +17,12 @@ export class MapComponent implements OnInit {
   }
 
   ngOnInit() {
+    const c = this;
+    this.mapService.setupClickEvent(function (e) {
+      c.dialog.open(VrpAddDialogComponent, {
+        data: {coordinate: new Coordinate(e.latlng.lat, e.latlng.lng)}
+      });
+    });
     this.mapService.setupMap();
     this.setupContextMenu();
   }
@@ -25,12 +31,8 @@ export class MapComponent implements OnInit {
    * Otwiera popup(dialog) po kliknięciu na mapę umożliwający dodanie odbiorcy/magazynu.
    */
   private setupContextMenu() {
-    const c = this;
-    this.mapService.map.on('click', function (e) {
-      c.dialog.open(VrpAddDialogComponent, {
-        data: {coordinate: new Coordinate(e.latlng.lat, e.latlng.lng)}
-      });
-    });
+
+
   }
 
 }
