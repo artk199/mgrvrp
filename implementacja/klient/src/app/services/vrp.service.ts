@@ -138,4 +138,13 @@ export class VRPService {
     this.customers.next(this.currentProblem.customers);
     this.refreshMap(); //TODO: Usunac tylko aktualny marker! jak? dunno.
   }
+
+
+  /**
+   * Wysyla problem do serwera ktory zwraca wynik.
+   */
+  solveCurrentProblem() {
+    console.log("Po pomoc do serwera");
+  }
+
 }

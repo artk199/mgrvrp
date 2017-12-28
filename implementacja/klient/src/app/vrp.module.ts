@@ -19,6 +19,8 @@ import {DepotInfoComponent} from './components/depot-info/depot-info.component';
 import {LogService} from './shared/log/log.service';
 import {LogPublishersService} from './shared/log/log-publishers.service';
 import {ProblemsComponent} from './components/problems/problems.component';
+import {SolutionsComponent} from './components/solutions/solutions.component';
+import {RoutesComponent} from './components/routes/routes.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +31,9 @@ import {ProblemsComponent} from './components/problems/problems.component';
     MapComponent,
     VrpAddDialogComponent,
     DepotInfoComponent,
-    ProblemsComponent
+    ProblemsComponent,
+    SolutionsComponent,
+    RoutesComponent
   ],
   imports: [
     BrowserModule,
