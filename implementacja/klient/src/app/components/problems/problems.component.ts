@@ -26,7 +26,7 @@ export class ProblemsComponent implements OnInit {
   }
 
   public loadProblem(problem){
-    this.vrpService.loadProblem(problem.id);
+    this.vrpService.loadProblemAndRefreshMap(problem.id);
     this.currentProblem = this.vrpService.currentProblem;
   }
 

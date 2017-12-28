@@ -1,4 +1,5 @@
 import {BrowserModule} from '@angular/platform-browser';
+import "reflect-metadata";
 import {NgModule} from '@angular/core';
 import {
   MatGridListModule, MatTabsModule, MatTableModule, MatListModule,

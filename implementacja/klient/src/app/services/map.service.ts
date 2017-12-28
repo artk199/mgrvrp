@@ -16,6 +16,7 @@ export class MapService {
 
   private _map: any = null;
   private _clickEvent: any;
+  private markers = [];
 
   get map(): any {
     return this._map;
@@ -63,9 +64,10 @@ export class MapService {
    */
   public clearMap(){
     let s = this;
-    s._map.eachLayer(function (layer) {
-      s._map.removeLayer(layer);
-    });
+    for(var i = 0; i < this.markers.length; i++){
+      this._map.removeLayer(this.markers[i]);
+    }
+    this.markers = [];
   }
 
   /**
@@ -103,6 +105,7 @@ export class MapService {
       coordinates.x = event.target._latlng.lat;
       coordinates.y = event.target._latlng.lng;
     });
+    this.markers.push(marker);
     return marker;
   }
 

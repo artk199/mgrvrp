@@ -1,5 +1,6 @@
 import {VRPDepot} from './VRPDepot';
 import {VRPCustomer} from './VRPCustomer';
+import {Type} from 'class-transformer';
 
 
 /**
@@ -8,8 +9,13 @@ import {VRPCustomer} from './VRPCustomer';
 export class VRPProblem {
 
   id: string;
+
+  @Type(() => VRPCustomer)
   customers: VRPCustomer[];
+
+  @Type(() => VRPDepot)
   depots: VRPDepot[];
+
   settings = {
     algorithm: "savings"
   };

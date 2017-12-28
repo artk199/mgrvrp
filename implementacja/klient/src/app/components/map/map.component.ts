@@ -13,7 +13,7 @@ import {Coordinate} from '../../domain/Coordinate';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private mapService: MapService, public dialog: MatDialog) {
+  constructor(private mapService: MapService, public dialog: MatDialog, private vRPService: VRPService) {
   }
 
   ngOnInit() {
@@ -25,6 +25,7 @@ export class MapComponent implements OnInit {
     });
     this.mapService.setupMap();
     this.setupContextMenu();
+    this.vRPService.refreshMap();
   }
 
   /**

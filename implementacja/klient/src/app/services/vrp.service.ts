@@ -7,6 +7,7 @@ import {VRPProblem} from '../domain/VRPProblem';
 import {MapService} from './map.service';
 import {StompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
+import {deserializeArray, serialize} from 'class-transformer';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -15,15 +16,24 @@ import {Message} from '@stomp/stompjs';
 export class VRPService {
 
 
-  currentProblem: VRPProblem = new VRPProblem('1');
+  currentProblem: VRPProblem;
+  private problems: BehaviorSubject<VRPProblem[]> = new BehaviorSubject<VRPProblem[]>([]);
+  private customers: BehaviorSubject<VRPCustomer[]> = new BehaviorSubject<VRPCustomer[]>([]);
+  private depots: BehaviorSubject<VRPDepot[]> = new BehaviorSubject<VRPDepot[]>([]);
 
+  private PROBLEMS_KEY: string = 'problems';
 
   constructor(private mapService: MapService, private _stompService: StompService) {
+    //Wczytywanie zapisanych problemow do storeage
+    let p: VRPProblem[] = deserializeArray(VRPProblem, window.localStorage.getItem(this.PROBLEMS_KEY));
+    if (p) {
+      this.problems.next(p);
+    } else {
+      this.problems.next([new VRPProblem('0')]);
+    }
+    this.loadProblem(this.problems.value[0].id);
   }
 
-  private problems: BehaviorSubject<VRPProblem[]> = new BehaviorSubject<VRPProblem[]>([this.currentProblem]);
-  private customers: BehaviorSubject<VRPCustomer[]> = new BehaviorSubject<VRPCustomer[]>(this.currentProblem.customers);
-  private depots: BehaviorSubject<VRPDepot[]> = new BehaviorSubject<VRPDepot[]>(this.currentProblem.depots);
 
   get depotsData(): VRPDepot[] {
     return this.depots.value;
@@ -51,6 +61,8 @@ export class VRPService {
     this.currentProblem.addCustomer(customer);
     this.customers.next(this.currentProblem.customers);
     this.mapService.addCustomerToMap(customer);
+
+    this.saveProblemsToStorage();
   }
 
   /**
@@ -73,6 +85,8 @@ export class VRPService {
     copiedData = [depot];
     this.depots.next(copiedData);
     this.mapService.addDepotToMap(depot);
+
+    this.saveProblemsToStorage();
   }
 
   getProblems() {
@@ -87,37 +101,20 @@ export class VRPService {
     let copiedData = this.problems.value.slice();
     copiedData.push(problem);
     this.problems.next(copiedData);
-    this.loadProblem(problem.id);
+    this.loadProblemAndRefreshMap(problem.id);
   }
 
   /**
    * Pokazuje na mapie wybrany problem
    * @param id - id problemu
    */
-  loadProblem(id) {
-
-    if (this.currentProblem.id === id) {
-      console.log('Problem juz wczytany');
-      return;
-    }
-
-    let problem: VRPProblem = this.problems.value.find(x => x.id == id);
-
-    if (problem) {
-      console.log('Wczytywanie problemu:');
-      console.log(problem);
-      this.currentProblem = problem;
-      this.customers.next(problem.customers);
-      this.depots.next(problem.depots);
-      this.refreshMap();
-
-    } else {
-      console.log('Nie mozna wczytac problemu - nie znaleziono problemu o podanym ID.');
-    }
+  loadProblemAndRefreshMap(id) {
+    this.loadProblem(id);
+    this.refreshMap();
 
   }
 
-  private refreshMap() {
+  refreshMap() {
     this.mapService.clearMap();
     for (let customer of this.customersData) {
       this.mapService.addCustomerToMap(customer);
@@ -150,11 +147,38 @@ export class VRPService {
 
     stomp_subscription.map((message: Message) => {
       return message.body;
-    }).subscribe((msg_body: string) => {
-      console.log(`Received: ${msg_body}`);
+    }).subscribe((msg: string) => {
+      console.log(JSON.parse(msg));
+      console.log(msg['content']['type']);
+      if (msg['content']['type'] === 'END') {
+        console.log('KONIEC');
+      }
     });
 
     this._stompService.publish('/app/vrp', JSON.stringify(this.currentProblem));
+  }
+
+  private saveProblemsToStorage() {
+    window.localStorage.setItem(this.PROBLEMS_KEY, serialize(this.problems.value));
+  }
+
+  private loadProblem(id) {
+    if (this.currentProblem && this.currentProblem.id === id) {
+      console.log('Problem juz wczytany');
+      return;
+    }
+
+    let problem: VRPProblem = this.problems.value.find(x => x.id == id);
+
+    if (problem) {
+      console.log('Wczytywanie problemu:');
+      console.log(problem);
+      this.currentProblem = problem;
+      this.customers.next(problem.customers);
+      this.depots.next(problem.depots);
+    } else {
+      console.log('Nie mozna wczytac problemu - nie znaleziono problemu o podanym ID.');
+    }
   }
 
 }
