@@ -21,6 +21,21 @@ import {LogPublishersService} from './shared/log/log-publishers.service';
 import {ProblemsComponent} from './components/problems/problems.component';
 import {SolutionsComponent} from './components/solutions/solutions.component';
 import {RoutesComponent} from './components/routes/routes.component';
+import {StompConfig, StompService} from '@stomp/ng2-stompjs';
+import * as SockJS from 'sockjs-client';
+
+export function socketProvider() {
+  return new SockJS('http://localhost:9090/stomp');
+}
+
+const stompConfig: StompConfig = {
+  url: socketProvider,
+  headers: {},
+  heartbeat_in: 0,
+  heartbeat_out: 20000,
+  reconnect_delay: 5000,
+  debug: true
+};
 
 @NgModule({
   declarations: [
@@ -53,7 +68,11 @@ import {RoutesComponent} from './components/routes/routes.component';
   entryComponents: [
     VrpAddDialogComponent
   ],
-  providers: [VRPService, MapService, LogService, LogPublishersService, ImportService],
+  providers: [VRPService, MapService, LogService, LogPublishersService, ImportService, StompService,
+    {
+      provide: StompConfig,
+      useValue: stompConfig
+    }],
   bootstrap: [VrpComponent]
 })
 export class VrpModule {

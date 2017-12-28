@@ -5,6 +5,7 @@ import groovy.json.internal.LazyMap
 
 class VRPProblem implements Validateable {
 
+    String id
     List<VRPDepot> depots
     List<VRPCustomer> customers
     Map settings

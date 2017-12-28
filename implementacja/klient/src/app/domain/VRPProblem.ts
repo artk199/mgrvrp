@@ -10,6 +10,9 @@ export class VRPProblem {
   id: string;
   customers: VRPCustomer[];
   depots: VRPDepot[];
+  settings = {
+    algorithm: "savings"
+  };
 
   constructor(id: string) {
     this.id = id;

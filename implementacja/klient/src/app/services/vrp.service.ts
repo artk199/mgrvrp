@@ -5,6 +5,8 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {VRPDepot} from '../domain/VRPDepot';
 import {VRPProblem} from '../domain/VRPProblem';
 import {MapService} from './map.service';
+import {StompService} from '@stomp/ng2-stompjs';
+import {Message} from '@stomp/stompjs';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -16,7 +18,7 @@ export class VRPService {
   currentProblem: VRPProblem = new VRPProblem('1');
 
 
-  constructor(private mapService: MapService) {
+  constructor(private mapService: MapService, private _stompService: StompService) {
   }
 
   private problems: BehaviorSubject<VRPProblem[]> = new BehaviorSubject<VRPProblem[]>([this.currentProblem]);
@@ -144,7 +146,15 @@ export class VRPService {
    * Wysyla problem do serwera ktory zwraca wynik.
    */
   solveCurrentProblem() {
-    console.log("Po pomoc do serwera");
+    let stomp_subscription = this._stompService.subscribe('/topic/hello');
+
+    stomp_subscription.map((message: Message) => {
+      return message.body;
+    }).subscribe((msg_body: string) => {
+      console.log(`Received: ${msg_body}`);
+    });
+
+    this._stompService.publish('/app/vrp', JSON.stringify(this.currentProblem));
   }
 
 }

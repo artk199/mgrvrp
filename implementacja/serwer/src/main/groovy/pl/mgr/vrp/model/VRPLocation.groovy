@@ -7,7 +7,7 @@ class VRPLocation {
     VRPLocation(double x, double y) {
         coordinates = new Coordinate(x: x, y: y)
     }
-    long id
+    String id
     Coordinate coordinates
 }
 
