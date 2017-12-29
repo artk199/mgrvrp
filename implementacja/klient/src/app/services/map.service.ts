@@ -18,6 +18,7 @@ export class MapService {
   private _map: any = null;
   private _clickEvent: any;
   private markers = [];
+  private paths = [];
 
   get map(): any {
     return this._map;
@@ -45,10 +46,10 @@ export class MapService {
       position: 'topright'
     }).addTo(this._map);
 
-    this._map.on('click',this._clickEvent);
+    this._map.on('click', this._clickEvent);
   }
 
-  public changeToSimplePlane(){
+  public changeToSimplePlane() {
     this._map.remove();
     this._map = L.map(this.MAP_ID, {
       crs: L.CRS.Simple,
@@ -63,12 +64,13 @@ export class MapService {
   /**
    * Usuwa i tworzy od nowa mapę - hard reset
    */
-  public clearMap(){
+  public clearMap() {
     let s = this;
-    for(var i = 0; i < this.markers.length; i++){
+    for (let i = 0; i < this.markers.length; i++) {
       this._map.removeLayer(this.markers[i]);
     }
     this.markers = [];
+    this.clearPaths();
   }
 
   /**
@@ -115,20 +117,22 @@ export class MapService {
   }
 
   drawSolution(solution: VRPSolution) {
+    this.clearPaths();
     let colors = ['black', 'blue', 'brown', 'gray', 'green', 'orange', 'pink', 'purple', 'red', 'white', 'yellow'];
-
-    let from = solution.routes[0].driveRoute[0];
     let idx = 0;
-    for(let to of solution.routes[0].driveRoute){
-      let path = this.drawPath(
-        from.coordinates.x,
-        from.coordinates.y,
-        to.coordinates.x,
-        to.coordinates.y,
-        this._map,
-        colors[idx % colors.length]
-      );
-      from = to;
+    for (let route of solution.routes) {
+      let from = route.driveRoute[0];
+      for (let to of route.driveRoute) {
+        let path = this.drawPath(
+          from.coordinates.x,
+          from.coordinates.y,
+          to.coordinates.x,
+          to.coordinates.y,
+          this._map,
+          colors[idx % colors.length]
+        );
+        from = to;
+      }
       idx += 1;
     }
   }
@@ -140,13 +144,20 @@ export class MapService {
 
     var path = new L.Polyline(pointList, {
       color: color,
-      weight: 3,
-      opacity: 0.7,
+      weight: 4,
+      opacity: 0.8,
       smoothFactor: 1
     });
     path.addTo(map);
+    this.paths.push(path);
     return path;
   }
 
 
+  private clearPaths() {
+    for (let i = 0; i < this.paths.length; i++) {
+      this._map.removeLayer(this.paths[i]);
+    }
+    this.paths = [];
+  }
 }

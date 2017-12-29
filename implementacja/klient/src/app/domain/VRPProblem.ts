@@ -1,6 +1,7 @@
 import {VRPDepot} from './VRPDepot';
 import {VRPCustomer} from './VRPCustomer';
 import {Type} from 'class-transformer';
+import {VRPSolution} from './VRPSolution';
 
 
 /**
@@ -16,14 +17,20 @@ export class VRPProblem {
   @Type(() => VRPDepot)
   depots: VRPDepot[];
 
+  solutions: VRPSolution[];
+
   settings = {
-    algorithm: "savings"
+    algorithm: "savings",
+    distance: "road",
+    geo_distance: "spherical",
+    capacity: 200
   };
 
   constructor(id: string) {
     this.id = id;
     this.customers = [];
     this.depots = [];
+    this.solutions = [];
   }
 
   public addCustomer(customer: VRPCustomer) {

@@ -48,6 +48,9 @@ class GraphHopperOSMService {
         request.setVehicle("car")
         GHResponse route = graphHopper.route(request)
         if (route.hasErrors()) {
+            route.errors.each { err ->
+                log.error err.message
+            }
             throw new RuntimeException("Route has errors!")
         }
         def best = route.getBest()

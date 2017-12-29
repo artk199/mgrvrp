@@ -1,3 +1,27 @@
-<div style="margin:20px">
-  <button (click)="solve()">Solve!</button>
+<div>
+  <mat-table #table [dataSource]="dataSource">
+
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef> ID</mat-header-cell>
+      <mat-cell *matCellDef="let solution"> {{solution.id}}</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef> Actions:</mat-header-cell>
+      <mat-cell *matCellDef="let solution">
+          <button mat-button (click)="loadSolution(solution)">Load</button>
+          <button mat-button (click)="deleteSolution(solution)">Delete</button>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
+    <mat-row *matRowDef="let solution; columns: displayedColumns;"></mat-row>
+
+  </mat-table>
+
+  <div class="button-row" class="add-panel">
+    <button mat-button (click)="solve()">Solve</button>
+  </div>
+
 </div>

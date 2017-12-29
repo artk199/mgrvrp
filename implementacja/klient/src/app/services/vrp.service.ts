@@ -21,6 +21,7 @@ export class VRPService {
   private problems: BehaviorSubject<VRPProblem[]> = new BehaviorSubject<VRPProblem[]>([]);
   private customers: BehaviorSubject<VRPCustomer[]> = new BehaviorSubject<VRPCustomer[]>([]);
   private depots: BehaviorSubject<VRPDepot[]> = new BehaviorSubject<VRPDepot[]>([]);
+  private solutions: BehaviorSubject<VRPSolution[]> = new BehaviorSubject<VRPSolution[]>([]);
 
   private PROBLEMS_KEY: string = 'problems';
 
@@ -33,15 +34,6 @@ export class VRPService {
       this.problems.next([new VRPProblem('0')]);
     }
     this.loadProblem(this.problems.value[0].id);
-  }
-
-
-  get depotsData(): VRPDepot[] {
-    return this.depots.value;
-  }
-
-  get customersData(): VRPCustomer[] {
-    return this.customers.value;
   }
 
   /**
@@ -67,6 +59,21 @@ export class VRPService {
   }
 
   /**
+   * Usuwa customera z aktualnego problemu
+   * @param {VRPCustomer} customer
+   */
+  deleteCustomer(customer: VRPCustomer) {
+    var index = this.currentProblem.customers.indexOf(customer, 0);
+    if (index > -1) {
+      this.currentProblem.customers.splice(index, 1);
+    }
+    this.customers.next(this.currentProblem.customers);
+    this.refreshMap(); //TODO: Usunac tylko aktualny marker! jak? dunno.
+
+    this.saveProblemsToStorage();
+  }
+
+  /**
    * Zwraca magazyn jako Observable.
    * Przykład użycia:
    * getDepot().subscribe( response => this.depot = response[0] );
@@ -82,7 +89,7 @@ export class VRPService {
    */
   addDepot(depot: VRPDepot) {
     this.currentProblem.setDepot(depot);
-    let copiedData = this.depotsData.slice();
+    let copiedData = this.depots.value.slice();
     copiedData = [depot];
     this.depots.next(copiedData);
     this.mapService.addDepotToMap(depot);
@@ -90,6 +97,10 @@ export class VRPService {
     this.saveProblemsToStorage();
   }
 
+  /**
+   * Zwraca wszystkie problemy
+   * @returns {BehaviorSubject<VRPProblem[]>}
+   */
   getProblems() {
     return this.problems;
   }
@@ -115,30 +126,19 @@ export class VRPService {
 
   }
 
+  /**
+   * Odświeża mapę z aktualnymi odbiorcami oraz magazynami
+   */
   refreshMap() {
     this.mapService.clearMap();
-    for (let customer of this.customersData) {
+    for (let customer of this.customers.value) {
       this.mapService.addCustomerToMap(customer);
     }
 
-    for (let depot of this.depotsData) {
+    for (let depot of this.depots.value) {
       this.mapService.addDepotToMap(depot);
     }
   }
-
-  /**
-   * Usuwa customera z aktualnego problemu
-   * @param {VRPCustomer} customer
-   */
-  deleteCustomer(customer: VRPCustomer) {
-    var index = this.currentProblem.customers.indexOf(customer, 0);
-    if (index > -1) {
-      this.currentProblem.customers.splice(index, 1);
-    }
-    this.customers.next(this.currentProblem.customers);
-    this.refreshMap(); //TODO: Usunac tylko aktualny marker! jak? dunno.
-  }
-
 
   /**
    * Wysyla problem do serwera ktory zwraca wynik.
@@ -146,28 +146,68 @@ export class VRPService {
   solveCurrentProblem() {
     let stomp_subscription = this._stompService.subscribe('/topic/hello');
 
-    stomp_subscription.map((message: Message) => {
+    let obs = stomp_subscription.map((message: Message) => {
       return message.body;
     }).subscribe((msg: string) => {
-      console.log(JSON.parse(msg));
       let m = JSON.parse(msg);
       if (m.content && m.content.type === 'END') {
         let solution: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
         this.addSolution(solution);
+        obs.unsubscribe();
       }
     });
 
-    this._stompService.publish('/app/vrp', JSON.stringify(this.currentProblem));
+    this._stompService.publish('/app/vrp', serialize(this.currentProblem, {excludePrefixes: ['solutions']}));
   }
 
-  private addSolution(solution: VRPSolution) {
+  /**
+   * Zwraca liste solucji jako Observable
+   */
+  getSolutions() {
+    return this.solutions;
+  }
+
+  /**
+   * Rysuje rozwiazanie na mapie
+   * @param solution
+   */
+  loadSolution(solution){
     this.mapService.drawSolution(solution);
+  };
+
+  /**
+   * Usuwa rozwiazanie
+   */
+  deleteSolution(solution) {
+    let index = this.currentProblem.solutions.indexOf(solution, 0);
+    if (index > -1) {
+      this.currentProblem.solutions.splice(index, 1);
+    }
+    this.solutions.next(this.currentProblem.solutions);
   }
 
+  /**
+   * Dodaje odpowiedz do aktualnie wybranego problemu
+   * @param {VRPSolution} solution
+   */
+  private addSolution(solution: VRPSolution) {
+    this.currentProblem.solutions.push(solution);
+    this.solutions.next(this.currentProblem.solutions);
+    this.loadSolution(solution)
+  }
+
+
+  /**
+   * Zapisuje problemy do pamieci podrecznej przeglaradki co po odswiezeniu storny bedzie nadal taki jak jest
+   */
   private saveProblemsToStorage() {
     window.localStorage.setItem(this.PROBLEMS_KEY, serialize(this.problems.value));
   }
 
+  /**
+   * Wczytuje problem na podstawie ID -> jeżeli nie ma to nic nie wyświetli
+   * @param id
+   */
   private loadProblem(id) {
     if (this.currentProblem && this.currentProblem.id === id) {
       console.log('Problem juz wczytany');
@@ -181,6 +221,7 @@ export class VRPService {
       this.currentProblem = problem;
       this.customers.next(problem.customers);
       this.depots.next(problem.depots);
+      this.solutions.next(problem.solutions);
     } else {
       console.log('Nie mozna wczytac problemu - nie znaleziono problemu o podanym ID.');
     }

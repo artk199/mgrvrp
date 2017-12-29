@@ -10,16 +10,16 @@ class EntryVRPService {
 
     def prepareAndSolve(VRPProblem problem) {
         def algorithmName = problem.settings['algorithm']
-        if(!problem.settings['algorithm']) {
+        if (!problem.settings['algorithm']) {
             algorithmName = DEFAULT_ALGORITHM
             log.warn "Brak wybranego algorytmu - zostanie wybrany defaultowy."
         }
         log.info "Obsługa według algorytmu - ${algorithmName}"
         ApplicationContext ctx = Holders.applicationContext
-        def service = ctx.getBean(algorithmName+"VRPSolverService")
-        if(!service || !(service instanceof VRPSolverService)) {
+        def service = ctx.getBean(algorithmName + "VRPSolverService")
+        if (!service || !(service instanceof VRPSolverService)) {
             log.error "Nie mozna znaleźć algorytmu lub algorytm nie implementuje 'VRPSolverService'! Koniec."
-        }else{
+        } else {
             service.solve(problem)
         }
     }
