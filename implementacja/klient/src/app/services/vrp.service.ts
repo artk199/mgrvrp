@@ -7,7 +7,8 @@ import {VRPProblem} from '../domain/VRPProblem';
 import {MapService} from './map.service';
 import {StompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
-import {deserializeArray, serialize} from 'class-transformer';
+import {deserialize, deserializeArray, serialize} from 'class-transformer';
+import {VRPSolution} from '../domain/VRPSolution';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -149,13 +150,18 @@ export class VRPService {
       return message.body;
     }).subscribe((msg: string) => {
       console.log(JSON.parse(msg));
-      console.log(msg['content']['type']);
-      if (msg['content']['type'] === 'END') {
-        console.log('KONIEC');
+      let m = JSON.parse(msg);
+      if (m.content && m.content.type === 'END') {
+        let solution: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
+        this.addSolution(solution);
       }
     });
 
     this._stompService.publish('/app/vrp', JSON.stringify(this.currentProblem));
+  }
+
+  private addSolution(solution: VRPSolution) {
+    this.mapService.drawSolution(solution);
   }
 
   private saveProblemsToStorage() {
@@ -172,7 +178,6 @@ export class VRPService {
 
     if (problem) {
       console.log('Wczytywanie problemu:');
-      console.log(problem);
       this.currentProblem = problem;
       this.customers.next(problem.customers);
       this.depots.next(problem.depots);

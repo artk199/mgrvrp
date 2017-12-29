@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import {Coordinate} from '../domain/Coordinate';
 import {VRPCustomer} from '../domain/VRPCustomer';
 import {VRPDepot} from '../domain/VRPDepot';
+import {VRPSolution} from '../domain/VRPSolution';
 
 @Injectable()
 export class MapService {
@@ -112,4 +113,40 @@ export class MapService {
   setupClickEvent(fnc) {
     this._clickEvent = fnc;
   }
+
+  drawSolution(solution: VRPSolution) {
+    let colors = ['black', 'blue', 'brown', 'gray', 'green', 'orange', 'pink', 'purple', 'red', 'white', 'yellow'];
+
+    let from = solution.routes[0].driveRoute[0];
+    let idx = 0;
+    for(let to of solution.routes[0].driveRoute){
+      let path = this.drawPath(
+        from.coordinates.x,
+        from.coordinates.y,
+        to.coordinates.x,
+        to.coordinates.y,
+        this._map,
+        colors[idx % colors.length]
+      );
+      from = to;
+      idx += 1;
+    }
+  }
+
+  drawPath(srcLat, srcLng, dstLat, dstLng, map, color) {
+    var pointA = new L.LatLng(srcLat, srcLng);
+    var pointB = new L.LatLng(dstLat, dstLng);
+    var pointList = [pointA, pointB];
+
+    var path = new L.Polyline(pointList, {
+      color: color,
+      weight: 3,
+      opacity: 0.7,
+      smoothFactor: 1
+    });
+    path.addTo(map);
+    return path;
+  }
+
+
 }
