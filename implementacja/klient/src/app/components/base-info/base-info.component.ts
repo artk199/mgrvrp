@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {VRPProblem} from '../../domain/VRPProblem';
+import {VRPService} from '../../services/vrp.service';
 
 @Component({
   selector: 'vrp-base-info',
@@ -7,8 +9,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BaseInfoComponent implements OnInit {
 
-  constructor() { }
+  currentProblem: VRPProblem;
+
+  algorithms = [{code: 'savings', description: 'Savings algorithm'},
+    {code: 'jsprit', description: 'JSprit? Metaheuristic'},
+    {code: 'random', description: 'Random solution'}
+  ];
+
+  distances = [{code: 'road', description: 'Road'},
+    {code: 'air', description: 'Air'}
+  ];
+
+  constructor(vRPService: VRPService) {
+    this.currentProblem = vRPService.currentProblem;
+  }
 
   ngOnInit() {
+
   }
+
+
 }
