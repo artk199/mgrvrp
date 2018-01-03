@@ -44,24 +44,31 @@ export class MapComponent implements OnInit {
 })
 export class VrpAddDialogComponent {
 
-  name = '';
+  name: any = '';
 
   constructor(private vRPService: VRPService,
               public dialogRef: MatDialogRef<VrpAddDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {
+    this.name = "" + this.vRPService.getCustomersData().length;
   }
 
   onNoClick(): void {
     this.dialogRef.close();
-
   }
 
   addCustomer() {
-    this.vRPService.addCustomer(new VRPCustomer(this.name, this.data.coordinate));
+    try {
+      this.vRPService.addCustomer(new VRPCustomer(this.name, this.data.coordinate));
+      this.dialogRef.close();
+    } catch (e) {
+      console.error(e);
+      alert(e);
+    }
   }
 
   addDepot() {
     this.vRPService.addDepot(new VRPDepot(this.name, this.data.coordinate));
+    this.dialogRef.close();
   }
 
 }

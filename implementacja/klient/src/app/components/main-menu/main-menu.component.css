@@ -7,8 +7,8 @@ mat-card {
   z-index: 999;
   left: 0;
   top: 0;
-  width: 33vw;
-  height: 83vh;
+  width: 0;
+  height: 0;
 }
 
 .tabs-content {
@@ -17,7 +17,18 @@ mat-card {
   margin-top: -24px !important;
 }
 
-.tabs-card {
-  height: 80%;
+.top-bar {
+  width: 30vw;
+  height: 40px;
+}
+
+.main-panel {
+  width: 30vw;
+  height: calc(100vh - 225px - 250px);
+}
+
+.route-bar {
+  width: calc(100vw - 70px);
+  height: 250px;
 }
 

@@ -8,6 +8,6 @@
     </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-raised-button [disabled]="name == ''" mat-dialog-close (click)="addCustomer()">Add customer</button>
+  <button mat-raised-button [disabled]="name == ''" (click)="addCustomer()">Add customer</button>
   <button mat-raised-button [disabled]="name == ''" mat-dialog-close (click)="addDepot()">Add depot</button>
 </mat-dialog-actions>

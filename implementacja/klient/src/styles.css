@@ -9,3 +9,7 @@ body {
 .mat-figure {
   display: block !important;
 }
+
+.mat-tab-label {
+  min-width: 50px !important;
+}

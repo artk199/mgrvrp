@@ -51,6 +51,9 @@ export class VRPService {
    * @param {VRPCustomer} customer - odbiorca która ma zostać dodany
    */
   addCustomer(customer: VRPCustomer) {
+    if(this.currentProblem.customers.some(x => x.id == customer.id)){
+      throw new Error("Customer with given name already exists.");
+    }
     this.currentProblem.addCustomer(customer);
     this.customers.next(this.currentProblem.customers);
     this.mapService.addCustomerToMap(customer);
@@ -227,4 +230,7 @@ export class VRPService {
     }
   }
 
+  getCustomersData() {
+    return this.customers.value;
+  }
 }
