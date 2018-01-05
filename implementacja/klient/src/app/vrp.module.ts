@@ -3,7 +3,8 @@ import "reflect-metadata";
 import {NgModule} from '@angular/core';
 import {
   MatGridListModule, MatTabsModule, MatTableModule, MatListModule,
-  MatButtonModule, MatDialogModule, MatCardModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTooltipModule
+  MatButtonModule, MatDialogModule, MatCardModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTooltipModule,
+  MatProgressSpinnerModule
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
@@ -66,7 +67,8 @@ const stompConfig: StompConfig = {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressSpinnerModule
   ],
   entryComponents: [
     VrpAddDialogComponent

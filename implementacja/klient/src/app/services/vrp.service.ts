@@ -147,16 +147,29 @@ export class VRPService {
    * Wysyla problem do serwera ktory zwraca wynik.
    */
   solveCurrentProblem() {
+    VRPService.startLoading();
     let stomp_subscription = this._stompService.subscribe('/topic/hello');
 
     let obs = stomp_subscription.map((message: Message) => {
       return message.body;
     }).subscribe((msg: string) => {
       let m = JSON.parse(msg);
-      if (m.content && m.content.type === 'END') {
-        let solution: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
-        this.addSolution(solution);
-        obs.unsubscribe();
+      let messageType = m.content ? m.content.type : '';
+      switch (messageType) {
+        case 'STEP':
+          let s : VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
+          this.setColors(s);
+          this.loadSolution(s);
+          break;
+        case 'END':
+          let solution: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
+          this.addSolution(solution);
+          VRPService.stopLoading();
+          obs.unsubscribe();
+          break;
+        case 'INFO':
+          console.log(m.content.message);
+          break;
       }
     });
 
@@ -194,16 +207,10 @@ export class VRPService {
    * @param {VRPSolution} solution
    */
   private addSolution(solution: VRPSolution) {
-    const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
-
+    this.setColors(solution);
     this.currentProblem.solutions.push(solution);
     this.solutions.next(this.currentProblem.solutions);
-    //Przypisz kolory
-    let i = 0;
-    for (let route of solution.routes) {
-      route.color = colors[i % colors.length];
-      i++;
-    }
+
     this.loadSolution(solution);
   }
 
@@ -240,5 +247,27 @@ export class VRPService {
 
   getCustomersData() {
     return this.customers.value;
+  }
+
+  private static stopLoading() {
+    document.getElementById('loading-screen').style.display = 'none';
+  }
+
+  private static startLoading() {
+    document.getElementById('loading-screen').style.display = 'block';
+  }
+
+  /**
+   * Przypisuje kolory do poszczegolnych tras
+   * @param {VRPSolution} solution
+   */
+  private setColors(solution: VRPSolution) {
+    const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
+
+    let i = 0;
+    for (let route of solution.routes) {
+      route.color = colors[i % colors.length];
+      i++;
+    }
   }
 }

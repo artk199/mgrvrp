@@ -27,7 +27,6 @@ export class RoutesComponent implements OnInit {
   }
 
   calculatePosition(route, point) {
-    console.log(route);
     let sum = 0;
     for (let r of route.drivePoints) {
       sum += r.routeLength;
