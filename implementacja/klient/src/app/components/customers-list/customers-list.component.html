@@ -14,7 +14,11 @@ y: {{customer.coordinates.y | number:'1.5-5'}}</pre>
 
   <ng-container matColumnDef="demand">
     <mat-header-cell *matHeaderCellDef> Demand</mat-header-cell>
-    <mat-cell *matCellDef="let customer"> {{customer.demand}}</mat-cell>
+    <mat-cell *matCellDef="let customer">
+      <mat-form-field>
+        <input matInput type="number" [(ngModel)]="customer.demand">
+      </mat-form-field>
+    </mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="actions">
