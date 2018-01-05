@@ -5,6 +5,7 @@ class VRPRoute {
     VRPLocation start
     VRPLocation end
     List<VRPCustomer> points = []
-    List<VRPPoint> driveRoute = []
+    List<VRPDrivePoint> drivePoints = []
+    double routeLength = 0
 
 }

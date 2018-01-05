@@ -118,22 +118,21 @@ export class MapService {
 
   drawSolution(solution: VRPSolution) {
     this.clearPaths();
-    let colors = ['black', 'blue', 'brown', 'gray', 'green', 'orange', 'pink', 'purple', 'red', 'white', 'yellow'];
-    let idx = 0;
     for (let route of solution.routes) {
-      let from = route.driveRoute[0];
-      for (let to of route.driveRoute) {
-        let path = this.drawPath(
-          from.coordinates.x,
-          from.coordinates.y,
-          to.coordinates.x,
-          to.coordinates.y,
-          this._map,
-          colors[idx % colors.length]
-        );
-        from = to;
+      for (let drivePoint of route.drivePoints) {
+        let from = drivePoint.from;
+        for (let to of drivePoint.points) {
+          let path = this.drawPath(
+            from.coordinates.x,
+            from.coordinates.y,
+            to.coordinates.x,
+            to.coordinates.y,
+            this._map,
+            route.color
+          );
+          from = to;
+        }
       }
-      idx += 1;
     }
   }
 

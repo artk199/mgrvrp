@@ -51,8 +51,8 @@ export class VRPService {
    * @param {VRPCustomer} customer - odbiorca która ma zostać dodany
    */
   addCustomer(customer: VRPCustomer) {
-    if(this.currentProblem.customers.some(x => x.id == customer.id)){
-      throw new Error("Customer with given name already exists.");
+    if (this.currentProblem.customers.some(x => x.id == customer.id)) {
+      throw new Error('Customer with given name already exists.');
     }
     this.currentProblem.addCustomer(customer);
     this.customers.next(this.currentProblem.customers);
@@ -174,7 +174,7 @@ export class VRPService {
    * Rysuje rozwiazanie na mapie
    * @param solution
    */
-  loadSolution(solution){
+  loadSolution(solution) {
     this.mapService.drawSolution(solution);
   };
 
@@ -194,9 +194,17 @@ export class VRPService {
    * @param {VRPSolution} solution
    */
   private addSolution(solution: VRPSolution) {
+    const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
+
     this.currentProblem.solutions.push(solution);
     this.solutions.next(this.currentProblem.solutions);
-    this.loadSolution(solution)
+    //Przypisz kolory
+    let i = 0;
+    for (let route of solution.routes) {
+      route.color = colors[i % colors.length];
+      i++;
+    }
+    this.loadSolution(solution);
   }
 
 

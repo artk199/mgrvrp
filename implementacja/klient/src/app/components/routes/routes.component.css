@@ -1,0 +1,40 @@
+.mat-column-actions {
+  flex: 0 0 50px;
+}
+
+.mat-column-id {
+  flex: 0 0 50px;
+}
+
+.mat-column-length {
+  flex: 0 0 100px;
+}
+
+.bar-container {
+  clear: both;
+  position: relative;
+  height: 26px;
+}
+
+.bar-slider {
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: #ccc;
+  top: 14px;
+}
+
+.bar-pointer {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 12px solid #a6d8ef;
+  background-color: #5082e0;
+  opacity: .7;
+  -webkit-border-radius: 18px;
+  -moz-border-radius: 18px;
+  border-radius: 18px;
+  left: -10px;
+}
+
+

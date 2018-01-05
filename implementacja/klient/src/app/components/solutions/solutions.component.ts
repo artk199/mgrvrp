@@ -12,10 +12,10 @@ import {VRPSolution} from '../../domain/VRPSolution';
 })
 export class SolutionsComponent implements OnInit {
 
-  displayedColumns = [ 'id', 'actions'];
+  displayedColumns = ['id', 'length', 'actions'];
   dataSource;
 
-  constructor(private vRPService: VRPService){
+  constructor(private vRPService: VRPService) {
     this.dataSource = new SolutionsDataSource(this.vRPService.getSolutions());
   }
 
@@ -23,15 +23,15 @@ export class SolutionsComponent implements OnInit {
   }
 
 
-  loadSolution(solution){
+  loadSolution(solution) {
     this.vRPService.loadSolution(solution);
   }
 
-  deleteSolution(solution){
+  deleteSolution(solution) {
     this.vRPService.deleteSolution(solution);
   }
 
-  solve(){
+  solve() {
     this.vRPService.solveCurrentProblem();
   }
 
