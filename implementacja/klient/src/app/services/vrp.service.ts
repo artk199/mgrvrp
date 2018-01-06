@@ -9,7 +9,6 @@ import {StompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
 import {deserialize, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
-import {MatSnackBar} from '@angular/material';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -26,7 +25,7 @@ export class VRPService {
 
   private PROBLEMS_KEY: string = 'problems';
 
-  constructor(private mapService: MapService, private _stompService: StompService, public snackBar: MatSnackBar) {
+  constructor(private mapService: MapService, private _stompService: StompService) {
     //Wczytywanie zapisanych problemow do storeage
     let p: VRPProblem[] = deserializeArray(VRPProblem, window.localStorage.getItem(this.PROBLEMS_KEY));
     if (p) {
@@ -67,7 +66,7 @@ export class VRPService {
    * @param {VRPCustomer} customer
    */
   deleteCustomer(customer: VRPCustomer) {
-    var index = this.currentProblem.customers.indexOf(customer, 0);
+    const index = this.currentProblem.customers.indexOf(customer, 0);
     if (index > -1) {
       this.currentProblem.customers.splice(index, 1);
     }
@@ -93,12 +92,20 @@ export class VRPService {
    */
   addDepot(depot: VRPDepot) {
     this.currentProblem.setDepot(depot);
-    let copiedData = this.depots.value.slice();
-    copiedData = [depot];
+    let copiedData = [depot];
     this.depots.next(copiedData);
     this.mapService.addDepotToMap(depot);
 
     this.saveProblemsToStorage();
+  }
+
+  /**
+   * Tworzy nowy problem
+   */
+  createNewProblem(name){
+    let problem = new VRPProblem(name);
+    this.addProblem(problem);
+    return
   }
 
   /**
@@ -247,20 +254,12 @@ export class VRPService {
     }
   }
 
+  /**
+   * Zwraca aktualnych odbiorców
+   * @returns {VRPCustomer[]}
+   */
   getCustomersData() {
     return this.customers.value;
-  }
-
-  private static stopLoading() {
-    document.getElementById('loading-screen').style.display = 'none';
-  }
-
-  private static startLoading() {
-    document.getElementById('loading-screen').style.display = 'block';
-  }
-
-  private static setLoadingMessage(message) {
-    document.getElementById('loading-info').innerText = message;
   }
 
   /**
@@ -275,5 +274,27 @@ export class VRPService {
       route.color = colors[i % colors.length];
       i++;
     }
+  }
+
+  /**
+   * Wyłącza ekran ładowania
+   */
+  private static stopLoading() {
+    document.getElementById('loading-screen').style.display = 'none';
+  }
+
+  /**
+   * Włącza ekran ładownaia
+   */
+  private static startLoading() {
+    document.getElementById('loading-screen').style.display = 'block';
+  }
+
+  /**
+   * Ustawia wiadomość na ekranie ładownaia
+   * @param message
+   */
+  private static setLoadingMessage(message) {
+    document.getElementById('loading-info').innerText = message;
   }
 }

@@ -41,6 +41,17 @@ export class ProblemsComponent implements OnInit {
     reader.readAsText(file);
   }
 
+  createNewProblem(){
+    this.vrpService.createNewProblem(ProblemsComponent.generateName())
+  }
+
+  static generateName() {
+    return 'xxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0, v = c === 'x' ? r : ( r & 0x3 | 0x8 );
+      return v.toString(16);
+    });
+  }
+
 }
 
 export class CustomersDataSource extends DataSource<any> {
