@@ -19,7 +19,9 @@ export class ProblemsComponent implements OnInit {
 
   constructor(private vrpService: VRPService, private importService: ImportService) {
     this.dataSource = new CustomersDataSource(this.vrpService.getProblems());
-    this.currentProblem = this.vrpService.currentProblem;
+    vrpService.getCurrentProblem().subscribe( p =>
+      this.currentProblem = p
+    );
   }
 
   ngOnInit() {
@@ -27,7 +29,6 @@ export class ProblemsComponent implements OnInit {
 
   public loadProblem(problem) {
     this.vrpService.loadProblemAndRefreshMap(problem.id);
-    this.currentProblem = this.vrpService.currentProblem;
   }
 
   uploadFile(event) {
@@ -36,7 +37,6 @@ export class ProblemsComponent implements OnInit {
     const reader = new FileReader();
     reader.onload = (e) => {
       this.importService.importVRPFile(reader.result, file.name);
-      this.currentProblem = this.vrpService.currentProblem;
     };
     reader.readAsText(file);
   }
@@ -47,6 +47,10 @@ export class ProblemsComponent implements OnInit {
 
   createNewProblem() {
     this.vrpService.createNewProblem(ProblemsComponent.generateName());
+  }
+
+  deleteProblem(problem){
+    this.vrpService.deleteProblem(problem);
   }
 
   static generateName() {

@@ -21,7 +21,9 @@ export class BaseInfoComponent implements OnInit {
   ];
 
   constructor(vRPService: VRPService) {
-    this.currentProblem = vRPService.currentProblem;
+    vRPService.getCurrentProblem().subscribe( p =>
+      this.currentProblem = p
+    );
   }
 
   ngOnInit() {

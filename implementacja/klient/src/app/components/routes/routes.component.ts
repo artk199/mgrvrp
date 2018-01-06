@@ -14,15 +14,12 @@ import {MapService} from '../../services/map.service';
 })
 export class RoutesComponent implements OnInit {
 
-  currentSolution: VRPSolution;
-
   displayedColumns = ['actions', 'length', 'bar'];
   dataSource;
 
   constructor(private vRPService: VRPService, private mapService: MapService) {
-    this.dataSource = new ProblemDataSource(this.vRPService.getSolutions());
+    this.dataSource = new ProblemDataSource(this.vRPService.currentSolution);
   }
-
 
   ngOnInit(): void {
   }
@@ -43,12 +40,10 @@ export class RoutesComponent implements OnInit {
   }
 
   setActive(route: VRPRoute){
-    console.log(route);
     MapService.markAsCurrent(route.mapPaths);
   }
 
   setNormal(route: VRPRoute){
-    console.log(route);
     MapService.markAsNormal(route.mapPaths);
   }
 
@@ -56,13 +51,13 @@ export class RoutesComponent implements OnInit {
 
 export class ProblemDataSource extends DataSource<any> {
 
-  constructor(private solutions: Observable<VRPSolution[]>) {
+  constructor(private solutions: Observable<VRPSolution>) {
     super();
   }
 
   connect(): Observable<VRPRoute[]> {
     return this.solutions.map(x => {
-      if (x[0]) return x[0].routes;
+      if (x) return x.routes;
     });
   }
 

@@ -10,6 +10,7 @@ import {Message} from '@stomp/stompjs';
 import {deserialize, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
 import {VRPRoute} from '../domain/VRPRoute';
+import {MatSnackBar} from '@angular/material';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -17,8 +18,8 @@ import {VRPRoute} from '../domain/VRPRoute';
 @Injectable()
 export class VRPService {
 
-
-  currentProblem: VRPProblem;
+  private _currentProblem: BehaviorSubject<VRPProblem> = new BehaviorSubject<VRPProblem>(null);
+  private _currentSolution: BehaviorSubject<VRPSolution> = new BehaviorSubject<VRPSolution>(null);
   private problems: BehaviorSubject<VRPProblem[]> = new BehaviorSubject<VRPProblem[]>([]);
   private customers: BehaviorSubject<VRPCustomer[]> = new BehaviorSubject<VRPCustomer[]>([]);
   private depots: BehaviorSubject<VRPDepot[]> = new BehaviorSubject<VRPDepot[]>([]);
@@ -26,7 +27,7 @@ export class VRPService {
 
   private PROBLEMS_KEY: string = 'problems';
 
-  constructor(private mapService: MapService, private _stompService: StompService) {
+  constructor(private mapService: MapService, private _stompService: StompService, private snackBar: MatSnackBar) {
     //Wczytywanie zapisanych problemow do storeage
     let p: VRPProblem[] = deserializeArray(VRPProblem, window.localStorage.getItem(this.PROBLEMS_KEY));
     if (p) {
@@ -37,10 +38,20 @@ export class VRPService {
     this.loadProblem(this.problems.value[0].id);
   }
 
+  getCurrentProblem() {
+    return this._currentProblem;
+  }
+
+  get currentProblemValue(): VRPProblem {
+    return this._currentProblem.value;
+  }
+
+  get currentSolution(): Observable<VRPSolution> {
+    return this._currentSolution;
+  }
+
   /**
    * Zwraca wszystkich odbiorców jako Observable.
-   * Przykład użycia
-   * getCustomers().subscribe();
    * @returns {Observable<VRPCustomer[]>} - lista wszystkich odbiorców
    */
   getCustomers(): Observable<VRPCustomer[]> {
@@ -52,11 +63,11 @@ export class VRPService {
    * @param {VRPCustomer} customer - odbiorca która ma zostać dodany
    */
   addCustomer(customer: VRPCustomer) {
-    if (this.currentProblem.customers.some(x => x.id == customer.id)) {
+    if (this.currentProblemValue.customers.some(x => x.id == customer.id)) {
       throw new Error('Customer with given name already exists.');
     }
-    this.currentProblem.addCustomer(customer);
-    this.customers.next(this.currentProblem.customers);
+    this.currentProblemValue.addCustomer(customer);
+    this.customers.next(this.currentProblemValue.customers);
     this.mapService.addCustomerToMap(customer);
   }
 
@@ -65,18 +76,16 @@ export class VRPService {
    * @param {VRPCustomer} customer
    */
   deleteCustomer(customer: VRPCustomer) {
-    const index = this.currentProblem.customers.indexOf(customer, 0);
+    const index = this.currentProblemValue.customers.indexOf(customer, 0);
     if (index > -1) {
-      this.currentProblem.customers.splice(index, 1);
+      this.currentProblemValue.customers.splice(index, 1);
     }
-    this.customers.next(this.currentProblem.customers);
+    this.customers.next(this.currentProblemValue.customers);
     this.refreshMap(); //TODO: Usunac tylko aktualny marker! jak? dunno.
   }
 
   /**
    * Zwraca magazyn jako Observable.
-   * Przykład użycia:
-   * getDepot().subscribe( response => this.depot = response[0] );
    * @returns {Observable<VRPDepot[]>} - obserwable zwracający magazyn
    */
   getDepot(): Observable<VRPDepot[]> {
@@ -88,7 +97,7 @@ export class VRPService {
    * @param {VRPDepot} depot - nowy magazyn
    */
   addDepot(depot: VRPDepot) {
-    this.currentProblem.setDepot(depot);
+    this.currentProblemValue.setDepot(depot);
     let copiedData = [depot];
     this.depots.next(copiedData);
     this.mapService.addDepotToMap(depot);
@@ -97,10 +106,10 @@ export class VRPService {
   /**
    * Tworzy nowy problem
    */
-  createNewProblem(name){
+  createNewProblem(name) {
     let problem = new VRPProblem(name);
     this.addProblem(problem);
-    return
+    return;
   }
 
   /**
@@ -120,6 +129,30 @@ export class VRPService {
     copiedData.push(problem);
     this.problems.next(copiedData);
     this.loadProblemAndRefreshMap(problem.id);
+  }
+
+  /**
+   * Usuwa podany problem - jeżeli jest ostatnim to komunikat
+   * @param problem
+   */
+  deleteProblem(problem: VRPProblem) {
+    let index = this.problems.value.indexOf(problem, 0);
+    if (index > -1) {
+      if(this.problems.value.length <= 1){
+        this.snackBar.open("Cannot delete last one problem", "OK", {
+          duration: 2000,
+        });
+      }
+      let copy = this.problems.value;
+      copy.splice(index, 1);
+      if (this.currentProblemValue === problem) {
+        this._currentProblem.next(copy[0]);
+      }
+      this.problems.next(copy);
+      this.snackBar.open("Deleted", "OK", {
+        duration: 2000,
+      });
+    }
   }
 
   /**
@@ -177,7 +210,7 @@ export class VRPService {
       }
     });
 
-    this._stompService.publish('/app/vrp', serialize(this.currentProblem, {excludePrefixes: ['solutions']}));
+    this._stompService.publish('/app/vrp', serialize(this.currentProblemValue, {excludePrefixes: ['solutions']}));
   }
 
   /**
@@ -192,6 +225,7 @@ export class VRPService {
    * @param solution
    */
   loadSolution(solution) {
+    this._currentSolution.next(solution);
     this.mapService.drawSolution(solution);
   };
 
@@ -199,11 +233,14 @@ export class VRPService {
    * Usuwa rozwiazanie
    */
   deleteSolution(solution) {
-    let index = this.currentProblem.solutions.indexOf(solution, 0);
+    let index = this.currentProblemValue.solutions.indexOf(solution, 0);
     if (index > -1) {
-      this.currentProblem.solutions.splice(index, 1);
+      if (this._currentSolution.value === solution) {
+        this._currentSolution.next(null);
+      }
+      this.currentProblemValue.solutions.splice(index, 1);
     }
-    this.solutions.next(this.currentProblem.solutions);
+    this.solutions.next(this.currentProblemValue.solutions);
   }
 
   /**
@@ -212,12 +249,10 @@ export class VRPService {
    */
   private addSolution(solution: VRPSolution) {
     VRPService.setColors(solution);
-    this.currentProblem.solutions.push(solution);
-    this.solutions.next(this.currentProblem.solutions);
-
+    this.currentProblemValue.solutions.push(solution);
+    this.solutions.next(this.currentProblemValue.solutions);
     this.loadSolution(solution);
   }
-
 
   /**
    * Zapisuje problemy do pamieci podrecznej przeglaradki co po odswiezeniu storny bedzie nadal taki jak jest
@@ -231,7 +266,7 @@ export class VRPService {
    * @param id
    */
   private loadProblem(id) {
-    if (this.currentProblem && this.currentProblem.id === id) {
+    if (this.currentProblemValue && this.currentProblemValue.id === id) {
       console.log('Problem juz wczytany');
       return;
     }
@@ -240,7 +275,7 @@ export class VRPService {
 
     if (problem) {
       console.log('Wczytywanie problemu:');
-      this.currentProblem = problem;
+      this._currentProblem.next(problem);
       this.customers.next(problem.customers);
       this.depots.next(problem.depots);
       this.solutions.next(problem.solutions);
@@ -292,5 +327,4 @@ export class VRPService {
   private static setLoadingMessage(message) {
     document.getElementById('loading-info').innerText = message;
   }
-
 }

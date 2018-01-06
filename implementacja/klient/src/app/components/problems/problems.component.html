@@ -16,6 +16,7 @@
       <mat-cell *matCellDef="let problem">
         <div class="button-row" *ngIf="problem.id != currentProblem.id">
           <button mat-button (click)="loadProblem(problem)">Load</button>
+          <button mat-button (click)="deleteProblem(problem)">Delete</button>
         </div>
       </mat-cell>
     </ng-container>

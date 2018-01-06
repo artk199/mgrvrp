@@ -21,7 +21,7 @@ export class VRPProblem {
 
   settings = {
     algorithm: "savings",
-    distance: "road",
+    distance: "air",
     geo_distance: "spherical",
     capacity: 200
   };
