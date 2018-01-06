@@ -17,18 +17,34 @@ mat-card {
   margin-top: -24px !important;
 }
 
-.top-bar {
-  width: 30vw;
-  height: 40px;
+@media (min-width: 1023px) {
+  .top-bar {
+    width: 30vw;
+    height: 40px;
+  }
+
+  .main-panel {
+    width: 30vw;
+    height: calc(100vh - 225px - 250px);
+  }
+
 }
 
-.main-panel {
-  width: 30vw;
-  height: calc(100vh - 225px - 250px);
+@media (max-width: 1024px) {
+
+  .top-bar {
+    width: calc(100vw - 80px);
+    height: 40px;
+  }
+
+  .main-panel {
+    width: calc(100vw - 80px);
+    height: calc(100vh - 225px - 250px);
+  }
 }
 
 .route-bar {
-  width: calc(100vw - 70px);
+  width: calc(100vw - 80px);
   height: 250px;
 }
 
