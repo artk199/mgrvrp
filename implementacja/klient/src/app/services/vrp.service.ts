@@ -9,6 +9,7 @@ import {StompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
 import {deserialize, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
+import {MatSnackBar} from '@angular/material';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -25,7 +26,7 @@ export class VRPService {
 
   private PROBLEMS_KEY: string = 'problems';
 
-  constructor(private mapService: MapService, private _stompService: StompService) {
+  constructor(private mapService: MapService, private _stompService: StompService, public snackBar: MatSnackBar) {
     //Wczytywanie zapisanych problemow do storeage
     let p: VRPProblem[] = deserializeArray(VRPProblem, window.localStorage.getItem(this.PROBLEMS_KEY));
     if (p) {
@@ -157,8 +158,8 @@ export class VRPService {
       let messageType = m.content ? m.content.type : '';
       switch (messageType) {
         case 'STEP':
-          let s : VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
-          this.setColors(s);
+          let s: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
+          VRPService.setColors(s);
           this.loadSolution(s);
           break;
         case 'END':
@@ -168,6 +169,7 @@ export class VRPService {
           obs.unsubscribe();
           break;
         case 'INFO':
+          VRPService.setLoadingMessage(m.content.message);
           console.log(m.content.message);
           break;
       }
@@ -207,7 +209,7 @@ export class VRPService {
    * @param {VRPSolution} solution
    */
   private addSolution(solution: VRPSolution) {
-    this.setColors(solution);
+    VRPService.setColors(solution);
     this.currentProblem.solutions.push(solution);
     this.solutions.next(this.currentProblem.solutions);
 
@@ -257,11 +259,15 @@ export class VRPService {
     document.getElementById('loading-screen').style.display = 'block';
   }
 
+  private static setLoadingMessage(message) {
+    document.getElementById('loading-info').innerText = message;
+  }
+
   /**
    * Przypisuje kolory do poszczegolnych tras
    * @param {VRPSolution} solution
    */
-  private setColors(solution: VRPSolution) {
+  private static setColors(solution: VRPSolution) {
     const colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
 
     let i = 0;

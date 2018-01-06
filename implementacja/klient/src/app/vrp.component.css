@@ -11,8 +11,21 @@
   top: 0;
   z-index: 999;
   display: none;
+  text-align: center;
+}
+
+.loading-spinner-container {
+  margin-top: calc(50vh - 50px);
+  margin-bottom: auto;
 }
 
 .loading-spinner {
-  margin: calc(50vh - 50px) auto auto;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+#loading-info {
+  font-family: Roboto,"Helvetica Neue",sans-serif;
+  font-size: 16px;
+  font-weight: 500;
 }
