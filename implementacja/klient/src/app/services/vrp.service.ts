@@ -57,8 +57,6 @@ export class VRPService {
     this.currentProblem.addCustomer(customer);
     this.customers.next(this.currentProblem.customers);
     this.mapService.addCustomerToMap(customer);
-
-    this.saveProblemsToStorage();
   }
 
   /**
@@ -72,8 +70,6 @@ export class VRPService {
     }
     this.customers.next(this.currentProblem.customers);
     this.refreshMap(); //TODO: Usunac tylko aktualny marker! jak? dunno.
-
-    this.saveProblemsToStorage();
   }
 
   /**
@@ -95,8 +91,6 @@ export class VRPService {
     let copiedData = [depot];
     this.depots.next(copiedData);
     this.mapService.addDepotToMap(depot);
-
-    this.saveProblemsToStorage();
   }
 
   /**
@@ -227,7 +221,7 @@ export class VRPService {
   /**
    * Zapisuje problemy do pamieci podrecznej przeglaradki co po odswiezeniu storny bedzie nadal taki jak jest
    */
-  private saveProblemsToStorage() {
+  saveProblemsToStorage() {
     window.localStorage.setItem(this.PROBLEMS_KEY, serialize(this.problems.value));
   }
 

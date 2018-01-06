@@ -13,7 +13,7 @@ import {ImportService} from '../../services/import.service';
 })
 export class ProblemsComponent implements OnInit {
 
-  displayedColumns = [ 'id', 'size', 'actions'];
+  displayedColumns = ['id', 'size', 'actions'];
   currentProblem: VRPProblem;
   dataSource;
 
@@ -25,7 +25,7 @@ export class ProblemsComponent implements OnInit {
   ngOnInit() {
   }
 
-  public loadProblem(problem){
+  public loadProblem(problem) {
     this.vrpService.loadProblemAndRefreshMap(problem.id);
     this.currentProblem = this.vrpService.currentProblem;
   }
@@ -41,12 +41,16 @@ export class ProblemsComponent implements OnInit {
     reader.readAsText(file);
   }
 
-  createNewProblem(){
-    this.vrpService.createNewProblem(ProblemsComponent.generateName())
+  saveToStorage(){
+    this.vrpService.saveProblemsToStorage();
+  }
+
+  createNewProblem() {
+    this.vrpService.createNewProblem(ProblemsComponent.generateName());
   }
 
   static generateName() {
-    return 'xxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxx'.replace(/[xy]/g, function (c) {
       const r = Math.random() * 16 | 0, v = c === 'x' ? r : ( r & 0x3 | 0x8 );
       return v.toString(16);
     });
