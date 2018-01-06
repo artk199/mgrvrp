@@ -5,3 +5,7 @@
 .mat-list-item {
   margin-top: 20px;
 }
+
+.add-panel {
+  float: right;
+}

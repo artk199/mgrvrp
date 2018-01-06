@@ -4,5 +4,6 @@ export class VRPSolution {
 
   routes: VRPRoute[];
   routeLength: any;
+  settings: any;
 
 }

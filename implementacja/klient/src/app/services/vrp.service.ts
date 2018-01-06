@@ -207,6 +207,12 @@ export class VRPService {
           VRPService.setLoadingMessage(m.content.message);
           console.log(m.content.message);
           break;
+        case 'RUNTIME_ERROR':
+          this.snackBar.open("Unknown error.", "OK", {
+            duration: 5000,
+          });
+          VRPService.stopLoading();
+          break;
       }
     });
 

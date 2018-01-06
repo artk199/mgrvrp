@@ -4,7 +4,7 @@ import {NgModule} from '@angular/core';
 import {
   MatGridListModule, MatTabsModule, MatTableModule, MatListModule,
   MatButtonModule, MatDialogModule, MatCardModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTooltipModule,
-  MatProgressSpinnerModule, MatSnackBarModule, MatCheckboxModule
+  MatProgressSpinnerModule, MatSnackBarModule, MatCheckboxModule, MatSortModule
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
@@ -17,7 +17,6 @@ import {VRPService} from './services/vrp.service';
 import {FormsModule} from '@angular/forms';
 import {MapService} from './services/map.service';
 import {ImportService} from './services/import.service';
-import {DepotInfoComponent} from './components/depot-info/depot-info.component';
 import {LogService} from './shared/log/log.service';
 import {LogPublishersService} from './shared/log/log-publishers.service';
 import {ProblemsComponent} from './components/problems/problems.component';
@@ -47,7 +46,6 @@ const stompConfig: StompConfig = {
     BaseInfoComponent,
     MapComponent,
     VrpAddDialogComponent,
-    DepotInfoComponent,
     ProblemsComponent,
     SolutionsComponent,
     RoutesComponent
@@ -70,7 +68,8 @@ const stompConfig: StompConfig = {
     MatTooltipModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatSortModule
   ],
   entryComponents: [
     VrpAddDialogComponent

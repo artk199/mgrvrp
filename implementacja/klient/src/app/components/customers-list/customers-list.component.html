@@ -24,8 +24,8 @@ y: {{customer.coordinates.y | number:'1.5-5'}}</pre>
   <ng-container matColumnDef="actions">
     <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
     <mat-cell *matCellDef="let customer">
-      <div class="button-row">
-        <button mat-button (click)="deleteCustomer(customer)">Delete</button>
+      <div class="button-row" style="margin-left: 10px;">
+        <button color="warn" mat-raised-button (click)="deleteCustomer(customer)">Delete</button>
       </div>
     </mat-cell>
   </ng-container>
