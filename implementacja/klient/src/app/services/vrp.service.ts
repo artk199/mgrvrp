@@ -9,6 +9,7 @@ import {StompService} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
 import {deserialize, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
+import {VRPRoute} from '../domain/VRPRoute';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -291,4 +292,5 @@ export class VRPService {
   private static setLoadingMessage(message) {
     document.getElementById('loading-info').innerText = message;
   }
+
 }

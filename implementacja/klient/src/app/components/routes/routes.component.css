@@ -13,7 +13,7 @@
 .bar-container {
   clear: both;
   position: relative;
-  height: 26px;
+  height: 19px;
 }
 
 .bar-slider {
@@ -21,20 +21,22 @@
   width: 100%;
   height: 4px;
   background: #ccc;
-  top: 14px;
+  top: 7px;
 }
 
 .bar-pointer {
   position: absolute;
   width: 8px;
   height: 8px;
-  border: 12px solid #a6d8ef;
+  border: 5px solid #a6d8ef;
   background-color: #5082e0;
   opacity: .7;
-  -webkit-border-radius: 18px;
-  -moz-border-radius: 18px;
-  border-radius: 18px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
   left: -10px;
 }
 
-
+.mat-header-row, .mat-row {
+  min-height: 22px !important;
+}

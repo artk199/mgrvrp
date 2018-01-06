@@ -119,39 +119,65 @@ export class MapService {
   drawSolution(solution: VRPSolution) {
     this.clearPaths();
     for (let route of solution.routes) {
+      let paths = [];
       for (let drivePoint of route.drivePoints) {
         let from = drivePoint.from;
         for (let to of drivePoint.points) {
-          let path = this.drawPath(
+          paths.push(MapService.generatePolylinePath(
             from.coordinates.x,
             from.coordinates.y,
             to.coordinates.x,
             to.coordinates.y,
-            this._map,
             route.color
-          );
+          ));
           from = to;
         }
       }
+      route.mapPaths = L.layerGroup(paths);
+      this.showPaths(route.mapPaths);
     }
   }
 
-  drawPath(srcLat, srcLng, dstLat, dstLng, map, color) {
-    var pointA = new L.LatLng(srcLat, srcLng);
-    var pointB = new L.LatLng(dstLat, dstLng);
-    var pointList = [pointA, pointB];
-
-    var path = new L.Polyline(pointList, {
+  static generatePolylinePath(srcLat, srcLng, dstLat, dstLng, color) {
+    let pointA = new L.LatLng(srcLat, srcLng);
+    let pointB = new L.LatLng(dstLat, dstLng);
+    let pointList = [pointA, pointB];
+    return new L.Polyline(pointList, {
       color: color,
-      weight: 4,
-      opacity: 0.8,
+      weight: 3,
+      opacity: 1,
       smoothFactor: 1
     });
-    path.addTo(map);
-    this.paths.push(path);
-    return path;
   }
 
+  public showPaths(mapPaths: any) {
+    this._map.addLayer(mapPaths);
+    this.paths.push(mapPaths);
+  }
+
+  public togglePaths(mapPaths: any) {
+    if (this._map.hasLayer(mapPaths)) {
+      this._map.removeLayer(mapPaths);
+    } else {
+      this._map.addLayer(mapPaths);
+    }
+  }
+
+  public static markAsCurrent(mapPaths: any) {
+    mapPaths.eachLayer(function(path) {
+      path.setStyle({
+        weight: 5
+      });
+    });
+  }
+
+  public static markAsNormal(mapPaths: any){
+    mapPaths.eachLayer(function(path) {
+      path.setStyle({
+        weight: 3
+      });
+    });
+  }
 
   private clearPaths() {
     for (let i = 0; i < this.paths.length; i++) {
@@ -159,4 +185,5 @@ export class MapService {
     }
     this.paths = [];
   }
+
 }

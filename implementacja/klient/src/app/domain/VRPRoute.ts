@@ -1,5 +1,5 @@
 import {VRPLocation} from './VRPLocation';
-import {Type} from 'class-transformer';
+import {Exclude, Type} from 'class-transformer';
 import {VRPDrivePoints} from './VRPDrivePoints';
 
 export class VRPRoute {
@@ -11,6 +11,10 @@ export class VRPRoute {
   public points: VRPLocation[];
 
   public routeLength: any;
+
   public color: any;
+
+  @Exclude()
+  public mapPaths: any = [];
 
 }

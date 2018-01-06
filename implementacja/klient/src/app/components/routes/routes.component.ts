@@ -5,6 +5,7 @@ import {DataSource} from '@angular/cdk/collections';
 import {Observable} from 'rxjs/Observable';
 import {VRPRoute} from '../../domain/VRPRoute';
 import {forEach} from '@angular/router/src/utils/collection';
+import {MapService} from '../../services/map.service';
 
 @Component({
   selector: 'vrp-routes',
@@ -15,10 +16,10 @@ export class RoutesComponent implements OnInit {
 
   currentSolution: VRPSolution;
 
-  displayedColumns = ['actions', 'id', 'length', 'bar'];
+  displayedColumns = ['actions', 'length', 'bar'];
   dataSource;
 
-  constructor(private vRPService: VRPService) {
+  constructor(private vRPService: VRPService, private mapService: MapService) {
     this.dataSource = new ProblemDataSource(this.vRPService.getSolutions());
   }
 
@@ -35,6 +36,20 @@ export class RoutesComponent implements OnInit {
       }
     }
     return '' + sum/route.routeLength *100 + '%';
+  }
+
+  toggle(route: VRPRoute){
+      this.mapService.togglePaths(route.mapPaths);
+  }
+
+  setActive(route: VRPRoute){
+    console.log(route);
+    MapService.markAsCurrent(route.mapPaths);
+  }
+
+  setNormal(route: VRPRoute){
+    console.log(route);
+    MapService.markAsNormal(route.mapPaths);
   }
 
 }
