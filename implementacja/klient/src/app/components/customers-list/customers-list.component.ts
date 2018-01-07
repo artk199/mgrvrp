@@ -4,6 +4,7 @@ import {VRPCustomer} from '../../domain/VRPCustomer';
 import {DataSource} from '@angular/cdk/collections';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
+import {MapService} from '../../services/map.service';
 
 @Component({
   selector: 'vrp-customers-list',
@@ -13,9 +14,17 @@ export class CustomersListComponent implements OnInit {
 
   displayedColumns = ['id', 'coords', 'demand', 'actions'];
   dataSource;
+  editEnabled: boolean;
 
   constructor(private vrpService: VRPService) {
     this.dataSource = new CustomersDataSource(this.vrpService.getCustomers());
+    this.vrpService.getSolutions().subscribe((v) => {
+      if (!v || v.length == 0) {
+        this.editEnabled = true;
+      } else {
+        this.editEnabled = false;
+      }
+    });
   }
 
   ngOnInit() {

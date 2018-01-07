@@ -21,6 +21,8 @@ export class MapService {
   private markers = [];
   private paths = [];
 
+  private ENABLED_EDITING = true;
+
   get map(): any {
     return this._map;
   }
@@ -47,7 +49,12 @@ export class MapService {
       position: 'topright'
     }).addTo(this._map);
 
-    this._map.on('click', this._clickEvent);
+    let s = this;
+    this._map.on('click', function(e){
+      if(s.ENABLED_EDITING) {
+        s._clickEvent(e);
+      }
+    });
   }
 
   public changeToSimplePlane() {
@@ -104,7 +111,7 @@ export class MapService {
     };
     const marker = L.marker(
       [coordinates.x, coordinates.y], opts).addTo(this._map);
-    marker.bindTooltip(name).openTooltip();
+    marker.bindTooltip(name);
     marker.on('dragend', function (event) {
       coordinates.x = event.target._latlng.lat;
       coordinates.y = event.target._latlng.lng;
@@ -172,15 +179,15 @@ export class MapService {
   }
 
   public static markAsCurrent(route: VRPRoute) {
-    route.mapPaths.eachLayer(function(path) {
+    route.mapPaths.eachLayer(function (path) {
       path.setStyle({
         weight: 5
       });
     });
   }
 
-  public static markAsNormal(route: VRPRoute){
-    route.mapPaths.eachLayer(function(path) {
+  public static markAsNormal(route: VRPRoute) {
+    route.mapPaths.eachLayer(function (path) {
       path.setStyle({
         weight: 3
       });
@@ -192,6 +199,20 @@ export class MapService {
       this._map.removeLayer(this.paths[i]);
     }
     this.paths = [];
+  }
+
+  disableEditing() {
+    this.ENABLED_EDITING = false;
+    for (let m of this.markers) {
+      m.dragging.disable();
+    }
+  }
+
+  enableEditing() {
+    this.ENABLED_EDITING = true;
+    for (let m of this.markers) {
+      m.dragging.enable();
+    }
   }
 
 }

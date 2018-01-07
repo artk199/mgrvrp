@@ -36,6 +36,14 @@ export class VRPService {
       this.problems.next([new VRPProblem('0')]);
     }
     this.loadProblem(this.problems.value[0].id);
+
+    this.solutions.subscribe((v) => {
+      if (!v || v.length == 0) {
+        this.mapService.enableEditing();
+      } else {
+        this.mapService.disableEditing();
+      }
+    });
   }
 
   getCurrentProblem() {
@@ -138,8 +146,8 @@ export class VRPService {
   deleteProblem(problem: VRPProblem) {
     let index = this.problems.value.indexOf(problem, 0);
     if (index > -1) {
-      if(this.problems.value.length <= 1){
-        this.snackBar.open("Cannot delete last one problem", "OK", {
+      if (this.problems.value.length <= 1) {
+        this.snackBar.open('Cannot delete last one problem', 'OK', {
           duration: 2000,
         });
       }
@@ -149,7 +157,7 @@ export class VRPService {
         this._currentProblem.next(copy[0]);
       }
       this.problems.next(copy);
-      this.snackBar.open("Deleted", "OK", {
+      this.snackBar.open('Deleted', 'OK', {
         duration: 2000,
       });
     }
@@ -208,7 +216,7 @@ export class VRPService {
           console.log(m.content.message);
           break;
         case 'RUNTIME_ERROR':
-          this.snackBar.open("Unknown error.", "OK", {
+          this.snackBar.open('Unknown error.', 'OK', {
             duration: 5000,
           });
           VRPService.stopLoading();
@@ -250,6 +258,21 @@ export class VRPService {
   }
 
   /**
+   * Zapisuje problemy do pamieci podrecznej przeglaradki co po odswiezeniu storny bedzie nadal taki jak jest
+   */
+  saveProblemsToStorage() {
+    window.localStorage.setItem(this.PROBLEMS_KEY, serialize(this.problems.value));
+  }
+
+  /**
+   * Zwraca aktualnych odbiorców
+   * @returns {VRPCustomer[]}
+   */
+  getCustomersData() {
+    return this.customers.value;
+  }
+
+  /**
    * Dodaje odpowiedz do aktualnie wybranego problemu
    * @param {VRPSolution} solution
    */
@@ -258,13 +281,6 @@ export class VRPService {
     this.currentProblemValue.solutions.push(solution);
     this.solutions.next(this.currentProblemValue.solutions);
     this.loadSolution(solution);
-  }
-
-  /**
-   * Zapisuje problemy do pamieci podrecznej przeglaradki co po odswiezeniu storny bedzie nadal taki jak jest
-   */
-  saveProblemsToStorage() {
-    window.localStorage.setItem(this.PROBLEMS_KEY, serialize(this.problems.value));
   }
 
   /**
@@ -288,14 +304,6 @@ export class VRPService {
     } else {
       console.log('Nie mozna wczytac problemu - nie znaleziono problemu o podanym ID.');
     }
-  }
-
-  /**
-   * Zwraca aktualnych odbiorców
-   * @returns {VRPCustomer[]}
-   */
-  getCustomersData() {
-    return this.customers.value;
   }
 
   /**
@@ -333,4 +341,5 @@ export class VRPService {
   private static setLoadingMessage(message) {
     document.getElementById('loading-info').innerText = message;
   }
+
 }
