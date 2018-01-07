@@ -1,31 +1,32 @@
 <div class="main-menu">
 
   <mat-card class="top-bar">
-    <button mat-icon-button>
-      <mat-icon>menu</mat-icon>
-    </button>
+    <h2 style="margin-top: 20px;">CVRP Solver</h2>
+    <span class="spacer"></span>
+    <mat-button-toggle (change)="toggleInfoPanel()" class="panel-button">Info panel</mat-button-toggle>
+    <mat-button-toggle (change)="toggleRoutesPanel()" class="panel-button">Routes panel</mat-button-toggle>
   </mat-card>
 
-  <mat-card class="tabs-card main-panel" style="overflow-y: auto">
+  <mat-card *ngIf="!infoPanelHidden" class="tabs-card main-panel" style="overflow-y: auto">
 
-      <mat-tab-group class="tabs-content">
-        <mat-tab label="Info">
-          <vrp-base-info></vrp-base-info>
-        </mat-tab>
-        <mat-tab label="Solutions">
-          <vrp-solutions></vrp-solutions>
-        </mat-tab>
-        <mat-tab label="Customers">
-          <vrp-customers-list></vrp-customers-list>
-        </mat-tab>
-        <mat-tab label="Problems">
-          <vrp-problems></vrp-problems>
-        </mat-tab>
-      </mat-tab-group>
+    <mat-tab-group class="tabs-content">
+      <mat-tab label="Info">
+        <vrp-base-info></vrp-base-info>
+      </mat-tab>
+      <mat-tab label="Solutions">
+        <vrp-solutions></vrp-solutions>
+      </mat-tab>
+      <mat-tab label="Customers">
+        <vrp-customers-list></vrp-customers-list>
+      </mat-tab>
+      <mat-tab label="Problems">
+        <vrp-problems></vrp-problems>
+      </mat-tab>
+    </mat-tab-group>
 
   </mat-card>
 
-  <mat-card class="route-bar">
+  <mat-card *ngIf="!routesPanelHidden" class="route-bar">
     <vrp-routes></vrp-routes>
   </mat-card>
 </div>

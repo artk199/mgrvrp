@@ -1,10 +1,10 @@
 import {BrowserModule} from '@angular/platform-browser';
-import "reflect-metadata";
+import 'reflect-metadata';
 import {NgModule} from '@angular/core';
 import {
   MatGridListModule, MatTabsModule, MatTableModule, MatListModule,
   MatButtonModule, MatDialogModule, MatCardModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTooltipModule,
-  MatProgressSpinnerModule, MatSnackBarModule, MatCheckboxModule, MatSortModule
+  MatProgressSpinnerModule, MatSnackBarModule, MatCheckboxModule, MatSortModule, MatButtonToggleModule
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
@@ -69,7 +69,8 @@ const stompConfig: StompConfig = {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatCheckboxModule,
-    MatSortModule
+    MatSortModule,
+    MatButtonToggleModule
   ],
   entryComponents: [
     VrpAddDialogComponent

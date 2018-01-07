@@ -2,6 +2,20 @@ mat-card {
   margin: 10px;
 }
 
+.top-bar {
+  display: flex;
+  align-items: center;
+  height: 35px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.panel-button {
+  margin: 0 14px;
+}
+
 .main-menu {
   position: absolute;
   z-index: 999;
@@ -20,7 +34,6 @@ mat-card {
 @media (min-width: 1023px) {
   .top-bar {
     width: 30vw;
-    height: 40px;
   }
 
   .main-panel {
