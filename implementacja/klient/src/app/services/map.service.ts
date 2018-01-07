@@ -4,6 +4,7 @@ import {Coordinate} from '../domain/Coordinate';
 import {VRPCustomer} from '../domain/VRPCustomer';
 import {VRPDepot} from '../domain/VRPDepot';
 import {VRPSolution} from '../domain/VRPSolution';
+import {VRPRoute} from '../domain/VRPRoute';
 
 @Injectable()
 export class MapService {
@@ -123,13 +124,20 @@ export class MapService {
       for (let drivePoint of route.drivePoints) {
         let from = drivePoint.from;
         for (let to of drivePoint.points) {
-          paths.push(MapService.generatePolylinePath(
+          let path = MapService.generatePolylinePath(
             from.coordinates.x,
             from.coordinates.y,
             to.coordinates.x,
             to.coordinates.y,
             route.color
-          ));
+          );
+          paths.push(path);
+          path.on('mouseover', function (e) {
+            MapService.markAsCurrent(route);
+          });
+          path.on('mouseout', function (e) {
+            MapService.markAsNormal(route);
+          });
           from = to;
         }
       }
@@ -163,16 +171,16 @@ export class MapService {
     }
   }
 
-  public static markAsCurrent(mapPaths: any) {
-    mapPaths.eachLayer(function(path) {
+  public static markAsCurrent(route: VRPRoute) {
+    route.mapPaths.eachLayer(function(path) {
       path.setStyle({
         weight: 5
       });
     });
   }
 
-  public static markAsNormal(mapPaths: any){
-    mapPaths.eachLayer(function(path) {
+  public static markAsNormal(route: VRPRoute){
+    route.mapPaths.eachLayer(function(path) {
       path.setStyle({
         weight: 3
       });

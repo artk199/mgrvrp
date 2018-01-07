@@ -40,11 +40,11 @@ export class RoutesComponent implements OnInit {
   }
 
   setActive(route: VRPRoute){
-    MapService.markAsCurrent(route.mapPaths);
+    MapService.markAsCurrent(route);
   }
 
   setNormal(route: VRPRoute){
-    MapService.markAsNormal(route.mapPaths);
+    MapService.markAsNormal(route);
   }
 
 }
