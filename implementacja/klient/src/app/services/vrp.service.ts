@@ -5,7 +5,7 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {VRPDepot} from '../domain/VRPDepot';
 import {VRPProblem} from '../domain/VRPProblem';
 import {MapService} from './map.service';
-import {StompService} from '@stomp/ng2-stompjs';
+import {StompService, StompState} from '@stomp/ng2-stompjs';
 import {Message} from '@stomp/stompjs';
 import {deserialize, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
@@ -191,6 +191,11 @@ export class VRPService {
    * Wysyla problem do serwera ktory zwraca wynik.
    */
   solveCurrentProblem() {
+    let currentState = this._stompService.state.value;
+    if(currentState === StompState.CLOSED){
+      this.snackBar.open('Cannot connect to solving service.');
+      return;
+    }
     VRPService.startLoading();
     let stomp_subscription = this._stompService.subscribe('/topic/hello');
 
@@ -250,6 +255,7 @@ export class VRPService {
     let index = this.currentProblemValue.solutions.indexOf(solution, 0);
     if (index > -1) {
       if (this._currentSolution.value === solution) {
+
         this._currentSolution.next(null);
       }
       this.currentProblemValue.solutions.splice(index, 1);

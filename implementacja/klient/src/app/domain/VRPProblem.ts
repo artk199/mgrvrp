@@ -23,7 +23,8 @@ export class VRPProblem {
     algorithm: "savings",
     distance: "air",
     geo_distance: "spherical",
-    capacity: 200
+    capacity: 200,
+    type: 'MAP'
   };
 
   constructor(id: string) {

@@ -70,6 +70,9 @@ export class ImportService {
 
     let problem = new VRPProblem(id);
 
+    problem.settings.capacity = parseInt(settings['CAPACITY']);
+    problem.settings.type = settings['EDGE_WEIGHT_TYPE'];
+
     for(let node of nodes){
       if(node.isDepot){
         let d = new VRPDepot(node.id, new Coordinate(node.x,node.y));

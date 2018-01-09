@@ -16,7 +16,8 @@ export class BaseInfoComponent implements OnInit {
 
   algorithms = [{code: 'savings', description: 'Savings algorithm'},
     {code: 'jsprit', description: 'JSprit? Metaheuristic'},
-    {code: 'random', description: 'Random solution'}
+    {code: 'random', description: 'Random solution'},
+    {code: 'greedyFirst', description: 'Greedy first'}
   ];
 
   distances = [{code: 'road', description: 'Road'},
