@@ -59,5 +59,6 @@ mat-card {
 .route-bar {
   width: calc(100vw - 80px);
   height: 250px;
+  padding: 0;
 }
 

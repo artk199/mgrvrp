@@ -11,6 +11,7 @@ import {deserialize, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
 import {VRPRoute} from '../domain/VRPRoute';
 import {MatSnackBar} from '@angular/material';
+import {VRPSolutionStep} from '../domain/VRPSolutionStep';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -199,6 +200,8 @@ export class VRPService {
     VRPService.startLoading();
     let stomp_subscription = this._stompService.subscribe('/topic/hello');
 
+    let steps = [];
+
     let obs = stomp_subscription.map((message: Message) => {
       return message.body;
     }).subscribe((msg: string) => {
@@ -207,11 +210,15 @@ export class VRPService {
       switch (messageType) {
         case 'STEP':
           let s: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
+          let solutionStep = new VRPSolutionStep();
+          solutionStep.data = s;
+          steps.push(solutionStep);
           VRPService.setColors(s);
           this.loadSolution(s);
           break;
         case 'END':
           let solution: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
+          solution.solutionsSteps = steps;
           this.addSolution(solution);
           VRPService.stopLoading();
           obs.unsubscribe();

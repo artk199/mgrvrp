@@ -1,40 +1,59 @@
-<div>
-  <mat-table #table [dataSource]="dataSource">
+<mat-tab-group class="tabs-content" (selectedTabChange)="onTabChanged($event)">
+  <mat-tab label="Current solution info">
+    <div style="padding:10px;">
+      <mat-table #table [dataSource]="dataSource">
 
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef width="10%"> Actions</mat-header-cell>
-      <mat-cell *matCellDef="let route">
-        <mat-checkbox (change)="toggle(route)" checked="true"></mat-checkbox>
-      </mat-cell>
-    </ng-container>
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef width="10%"> Actions</mat-header-cell>
+          <mat-cell *matCellDef="let route">
+            <mat-checkbox (change)="toggle(route)" checked="true"></mat-checkbox>
+          </mat-cell>
+        </ng-container>
 
-    <ng-container matColumnDef="length">
-      <mat-header-cell *matHeaderCellDef> Length</mat-header-cell>
-      <mat-cell *matCellDef="let route"> {{route.routeLength | number : '1.4-4' }}km</mat-cell>
-    </ng-container>
+        <ng-container matColumnDef="length">
+          <mat-header-cell *matHeaderCellDef> Length</mat-header-cell>
+          <mat-cell *matCellDef="let route"> {{route.routeLength | number : '1.4-4' }}km</mat-cell>
+        </ng-container>
 
-    <ng-container matColumnDef="bar">
-      <mat-header-cell *matHeaderCellDef>-</mat-header-cell>
-      <mat-cell *matCellDef="let route">
-        <div class="bar-container">
-          <div class="bar-slider" [ngStyle]="{ 'background': route.color}">
-          </div>
-          <div class="bar-pointer" *ngFor="let point of route.points"
-               [ngStyle]="{ 'left': calculatePosition(route,point)}"
-               matTooltip="{{point.id}}" matTooltipPosition="above">
-          </div>
-        </div>
+        <ng-container matColumnDef="bar">
+          <mat-header-cell *matHeaderCellDef>-</mat-header-cell>
+          <mat-cell *matCellDef="let route">
+            <div class="bar-container">
+              <div class="bar-slider" [ngStyle]="{ 'background': route.color}">
+              </div>
+              <div class="bar-pointer" *ngFor="let point of route.points"
+                   [ngStyle]="{ 'left': calculatePosition(route,point)}"
+                   matTooltip="{{point.id}}" matTooltipPosition="above">
+              </div>
+            </div>
 
-      </mat-cell>
-    </ng-container>
+          </mat-cell>
+        </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
 
-    <mat-row
-      *matRowDef="let route; columns: displayedColumns;"
-      (mouseenter)="setActive(route)"
-      (mouseleave)="setNormal(route)"
-    ></mat-row>
+        <mat-row
+          *matRowDef="let route; columns: displayedColumns;"
+          (mouseenter)="setActive(route)"
+          (mouseleave)="setNormal(route)"
+        ></mat-row>
 
-  </mat-table>
-</div>
+      </mat-table>
+    </div>
+  </mat-tab>
+  <mat-tab label="Steps">
+    <mat-grid-list cols="7" rowHeight="100px">
+      <mat-grid-tile>
+        <div (click)="prevStep()">Prev</div>
+      </mat-grid-tile>
+      <mat-grid-tile
+        [colspan]="5">
+        {{currentStep}}/{{maxSteps}}
+      </mat-grid-tile>
+      <mat-grid-tile>
+        <div (click)="nextStep()">Next</div>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </mat-tab>
+</mat-tab-group>
+

@@ -6,10 +6,6 @@ body {
   margin: 0px;
 }
 
-.mat-figure {
-  display: block !important;
-}
-
 .mat-tab-label {
   min-width: 50px !important;
 }

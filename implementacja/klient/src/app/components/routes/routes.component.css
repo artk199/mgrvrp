@@ -40,3 +40,7 @@
 .mat-header-row, .mat-row {
   min-height: 22px !important;
 }
+
+.route-tab {
+  padding:10px;
+}

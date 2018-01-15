@@ -87,7 +87,7 @@ export class MapService {
   public addCustomerToMap(customer: VRPCustomer) {
     const customerIcon = new L.Icon.Default({
       imagePath: 'assets/leaflet/images/',
-      iconUrl: 'marker-icon.png',
+      iconUrl: 'marker-icon-3.png',
     });
     this.addMarker(customer.coordinates, customerIcon, customer.id);
   }
@@ -98,7 +98,7 @@ export class MapService {
   public addDepotToMap(depot: VRPDepot) {
     const depotIcon = new L.Icon.Default({
       imagePath: 'assets/leaflet/images/',
-      iconUrl: 'marker-icon-2.png',
+      iconUrl: 'marker-icon-4.png',
     });
     this.addMarker(depot.coordinates, depotIcon, depot.id);
   }
