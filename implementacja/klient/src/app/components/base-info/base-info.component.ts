@@ -14,10 +14,10 @@ export class BaseInfoComponent implements OnInit {
   currentProblem: VRPProblem;
   depot: VRPDepot;
 
-  algorithms = [{code: 'savings', description: 'Savings algorithm'},
+  algorithms = [{code: 'savings', description: 'Clarke and Wright (C & W)'},
     {code: 'jsprit', description: 'JSprit? Metaheuristic'},
-    {code: 'random', description: 'Random solution'},
-    {code: 'greedyFirst', description: 'Greedy first'},
+    {code: 'random', description: 'Randomized Insertion (RandIns)'},
+    {code: 'greedyFirst', description: 'Nearest Neighbor (NN)'},
     {code: 'tabu', description: 'Tabu search'}
   ];
 

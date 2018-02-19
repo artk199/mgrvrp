@@ -44,14 +44,18 @@
   <mat-tab label="Steps">
     <mat-grid-list cols="7" rowHeight="100px">
       <mat-grid-tile>
-        <div (click)="prevStep()">Prev</div>
+        <button mat-fab>
+          <mat-icon color="primary" (click)="prevStep()">keyboard_arrow_left</mat-icon>
+        </button>
       </mat-grid-tile>
       <mat-grid-tile
         [colspan]="5">
         {{currentStep}}/{{maxSteps}}
       </mat-grid-tile>
       <mat-grid-tile>
-        <div (click)="nextStep()">Next</div>
+        <button mat-fab>
+          <mat-icon color="primary" (click)="nextStep()">keyboard_arrow_right</mat-icon>
+        </button>
       </mat-grid-tile>
     </mat-grid-list>
   </mat-tab>

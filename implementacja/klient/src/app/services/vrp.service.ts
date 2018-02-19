@@ -207,10 +207,13 @@ export class VRPService {
     }).subscribe((msg: string) => {
       let m = JSON.parse(msg);
       let messageType = m.content ? m.content.type : '';
+      console.log("Dostaje wiadomosc");
+      console.log(messageType);
       switch (messageType) {
         case 'STEP':
           let s: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
           let solutionStep = new VRPSolutionStep();
+          console.log(s);
           solutionStep.data = s;
           steps.push(solutionStep);
           VRPService.setColors(s);

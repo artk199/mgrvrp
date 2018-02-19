@@ -4,7 +4,7 @@ import {NgModule} from '@angular/core';
 import {
   MatGridListModule, MatTabsModule, MatTableModule, MatListModule,
   MatButtonModule, MatDialogModule, MatCardModule, MatIconModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatTooltipModule,
-  MatProgressSpinnerModule, MatSnackBarModule, MatCheckboxModule, MatSortModule, MatButtonToggleModule
+  MatProgressSpinnerModule, MatSnackBarModule, MatCheckboxModule, MatSortModule, MatButtonToggleModule, MatToolbarModule
 } from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
@@ -70,7 +70,8 @@ const stompConfig: StompConfig = {
     MatSnackBarModule,
     MatCheckboxModule,
     MatSortModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    MatToolbarModule
   ],
   entryComponents: [
     VrpAddDialogComponent
