@@ -1,5 +1,8 @@
 package pl.mgr.vrp.model
 
+import groovy.transform.AutoClone
+
+@AutoClone
 class VRPDrivePoint {
 
     VRPDrivePoint(VRPLocation from, VRPLocation dest, List<VRPPoint> points) {

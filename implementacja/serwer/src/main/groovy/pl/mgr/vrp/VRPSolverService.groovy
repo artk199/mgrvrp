@@ -42,6 +42,15 @@ abstract class VRPSolverService {
         return null
     }
 
+    def assignIDs(VRPProblem problem) {
+        int i = 1
+        problem.customers.each {
+            it._ID = i
+            i++
+        }
+        problem.depot._ID = 0
+    }
+
     def logRuntimeError(String _message) {
         def builder = new JsonBuilder()
         builder {
@@ -125,7 +134,7 @@ abstract class VRPSolverService {
                 route.routeLength += it.routeLength
             }
 
-            logStep(solution)
+            //logStep(solution)
         }
     }
 
@@ -157,7 +166,7 @@ abstract class VRPSolverService {
                 route.routeLength += it.routeLength
             }
         }
-        logStep(solution)
+        //logStep(solution)
     }
 
     def calculateDistances(VRPProblem vrpProblem) {

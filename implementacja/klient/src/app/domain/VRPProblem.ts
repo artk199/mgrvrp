@@ -7,9 +7,16 @@ import {VRPSolution} from './VRPSolution';
 /**
  * Informacje na temat problemu.
  */
+
+export class PaneType {
+  static EARTH = 'Earth';
+  static SIMPLE = 'Simple';
+}
+
 export class VRPProblem {
 
   id: string;
+  paneType: string;
 
   @Type(() => VRPCustomer)
   customers: VRPCustomer[];
@@ -20,9 +27,9 @@ export class VRPProblem {
   solutions: VRPSolution[];
 
   settings = {
-    algorithm: "savings",
-    distance: "air",
-    geo_distance: "spherical",
+    algorithm: 'savings',
+    distance: 'air',
+    geo_distance: 'spherical',
     capacity: 200,
     type: 'MAP'
   };
@@ -32,6 +39,7 @@ export class VRPProblem {
     this.customers = [];
     this.depots = [];
     this.solutions = [];
+    this.paneType = PaneType.EARTH;
   }
 
   public addCustomer(customer: VRPCustomer) {
@@ -41,5 +49,6 @@ export class VRPProblem {
   public setDepot(depot: VRPDepot) {
     this.depots = [depot];
   }
+
 
 }

@@ -1,5 +1,8 @@
 package pl.mgr.vrp.model
 
+import groovy.transform.AutoClone
+
+@AutoClone
 class Coordinate {
     double x, y
 

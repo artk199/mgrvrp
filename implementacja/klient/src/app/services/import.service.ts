@@ -4,7 +4,7 @@ import {VRPService} from './vrp.service';
 import {VRPCustomer} from '../domain/VRPCustomer';
 import {Coordinate} from '../domain/Coordinate';
 import {VRPDepot} from '../domain/VRPDepot';
-import {VRPProblem} from '../domain/VRPProblem';
+import {PaneType, VRPProblem} from '../domain/VRPProblem';
 
 @Injectable()
 export class ImportService {
@@ -15,7 +15,6 @@ export class ImportService {
 
   public importVRPFile(s, id) {
 
-    this.mapService.changeToSimplePlane();
     const lines = s.split('\n');
 
     const START_SECTION = ['NAME', 'COMMENT', 'TYPE', 'DIMENSION', 'EDGE_WEIGHT_TYPE', 'CAPACITY'];
@@ -83,6 +82,7 @@ export class ImportService {
       }
     }
 
+    problem.paneType = PaneType.SIMPLE;
     this.vRPService.addProblem(problem);
   }
 }

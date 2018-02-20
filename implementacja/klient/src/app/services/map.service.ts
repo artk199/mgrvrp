@@ -5,6 +5,8 @@ import {VRPCustomer} from '../domain/VRPCustomer';
 import {VRPDepot} from '../domain/VRPDepot';
 import {VRPSolution} from '../domain/VRPSolution';
 import {VRPRoute} from '../domain/VRPRoute';
+import {LSimpleGraticule} from '../libs/L.SimpleGraticule';
+import {PaneType} from '../domain/VRPProblem';
 
 @Injectable()
 export class MapService {
@@ -18,6 +20,7 @@ export class MapService {
 
   private _map: any = null;
   private _clickEvent: any;
+  private _currentPaneType: string;
   private markers = [];
   private paths = [];
 
@@ -25,6 +28,29 @@ export class MapService {
 
   get map(): any {
     return this._map;
+  }
+
+  get currentPaneType(): string {
+    return this._currentPaneType;
+  }
+
+  public setupMap(mapType: string = PaneType.EARTH){
+    if(this._map){
+      this.paths = [];
+      this.markers = [];
+      this._map.remove();
+    }
+
+    switch (mapType){
+      case PaneType.EARTH:
+        this.setupEarthMap();
+        break;
+      case PaneType.SIMPLE:
+        this.setupSimpleMap();
+        break;
+      default: console.log("ERROR: Nieznany mapType!");
+    }
+    this._currentPaneType = mapType;
   }
 
   /**
@@ -35,7 +61,7 @@ export class MapService {
    * - przestawia kontrolki na prawy górny róg (defaultowo jest w lewym górym rogu)
    * - dodaje menu dodawania nowego customera/depotu po kliknieciu na mapę
    */
-  public setupMap() {
+  public setupEarthMap() {
 
     this._map = L.map(this.MAP_ID, {
       zoomControl: false
@@ -55,18 +81,34 @@ export class MapService {
         s._clickEvent(e);
       }
     });
+
+    this._currentPaneType = PaneType.EARTH;
   }
 
-  public changeToSimplePlane() {
-    this._map.remove();
+  public setupSimpleMap() {
     this._map = L.map(this.MAP_ID, {
       crs: L.CRS.Simple,
       zoomControl: false
     }).setView([50, 50], 5);
 
+
     L.control.zoom({
       position: 'topright'
     }).addTo(this._map);
+
+    let options = {interval: 20,
+      showOriginLabel: true,
+      redraw: 'move',
+      zoomIntervals: [
+        {start: 0, end: 3, interval: 50},
+        {start: 4, end: 5, interval: 5},
+        {start: 6, end: 20, interval: 1}
+      ]};
+
+    LSimpleGraticule(options).addTo(this._map);
+
+    this._currentPaneType = PaneType.SIMPLE;
+
   }
 
   /**
@@ -194,7 +236,7 @@ export class MapService {
     });
   }
 
-  private clearPaths() {
+  public clearPaths() {
     for (let i = 0; i < this.paths.length; i++) {
       this._map.removeLayer(this.paths[i]);
     }

@@ -170,8 +170,8 @@ export class VRPService {
    */
   loadProblemAndRefreshMap(id) {
     this.loadProblem(id);
+    this.mapService.setupMap(this.currentProblemValue.paneType);
     this.refreshMap();
-
   }
 
   /**
@@ -265,8 +265,9 @@ export class VRPService {
     let index = this.currentProblemValue.solutions.indexOf(solution, 0);
     if (index > -1) {
       if (this._currentSolution.value === solution) {
-
         this._currentSolution.next(null);
+        //Wyczyscic mape.
+        this.mapService.clearPaths();
       }
       this.currentProblemValue.solutions.splice(index, 1);
     }
