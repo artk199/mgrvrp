@@ -19,6 +19,11 @@ class VRPProblem implements Validateable {
                 return new VRPCustomer(it)
             it
         }
+        problem.depots = problem.depots.collect {
+            if (it instanceof LazyMap)
+                return new VRPDepot(it)
+            it
+        }
         problem
     }
 

@@ -51,6 +51,8 @@ class JspritVRPSolverService extends VRPSolverService {
 
     @Override
     protected VRPSolution calculateSolution(VRPProblem problem) {
+        logInfo("Searching for solution...")
+
         def depot = Location.newInstance(problem.depots[0].coordinates.x,problem.depots[0].coordinates.y)
 
         List<Service> services = []

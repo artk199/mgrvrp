@@ -170,6 +170,36 @@ abstract class VRPSolverService {
         //logStep(solution)
     }
 
+    def calculateSimpleRoute(VRPSolution solution) {
+        solution.routes.each { route ->
+            def lastPoint = route.start
+            route.drivePoints = []
+            route.points.each { point ->
+                def drivePoint = new VRPDrivePoint(lastPoint, point, [
+                        new VRPPoint(lastPoint.coordinates.x, lastPoint.coordinates.y),
+                        new VRPPoint(point.coordinates.x, point.coordinates.y)
+                ])
+                for (int i = 1; i < drivePoint.points.size(); i++) {
+                    drivePoint.routeLength += routingUtilService.calculateSimpleDistance(drivePoint.points[i - 1], drivePoint.points[i])
+                }
+                route.drivePoints += drivePoint
+                lastPoint = point
+            }
+            def drivePoint = new VRPDrivePoint(lastPoint, route.end, [
+                    new VRPPoint(lastPoint.coordinates.x, lastPoint.coordinates.y),
+                    new VRPPoint(route.end.coordinates.x, route.end.coordinates.y)
+            ])
+            for (int i = 1; i < drivePoint.points.size(); i++) {
+                drivePoint.routeLength += routingUtilService.calculateSimpleDistance(drivePoint.points[i - 1], drivePoint.points[i])
+            }
+            route.drivePoints += drivePoint
+            route.routeLength = 0
+            route.drivePoints.each {
+                route.routeLength += it.routeLength
+            }
+        }
+    }
+
     def calculateDistances(VRPProblem vrpProblem) {
         logInfo "Obliczanie odleglosci..."
         def methodName = "calculate${vrpProblem.distanceType?.capitalize()}DistanceMatrix"

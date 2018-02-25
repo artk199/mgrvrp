@@ -19,7 +19,12 @@ export class BaseInfoComponent implements OnInit {
   algorithms: VRPAlgorithm[] = [
     new VRPAlgorithm('savings', 'Clarke and Wright (C & W)', []),
     new VRPAlgorithm('jsprit', 'JSprit? Metaheuristic', []),
-    new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', []),
+    new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', [{
+      code: 'attempts',
+      description: 'Attempts',
+      type  : 'NUMBER',
+      value: 1
+    }]),
     new VRPAlgorithm('greedyFirst', 'Nearest Neighbor (NN)', []),
     new VRPAlgorithm('tabu', 'Tabu search', [
       {
@@ -32,7 +37,8 @@ export class BaseInfoComponent implements OnInit {
   ];
 
 
-  distances = [{code: 'road', description: 'Road'},
+  distances = [{code: 'simple', description: 'Euclidean distance'},
+    {code: 'road', description: 'Road'},
     {code: 'air', description: 'Air'}
   ];
 

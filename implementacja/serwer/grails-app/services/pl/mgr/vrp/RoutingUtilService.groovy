@@ -36,6 +36,19 @@ class RoutingUtilService {
         distances
     }
 
+    double[][] calculateSimpleDistanceMatrix(VRPProblem vrpProblem) {
+        def distances = new double[vrpProblem.customers.size()+1][vrpProblem.customers.size()+1]
+        vrpProblem.customers.eachWithIndex { VRPCustomer c, int i ->
+            distances[i+1][0] = calculateSimpleDistance(vrpProblem.depot,c)
+            distances[0][i+1] = calculateSimpleDistance(c,vrpProblem.depot)
+            //Obliczamy n^2, a nie (n^2)/2 bo droga powrotna może mieć inna dlugosc
+            vrpProblem.customers.eachWithIndex { VRPCustomer c2, int j ->
+                distances[i+1][j+1] = calculateSimpleDistance(c2,c)
+            }
+        }
+        distances
+    }
+
     double  calculateRoadDistance(VRPLocation l1, VRPLocation l2){
         return graphHopperOSMService.calculateDistance(l1,l2)
     }
@@ -60,6 +73,10 @@ class RoutingUtilService {
         double K2 = 111.41513 * Math.cos(rad(mLat)) - 0.09455*Math.cos(3*rad(mLat)) + 0.00012*Math.cos(5*rad(mLat))
 
         return Math.sqrt(Math.pow(K1*dLat,2)+Math.pow(K2*dLon,2))
+    }
+
+    double calculateSimpleDistance(VRPLocation l1, VRPLocation l2){
+        return Math.hypot(l1.coordinates.x - l2.coordinates.x, l1.coordinates.y - l2.coordinates.y)
     }
 
     double rad(double v) {
