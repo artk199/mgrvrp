@@ -5,6 +5,7 @@ import {VRPCustomer} from '../domain/VRPCustomer';
 import {Coordinate} from '../domain/Coordinate';
 import {VRPDepot} from '../domain/VRPDepot';
 import {PaneType, VRPProblem} from '../domain/VRPProblem';
+import {deserialize} from 'class-transformer';
 
 @Injectable()
 export class ImportService {
@@ -78,11 +79,17 @@ export class ImportService {
         problem.setDepot(d);
       }else{
         let c = new VRPCustomer(node.id,new Coordinate(node.x,node.y));
+        c.demand = parseInt(node.demand);
         problem.addCustomer(c);
       }
     }
 
     problem.paneType = PaneType.SIMPLE;
     this.vRPService.addProblem(problem);
+  }
+
+  public importFile(s){
+    let p: VRPProblem = deserialize(VRPProblem, s);
+    this.vRPService.addProblem(p);
   }
 }

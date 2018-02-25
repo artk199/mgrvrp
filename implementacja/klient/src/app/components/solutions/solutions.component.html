@@ -3,7 +3,7 @@
 
     <ng-container matColumnDef="id">
       <mat-header-cell *matHeaderCellDef> Algorithm</mat-header-cell>
-      <mat-cell *matCellDef="let solution"> {{solution.settings? solution.settings?.algorithm : '-'}}</mat-cell>
+      <mat-cell *matCellDef="let solution"> {{solution.algorithm?.description}}</mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="length">
@@ -14,8 +14,12 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef> Actions:</mat-header-cell>
       <mat-cell *matCellDef="let solution">
-        <button color="primary" mat-raised-button (click)="loadSolution(solution)">Load</button>
-        <button color="warn" mat-raised-button (click)="deleteSolution(solution)">Delete</button>
+        <button color="primary" mat-icon-button (click)="loadSolution(solution)">
+          <mat-icon>open_in_browser</mat-icon>
+        </button>
+        <button color="warn" mat-icon-button (click)="deleteSolution(solution)">
+          <mat-icon>remove_circle</mat-icon>
+        </button>
       </mat-cell>
     </ng-container>
 

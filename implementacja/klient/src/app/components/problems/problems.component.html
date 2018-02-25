@@ -1,4 +1,5 @@
 <div>
+  <a style="display:none" id="export_link"></a>
   <mat-table #table [dataSource]="dataSource">
 
     <ng-container matColumnDef="id">
@@ -14,27 +15,53 @@
     <ng-container matColumnDef="actions">
       <mat-header-cell *matHeaderCellDef> Actions:</mat-header-cell>
       <mat-cell *matCellDef="let problem">
-        <div class="button-row" *ngIf="problem.id != currentProblem.id">
-          <button color="primary" mat-raised-button (click)="loadProblem(problem)">Load</button>
-          <button color="warn" mat-raised-button (click)="deleteProblem(problem)">Delete</button>
+        <div class="button-row">
+          <button color="primary" mat-icon-button (click)="exportProblem(problem)">
+            <mat-icon>save</mat-icon>
+          </button>
+          <button color="primary" mat-icon-button *ngIf="problem.id != currentProblem.id"
+                  (click)="loadProblem(problem)">
+            <mat-icon>open_in_browser</mat-icon>
+          </button>
+          <button color="warn" mat-icon-button *ngIf="problem.id != currentProblem.id" (click)="deleteProblem(problem)">
+            <mat-icon>remove_circle</mat-icon>
+          </button>
+
         </div>
       </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
 
-    <mat-row *matRowDef="let problem; columns: displayedColumns;" [class.current-problem]="problem.id == currentProblem.id"></mat-row>
+    <mat-row *matRowDef="let problem; columns: displayedColumns;"
+             [class.current-problem]="problem.id == currentProblem.id"></mat-row>
 
   </mat-table>
 
   <div class="button-row" class="add-panel">
-    <button mat-raised-button color="primary" (click)="createNewProblem()">Add new</button>
-    <button mat-raised-button color="primary" (click)="saveToStorage()">Save</button>
-
+    <button mat-raised-button color="primary" (click)="createNewProblem()">
+      <mat-icon>add_circle</mat-icon>
+      <span>Add new</span>
+    </button>
+    <button mat-raised-button color="primary" (click)="saveToStorage()">
+      <mat-icon>save</mat-icon>
+      <span>Save to local storage</span>
+    </button>
+    <button mat-raised-button color="primary" (click)="fileInput.click()">
+      <mat-icon>file_upload</mat-icon>
+      <span>Import</span>
+      <input #fileInput type="file" (change)="importProblem($event)" accept=".json" style="display:none;"/>
+    </button>
   </div>
 
+  <hr>
+
   <div class="add-panel">
-    <input name="vrp-upload" id="vrp-upload" type="file" (change)="uploadFile($event)" accept=".vrp"/>
+    <button mat-raised-button color="primary" (click)="vrpUpload.click()">
+      <mat-icon>file_upload</mat-icon>
+      <span>Load *.vrp file</span>
+      <input #vrpUpload id="vrp-upload" type="file" (change)="importVRPFile($event)" accept=".vrp" style="display:none;"/>
+    </button>
   </div>
 
 </div>

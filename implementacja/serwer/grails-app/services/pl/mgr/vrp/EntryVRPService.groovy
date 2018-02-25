@@ -9,8 +9,8 @@ class EntryVRPService {
     private final String DEFAULT_ALGORITHM = 'savings'
 
     def prepareAndSolve(VRPProblem problem) {
-        def algorithmName = problem.settings['algorithm']
-        if (!problem.settings['algorithm']) {
+        def algorithmName = problem.algorithm?.code
+        if (!algorithmName) {
             algorithmName = DEFAULT_ALGORITHM
             log.warn "Brak wybranego algorytmu - zostanie wybrany defaultowy."
         }

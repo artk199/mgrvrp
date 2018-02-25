@@ -3,6 +3,7 @@ import {VRPProblem} from '../../domain/VRPProblem';
 import {VRPService} from '../../services/vrp.service';
 import {Coordinate} from '../../domain/Coordinate';
 import {VRPDepot} from '../../domain/VRPDepot';
+import {VRPAlgorithm} from '../../domain/VRPAlgorithm';
 
 @Component({
   selector: 'vrp-base-info',
@@ -14,34 +15,41 @@ export class BaseInfoComponent implements OnInit {
   currentProblem: VRPProblem;
   depot: VRPDepot;
 
-  algorithms = [{code: 'savings', description: 'Clarke and Wright (C & W)'},
-    {code: 'jsprit', description: 'JSprit? Metaheuristic'},
-    {code: 'random', description: 'Randomized Insertion (RandIns)'},
-    {code: 'greedyFirst', description: 'Nearest Neighbor (NN)'},
-    {code: 'tabu', description: 'Tabu search'}
+
+  algorithms: VRPAlgorithm[] = [
+    new VRPAlgorithm('savings', 'Clarke and Wright (C & W)', []),
+    new VRPAlgorithm('jsprit', 'JSprit? Metaheuristic', []),
+    new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', []),
+    new VRPAlgorithm('greedyFirst', 'Nearest Neighbor (NN)', []),
+    new VRPAlgorithm('tabu', 'Tabu search', [
+      {
+        code: 'iterations',
+        description: 'Iterations',
+        type: 'NUMBER',
+        value: 100
+      }
+    ])
   ];
+
 
   distances = [{code: 'road', description: 'Road'},
     {code: 'air', description: 'Air'}
   ];
 
   constructor(private vRPService: VRPService) {
-    vRPService.getCurrentProblem().subscribe( p =>
-      this.currentProblem = p
-    );
-    this.vRPService.getDepot().subscribe(depotList =>
-      this.depot = depotList[0]
-    );
+    this.vRPService.getCurrentProblem().subscribe(p => this.currentProblem = p);
+    this.vRPService.getDepot().subscribe(depotList => this.depot = depotList[0]);
   }
 
   ngOnInit() {
-
+    if (!this.currentProblem.algorithm) {
+      this.currentProblem.algorithm = this.algorithms[0];
+    }
   }
 
   solve() {
     this.vRPService.solveCurrentProblem();
   }
-
 
 
 }

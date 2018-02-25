@@ -17,8 +17,6 @@ import {VRPService} from './services/vrp.service';
 import {FormsModule} from '@angular/forms';
 import {MapService} from './services/map.service';
 import {ImportService} from './services/import.service';
-import {LogService} from './shared/log/log.service';
-import {LogPublishersService} from './shared/log/log-publishers.service';
 import {ProblemsComponent} from './components/problems/problems.component';
 import {SolutionsComponent} from './components/solutions/solutions.component';
 import {RoutesComponent} from './components/routes/routes.component';
@@ -76,7 +74,7 @@ const stompConfig: StompConfig = {
   entryComponents: [
     VrpAddDialogComponent
   ],
-  providers: [VRPService, MapService, LogService, LogPublishersService, ImportService, StompService,
+  providers: [VRPService, MapService, ImportService, StompService,
     {
       provide: StompConfig,
       useValue: stompConfig

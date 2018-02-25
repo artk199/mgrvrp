@@ -29,8 +29,11 @@ y: {{customer.coordinates.y | number:'1.5-5'}}</pre>
     <mat-header-cell *matHeaderCellDef> Actions</mat-header-cell>
     <mat-cell *matCellDef="let customer">
       <div *ngIf="editEnabled" class="button-row" style="margin-left: 10px;">
-        <button color="warn" mat-raised-button (click)="deleteCustomer(customer)">Delete</button>
+        <button color="warn" mat-icon-button (click)="deleteCustomer(customer)">
+          <mat-icon>remove_circle</mat-icon>
+        </button>
       </div>
+
     </mat-cell>
   </ng-container>
 

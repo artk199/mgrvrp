@@ -1,6 +1,6 @@
 <mat-tab-group class="tabs-content" (selectedTabChange)="onTabChanged($event)">
   <mat-tab label="Current solution info">
-    <div style="padding:10px;">
+    <div style="padding:10px;    overflow-y: hidden;">
       <mat-table #table [dataSource]="dataSource">
 
         <ng-container matColumnDef="actions">
@@ -44,8 +44,8 @@
   <mat-tab label="Steps">
     <mat-grid-list cols="7" rowHeight="100px">
       <mat-grid-tile>
-        <button mat-fab>
-          <mat-icon color="primary" (click)="prevStep()">keyboard_arrow_left</mat-icon>
+        <button mat-fab (click)="prevStep()">
+          <mat-icon color="primary">keyboard_arrow_left</mat-icon>
         </button>
       </mat-grid-tile>
       <mat-grid-tile
@@ -53,8 +53,8 @@
         {{currentStep}}/{{maxSteps}}
       </mat-grid-tile>
       <mat-grid-tile>
-        <button mat-fab>
-          <mat-icon color="primary" (click)="nextStep()">keyboard_arrow_right</mat-icon>
+        <button mat-fab (click)="nextStep()">
+          <mat-icon color="primary">keyboard_arrow_right</mat-icon>
         </button>
       </mat-grid-tile>
     </mat-grid-list>

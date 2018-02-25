@@ -7,6 +7,7 @@ class VRPSolution {
 
     List<VRPRoute> routes = []
     double routeLength
+    VRPAlgorithm algorithm
     Map settings
 
 }

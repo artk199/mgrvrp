@@ -2,6 +2,7 @@ import {VRPDepot} from './VRPDepot';
 import {VRPCustomer} from './VRPCustomer';
 import {Type} from 'class-transformer';
 import {VRPSolution} from './VRPSolution';
+import {VRPAlgorithm} from './VRPAlgorithm';
 
 
 /**
@@ -17,6 +18,8 @@ export class VRPProblem {
 
   id: string;
   paneType: string;
+
+  algorithm: VRPAlgorithm;
 
   @Type(() => VRPCustomer)
   customers: VRPCustomer[];

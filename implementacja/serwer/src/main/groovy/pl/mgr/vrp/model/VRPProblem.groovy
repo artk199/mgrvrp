@@ -7,6 +7,7 @@ class VRPProblem implements Validateable {
 
     String id
     String paneType
+    VRPAlgorithm algorithm
     List<VRPDepot> depots
     List<VRPCustomer> customers
     Map settings

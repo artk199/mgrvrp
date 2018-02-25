@@ -1,12 +1,12 @@
 package pl.mgr.vrp.solvers
 
 import grails.transaction.Transactional
+import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPProblem
 import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPSolution
 
-@Transactional
-class GreedyFirstVRPSolverService extends RandomVRPSolverService {
+class GreedyFirstVRPSolverService extends VRPSolverService {
 
     @Override
     protected VRPSolution calculateSolution(VRPProblem problem) {
@@ -19,7 +19,7 @@ class GreedyFirstVRPSolverService extends RandomVRPSolverService {
         def leftCustomers = allCustomers.toSorted { a, b -> (a.demand <=> b.demand) * -1 }
 
         def adjacentMatrix = routingUtilService.calculateAirDistanceMatrix(problem)
-        println adjacentMatrix
+
         while (leftCustomers.size() > 0) {
 
             VRPRoute route = new VRPRoute()
@@ -30,7 +30,7 @@ class GreedyFirstVRPSolverService extends RandomVRPSolverService {
 
             route.points.push(problem.customers[customer.id])
 
-            double leftDemand = problem.maxCapacity
+            double leftDemand = problem.maxCapacity - customer.demand
             def nearestNeighbour = 0
             while (nearestNeighbour != -1) {
                 nearestNeighbour = findNearestNeighbour(adjacentMatrix, customer.id, leftDemand, leftCustomers)

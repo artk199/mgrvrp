@@ -89,7 +89,7 @@ export class MapService {
     this._map = L.map(this.MAP_ID, {
       crs: L.CRS.Simple,
       zoomControl: false
-    }).setView([50, 50], 5);
+    }).setView([30, 30], 2);
 
 
     L.control.zoom({
@@ -100,7 +100,8 @@ export class MapService {
       showOriginLabel: true,
       redraw: 'move',
       zoomIntervals: [
-        {start: 0, end: 3, interval: 50},
+        {start: 0, end: 1, interval: 50},
+        {start: 2, end: 3, interval: 10},
         {start: 4, end: 5, interval: 5},
         {start: 6, end: 20, interval: 1}
       ]};

@@ -28,6 +28,7 @@ abstract class VRPSolverService {
         try {
             validateVRPProblem(problem)
             VRPSolution solution = calculateSolution(problem)
+            solution.algorithm = problem.algorithm
             solution.settings = problem.settings
             calculateRoute(problem, solution)
             sendEndSignal(solution)

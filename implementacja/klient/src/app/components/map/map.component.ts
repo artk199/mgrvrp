@@ -23,17 +23,7 @@ export class MapComponent implements OnInit {
         data: {coordinate: new Coordinate(e.latlng.lat, e.latlng.lng)}
       });
     });
-    this.mapService.setupMap();
-    this.setupContextMenu();
-    this.vRPService.refreshMap();
-  }
-
-  /**
-   * Otwiera popup(dialog) po kliknięciu na mapę umożliwający dodanie odbiorcy/magazynu.
-   */
-  private setupContextMenu() {
-
-
+    this.vRPService.forceRefresh();
   }
 
 }

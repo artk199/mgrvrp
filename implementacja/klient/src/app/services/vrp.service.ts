@@ -170,6 +170,13 @@ export class VRPService {
    */
   loadProblemAndRefreshMap(id) {
     this.loadProblem(id);
+    this.forceRefresh();
+  }
+
+  /**
+   * Calkowicie usuwa mape i od nowa rysuje aktualny problem
+   */
+  forceRefresh(){
     this.mapService.setupMap(this.currentProblemValue.paneType);
     this.refreshMap();
   }
@@ -213,7 +220,6 @@ export class VRPService {
         case 'STEP':
           let s: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
           let solutionStep = new VRPSolutionStep();
-          console.log(s);
           solutionStep.data = s;
           steps.push(solutionStep);
           VRPService.setColors(s);
@@ -221,6 +227,7 @@ export class VRPService {
           break;
         case 'END':
           let solution: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
+          console.log(solution);
           solution.solutionsSteps = steps;
           this.addSolution(solution);
           VRPService.stopLoading();

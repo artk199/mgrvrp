@@ -25,6 +25,10 @@ mat-card {
   height: 0;
 }
 
+.main-panel {
+  overflow-y: auto;
+}
+
 .tabs-content {
   width: calc(100% + 48px);
   margin: 0 -24px 16px -24px;
@@ -57,9 +61,10 @@ mat-card {
 }
 
 .route-bar {
-  width: calc(100vw - 80px);
+  width: calc(100vw - 20px);
   height: 250px;
   padding: 0;
+  overflow-y: auto;
 }
 
 .small-icon {

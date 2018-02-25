@@ -19,16 +19,19 @@ export class RoutesComponent implements OnInit {
   isLoadedStep;
   currentStep = 0;
   maxSteps = 0;
-  currentSolution;
+  currentSolution: VRPSolution;
 
   constructor(private vRPService: VRPService, private mapService: MapService) {
     let ctrl = this;
     this.dataSource = new ProblemDataSource(this.vRPService.currentSolution);
     vRPService.currentSolution.subscribe(sol => {
-        if (sol) {
+        ctrl.currentSolution = sol;
+        if (sol && sol.solutionsSteps) {
           ctrl.maxSteps = sol.solutionsSteps.length;
           ctrl.currentStep = ctrl.maxSteps;
-          ctrl.currentSolution = sol;
+        }else{
+          ctrl.maxSteps = 0;
+          ctrl.currentStep = 0;
         }
       }
     );
