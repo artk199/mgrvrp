@@ -7,9 +7,14 @@ import {VRPSolution} from '../domain/VRPSolution';
 import {VRPRoute} from '../domain/VRPRoute';
 import {LSimpleGraticule} from '../libs/L.SimpleGraticule';
 import {PaneType} from '../domain/VRPProblem';
+import {VRPDrivePoints} from '../domain/VRPDrivePoints';
+import {DialogFactoryService} from './dialog.factory.service';
 
 @Injectable()
 export class MapService {
+
+  constructor(private dialogFactoryService: DialogFactoryService) {
+  }
 
   public MAP_ID = 'mapid';
   private options = {
@@ -34,21 +39,22 @@ export class MapService {
     return this._currentPaneType;
   }
 
-  public setupMap(mapType: string = PaneType.EARTH){
-    if(this._map){
+  public setupMap(mapType: string = PaneType.EARTH) {
+    if (this._map) {
       this.paths = [];
       this.markers = [];
       this._map.remove();
     }
 
-    switch (mapType){
+    switch (mapType) {
       case PaneType.EARTH:
         this.setupEarthMap();
         break;
       case PaneType.SIMPLE:
         this.setupSimpleMap();
         break;
-      default: console.log("ERROR: Nieznany mapType!");
+      default:
+        console.log('ERROR: Nieznany mapType!');
     }
     this._currentPaneType = mapType;
   }
@@ -76,8 +82,8 @@ export class MapService {
     }).addTo(this._map);
 
     let s = this;
-    this._map.on('click', function(e){
-      if(s.ENABLED_EDITING) {
+    this._map.on('click', function (e) {
+      if (s.ENABLED_EDITING) {
         s._clickEvent(e);
       }
     });
@@ -96,7 +102,8 @@ export class MapService {
       position: 'topright'
     }).addTo(this._map);
 
-    let options = {interval: 20,
+    let options = {
+      interval: 20,
       showOriginLabel: true,
       redraw: 'move',
       zoomIntervals: [
@@ -104,7 +111,8 @@ export class MapService {
         {start: 2, end: 3, interval: 10},
         {start: 4, end: 5, interval: 5},
         {start: 6, end: 20, interval: 1}
-      ]};
+      ]
+    };
 
     LSimpleGraticule(options).addTo(this._map);
 
@@ -153,7 +161,8 @@ export class MapService {
       title: ''
     };
     const marker = L.marker(
-      [coordinates.x, coordinates.y], opts).addTo(this._map);
+      [coordinates.x, coordinates.y], opts);
+    marker.addTo(this._map);
     marker.bindTooltip(name);
     marker.on('dragend', function (event) {
       coordinates.x = event.target._latlng.lat;
@@ -170,30 +179,49 @@ export class MapService {
   drawSolution(solution: VRPSolution) {
     this.clearPaths();
     for (let route of solution.routes) {
-      let paths = [];
-      for (let drivePoint of route.drivePoints) {
-        let from = drivePoint.from;
-        for (let to of drivePoint.points) {
-          let path = MapService.generatePolylinePath(
-            from.coordinates.x,
-            from.coordinates.y,
-            to.coordinates.x,
-            to.coordinates.y,
-            route.color
-          );
-          paths.push(path);
-          path.on('mouseover', function (e) {
-            MapService.markAsCurrent(route);
-          });
-          path.on('mouseout', function (e) {
-            MapService.markAsNormal(route);
-          });
-          from = to;
-        }
-      }
-      route.mapPaths = L.layerGroup(paths);
-      this.showPaths(route.mapPaths);
+      this.drawRoute(route);
     }
+  }
+
+  private drawRoute(route: VRPRoute) {
+    let paths: Array<any> = [];
+    for (let drivePoint of route.drivePoints) {
+      paths = paths.concat(this.createPathFromDrivePoints(drivePoint, route.color, route));
+    }
+    route.mapPaths = L.layerGroup(paths);
+    this.showPaths(route.mapPaths);
+    return;
+  }
+
+  private createPathFromDrivePoints(drivePoints: VRPDrivePoints, color: any, route: VRPRoute) {
+    let paths = [];
+    let from = drivePoints.from;
+    for (let to of drivePoints.points) {
+      let path = MapService.generatePolylinePath(
+        from.coordinates.x,
+        from.coordinates.y,
+        to.coordinates.x,
+        to.coordinates.y,
+        color
+      );
+      paths.push(path);
+      this.bindMouseEventsOnPath(path, route);
+      from = to;
+    }
+    return paths;
+  }
+
+  private bindMouseEventsOnPath(path: L.Polyline, route: VRPRoute) {
+    let srv = this;
+    path.on('mouseover', function (e) {
+      MapService.markAsCurrent(route);
+    });
+    path.on('mouseout', function (e) {
+      MapService.markAsNormal(route);
+    });
+    path.on('click', function (e) {
+      srv.dialogFactoryService.showRouteDialog(route)
+    });
   }
 
   static generatePolylinePath(srcLat, srcLng, dstLat, dstLng, color) {

@@ -1,0 +1,40 @@
+<h3 mat-dialog-title>Route</h3>
+<mat-dialog-content>
+  <mat-list dense>
+    <mat-list-item>
+      <div class="label-container">
+        <div class="label-title">
+          Route length
+        </div>
+        <div class="label-value">
+          {{route.routeLength}}
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item>
+      <div class="label-container">
+        <div class="label-title">
+          Color
+        </div>
+        <div class="label-value">
+          <div style="width: 200px; height: 10px; border-radius: 2px" [style.background-color]="route.color"></div>
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item>
+      <div class="label-container">
+        <div class="label-title">
+          Route
+        </div>
+        <div class="label-value">
+          <span *ngFor="let r of route.points; let last = last;">
+            {{r.id}} <span *ngIf="!last"> -> </span>
+          </span>
+        </div>
+      </div>
+    </mat-list-item>
+  </mat-list>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

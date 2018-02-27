@@ -22,6 +22,8 @@ import {SolutionsComponent} from './components/solutions/solutions.component';
 import {RoutesComponent} from './components/routes/routes.component';
 import {StompConfig, StompService} from '@stomp/ng2-stompjs';
 import * as SockJS from 'sockjs-client';
+import {RouteDialogComponent} from './components/map/modals/route.dialog';
+import {DialogFactoryService} from './services/dialog.factory.service';
 
 export function socketProvider() {
   return new SockJS('http://localhost:9090/stomp');
@@ -46,7 +48,8 @@ const stompConfig: StompConfig = {
     VrpAddDialogComponent,
     ProblemsComponent,
     SolutionsComponent,
-    RoutesComponent
+    RoutesComponent,
+    RouteDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -72,9 +75,10 @@ const stompConfig: StompConfig = {
     MatToolbarModule
   ],
   entryComponents: [
-    VrpAddDialogComponent
+    VrpAddDialogComponent,
+    RouteDialogComponent
   ],
-  providers: [VRPService, MapService, ImportService, StompService,
+  providers: [VRPService, MapService, ImportService, StompService, DialogFactoryService,
     {
       provide: StompConfig,
       useValue: stompConfig

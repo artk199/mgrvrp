@@ -1,10 +1,11 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject, OnInit, ViewContainerRef} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 import {VRPService} from '../../services/vrp.service';
 import {VRPCustomer} from '../../domain/VRPCustomer';
 import {MapService} from '../../services/map.service';
 import {VRPDepot} from '../../domain/VRPDepot';
 import {Coordinate} from '../../domain/Coordinate';
+import {DialogFactoryService} from '../../services/dialog.factory.service';
 
 @Component({
   selector: 'vrp-map',
@@ -13,7 +14,8 @@ import {Coordinate} from '../../domain/Coordinate';
 })
 export class MapComponent implements OnInit {
 
-  constructor(private mapService: MapService, public dialog: MatDialog, private vRPService: VRPService) {
+  constructor(private mapService: MapService, public dialog: MatDialog, private vRPService: VRPService, private dialogFactoryService: DialogFactoryService, viewContainerRef: ViewContainerRef) {
+    dialogFactoryService.setRootViewContainerRef(this);
   }
 
   ngOnInit() {
@@ -39,7 +41,7 @@ export class VrpAddDialogComponent {
   constructor(private vRPService: VRPService,
               public dialogRef: MatDialogRef<VrpAddDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {
-    this.name = "" + this.vRPService.getCustomersData().length;
+    this.name = '' + this.vRPService.getCustomersData().length;
   }
 
   onNoClick(): void {

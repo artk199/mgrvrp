@@ -24,7 +24,8 @@ export class ImportService {
     let nodes = [];
     let CURRENT_SECTION = 'START';
     for (let i = 0; i < lines.length; i++) {
-      const x = lines[i];
+      let x = lines[i];
+      x = x.split('\t').join(" ");
       const startFound = START_SECTION.some((e) => {
         const ret = x.startsWith(e);
         if (ret === true) {
@@ -48,21 +49,29 @@ export class ImportService {
       }
       switch (CURRENT_SECTION) {
         case 'NODE_COORD_SECTION':
-          let splittedCord = x.split(' ');
+          let splittedCord = x.trim().split(' ');
           nodes.push({
-            id:splittedCord[1],
-            x:splittedCord[2],
-            y:splittedCord[3]
+            id: splittedCord[0],
+            x: splittedCord[1],
+            y: splittedCord[2]
           });
           break;
         case 'DEMAND_SECTION':
-          let splittedDemand = x.split(' ');
-          nodes[parseInt(splittedDemand[0])-1].demand = splittedDemand[1];
+          let splittedDemand = x.trim().split(' ');
+          nodes[parseInt(splittedDemand[0]) - 1].demand = splittedDemand[1];
           break;
         case 'DEPOT_SECTION':
-          let splittedDepot = x.split(' ');
-          if(splittedDepot[1] != '-1'){
-            nodes[parseInt(splittedDepot[1])-1].isDepot = true;
+          let splittedDepot = x.trim().split(' ');
+          if (parseInt(splittedDepot[0]) > 0 && nodes.includes(parseInt(splittedDepot[0]) - 1)) {
+            nodes[parseInt(splittedDepot[0]) - 1].isDepot = true;
+          } else {
+            if (splittedDepot[0] != '-1')
+              nodes.push({
+                id: i,
+                x: splittedDepot[0],
+                y: splittedDepot[1],
+                isDepot: true
+              });
           }
           break;
       }
@@ -73,12 +82,12 @@ export class ImportService {
     problem.settings.capacity = parseInt(settings['CAPACITY']);
     problem.settings.type = settings['EDGE_WEIGHT_TYPE'];
 
-    for(let node of nodes){
-      if(node.isDepot){
-        let d = new VRPDepot(node.id, new Coordinate(node.x,node.y));
+    for (let node of nodes) {
+      if (node.isDepot) {
+        let d = new VRPDepot(node.id, new Coordinate(node.x, node.y));
         problem.setDepot(d);
-      }else{
-        let c = new VRPCustomer(node.id,new Coordinate(node.x,node.y));
+      } else {
+        let c = new VRPCustomer(node.id, new Coordinate(node.x, node.y));
         c.demand = parseInt(node.demand);
         problem.addCustomer(c);
       }
@@ -88,7 +97,7 @@ export class ImportService {
     this.vRPService.addProblem(problem);
   }
 
-  public importFile(s){
+  public importFile(s) {
     let p: VRPProblem = deserialize(VRPProblem, s);
     this.vRPService.addProblem(p);
   }

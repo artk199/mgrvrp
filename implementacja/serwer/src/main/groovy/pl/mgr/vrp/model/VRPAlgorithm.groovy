@@ -12,6 +12,6 @@ class VRPAlgorithm {
         def found = additionalSettings?.find {
             it['code'] == name
         }
-        return found['value']
+        return found ? found['value'] : null
     }
 }
