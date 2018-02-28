@@ -140,7 +140,11 @@ export class MapService {
       imagePath: 'assets/leaflet/images/',
       iconUrl: 'marker-icon-3.png',
     });
-    this.addMarker(customer.coordinates, customerIcon, customer.id);
+    let marker = this.addMarker(customer.coordinates, customerIcon, customer.id);
+    let srv = this;
+    marker.on('click', function (event) {
+      srv.dialogFactoryService.showCustomerDialog(customer);
+    });
   }
 
   /**
@@ -220,7 +224,7 @@ export class MapService {
       MapService.markAsNormal(route);
     });
     path.on('click', function (e) {
-      srv.dialogFactoryService.showRouteDialog(route)
+      srv.dialogFactoryService.showRouteDialog(route);
     });
   }
 

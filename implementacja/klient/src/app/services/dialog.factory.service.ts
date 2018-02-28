@@ -8,6 +8,8 @@ import {
 import {RouteDialogComponent} from '../components/map/modals/route.dialog';
 import {MatDialog} from '@angular/material';
 import {VRPRoute} from '../domain/VRPRoute';
+import {VRPCustomer} from '../domain/VRPCustomer';
+import {CustomerDialogComponent} from '../components/map/modals/customer.dialog';
 
 @Injectable()
 export class DialogFactoryService {
@@ -25,4 +27,7 @@ export class DialogFactoryService {
     this.rootViewContainer.dialog.open(RouteDialogComponent, {data: {route: route}});
   }
 
+  showCustomerDialog(customer: VRPCustomer) {
+    this.rootViewContainer.dialog.open(CustomerDialogComponent, {data: {customer: customer}});
+  }
 }

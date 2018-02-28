@@ -24,6 +24,7 @@ import {StompConfig, StompService} from '@stomp/ng2-stompjs';
 import * as SockJS from 'sockjs-client';
 import {RouteDialogComponent} from './components/map/modals/route.dialog';
 import {DialogFactoryService} from './services/dialog.factory.service';
+import {CustomerDialogComponent} from './components/map/modals/customer.dialog';
 
 export function socketProvider() {
   return new SockJS('http://localhost:9090/stomp');
@@ -49,7 +50,8 @@ const stompConfig: StompConfig = {
     ProblemsComponent,
     SolutionsComponent,
     RoutesComponent,
-    RouteDialogComponent
+    RouteDialogComponent,
+    CustomerDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -76,7 +78,8 @@ const stompConfig: StompConfig = {
   ],
   entryComponents: [
     VrpAddDialogComponent,
-    RouteDialogComponent
+    RouteDialogComponent,
+    CustomerDialogComponent
   ],
   providers: [VRPService, MapService, ImportService, StompService, DialogFactoryService,
     {

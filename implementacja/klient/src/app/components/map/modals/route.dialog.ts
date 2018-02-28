@@ -13,8 +13,6 @@ export class RouteDialogComponent {
 
   constructor(public dialogRef: MatDialogRef<RouteDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {
-    console.log(data.route);
     this.route = data.route;
-    console.log(data.route);
   }
 }

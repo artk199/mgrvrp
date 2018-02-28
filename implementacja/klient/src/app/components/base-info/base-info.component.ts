@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {VRPProblem} from '../../domain/VRPProblem';
+import {PaneType, VRPProblem} from '../../domain/VRPProblem';
 import {VRPService} from '../../services/vrp.service';
 import {Coordinate} from '../../domain/Coordinate';
 import {VRPDepot} from '../../domain/VRPDepot';
 import {VRPAlgorithm} from '../../domain/VRPAlgorithm';
+import {MapService} from '../../services/map.service';
 
 @Component({
   selector: 'vrp-base-info',
@@ -14,36 +15,21 @@ export class BaseInfoComponent implements OnInit {
 
   currentProblem: VRPProblem;
   depot: VRPDepot;
+  distancesAllowed: boolean = true;
 
+  algorithms: VRPAlgorithm[] = VRPAlgorithm.algorithms;
 
-  algorithms: VRPAlgorithm[] = [
-    new VRPAlgorithm('savings', 'Clarke and Wright (C & W)', []),
-    new VRPAlgorithm('jsprit', 'JSprit? Metaheuristic', []),
-    new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', [{
-      code: 'attempts',
-      description: 'Attempts',
-      type  : 'NUMBER',
-      value: 1
-    }]),
-    new VRPAlgorithm('greedyFirst', 'Nearest Neighbor (NN)', []),
-    new VRPAlgorithm('tabu', 'Tabu search', [
-      {
-        code: 'iterations',
-        description: 'Iterations',
-        type: 'NUMBER',
-        value: 100
-      }
-    ])
-  ];
-
-
-  distances = [{code: 'simple', description: 'Euclidean distance'},
+  distances = [
     {code: 'road', description: 'Road'},
     {code: 'air', description: 'Air'}
   ];
 
-  constructor(private vRPService: VRPService) {
-    this.vRPService.getCurrentProblem().subscribe(p => this.currentProblem = p);
+  constructor(private vRPService: VRPService, private mapService: MapService) {
+    this.vRPService.getCurrentProblem().subscribe(p => {
+        this.currentProblem = p;
+        this.changePaneType();
+      }
+    );
     this.vRPService.getDepot().subscribe(depotList => this.depot = depotList[0]);
   }
 
@@ -51,10 +37,23 @@ export class BaseInfoComponent implements OnInit {
     if (!this.currentProblem.algorithm) {
       this.currentProblem.algorithm = this.algorithms[0];
     }
+    this.changePaneType();
   }
 
   solve() {
     this.vRPService.solveCurrentProblem();
+  }
+
+  changePaneType() {
+    console.log('JEDEN JEDEN JEDEN');
+    if (this.currentProblem.paneType == PaneType.SIMPLE) {
+      this.distancesAllowed = false;
+      this.currentProblem.settings.distance = 'simple';
+    } else {
+      this.distancesAllowed = true;
+      this.currentProblem.settings.distance = 'road';
+    }
+    this.vRPService.forceRefresh();
   }
 
 

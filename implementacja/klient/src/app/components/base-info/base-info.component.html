@@ -18,6 +18,18 @@
   <mat-list dense>
     <mat-list-item>
       <mat-form-field class="full-width">
+        <mat-select placeholder="Surface type"
+                    (selectionChange)="changePaneType()"
+                    (change)="changePaneType()"
+                    [(ngModel)]="currentProblem.paneType">
+          <mat-option value="Simple">Simple</mat-option>
+          <mat-option value="Earth">Earth</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-list-item>
+    <mat-list-item>
+
+      <mat-form-field class="full-width">
         <mat-select placeholder="Algorithm" [(ngModel)]="currentProblem.algorithm">
           <mat-option *ngFor="let algorithm of algorithms"
                       [value]="algorithm">{{ algorithm.description }}
@@ -25,7 +37,7 @@
         </mat-select>
       </mat-form-field>
     </mat-list-item>
-    <mat-list-item>
+    <mat-list-item *ngIf="distancesAllowed">
       <mat-form-field class="full-width">
         <mat-select placeholder="Distance calculation type" [(ngModel)]="currentProblem.settings.distance">
           <mat-option *ngFor="let distance of distances"
