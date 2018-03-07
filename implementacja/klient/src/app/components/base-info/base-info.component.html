@@ -63,6 +63,14 @@
         <mat-form-field class="full-width" *ngSwitchCase="'NUMBER'">
           <input matInput type="number" placeholder="{{setting.description}}" [(ngModel)]="setting.value">
         </mat-form-field>
+        <mat-form-field class="full-width" *ngSwitchCase="'SELECT'">
+          <mat-select placeholder="{{setting.description}}" [(ngModel)]="setting.value">
+            <mat-option *ngFor="let opt of setting.opts"
+                        [value]="opt.v">
+              {{ opt.k }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-form-field class="full-width" *ngSwitchDefault>
           <input matInput type="text" placeholder="{{setting.description}}" [(ngModel)]="setting.value">
         </mat-form-field>

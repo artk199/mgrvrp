@@ -9,7 +9,13 @@ export class VRPAlgorithm {
 
   static initialize() {
     this.algorithms = [
-      new VRPAlgorithm('savings', 'Clarke and Wright (C & W)', []),
+      new VRPAlgorithm('savings', 'Clarke and Wright (C & W)', [{
+        code: 'type',
+        description: 'Type',
+        type: 'SELECT',
+        value: 'parallel',
+        opts: [{v: 'parallel', k: 'Parallel'}, {v: 'sequential', k: 'Sequential'}]
+      }]),
       new VRPAlgorithm('jsprit', 'JSprit? Metaheuristic', []),
       new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', [{
         code: 'attempts',

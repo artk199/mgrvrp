@@ -11,58 +11,117 @@ import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPSolution
 
 @Slf4j
-class SavingsVRPSolverService extends VRPSolverService  {
+class SavingsVRPSolverService extends VRPSolverService {
 
     RoutingUtilService routingUtilService
 
     @Override
     protected VRPSolution calculateSolution(VRPProblem problem) {
-        VRPSolution solution = createInitialSolution(problem)
-        calculateRoute(problem,solution)
+        VRPSolution solution
         double[][] distances = calculateDistances(problem)
         List<Saving> savings = calculateSavings(distances)
-        createRoutes(solution,savings,problem)
+        if (problem.algorithm.findSetting('type') == 'sequential') {
+            solution = new VRPSolution()
+            calculateRoute(problem, solution)
+            sequentialCreateRoutes(solution, savings, problem)
+        }else {
+            solution = createInitialSolution(problem)
+            calculateRoute(problem, solution)
+            createRoutes(solution, savings, problem)
+        }
         solution
     }
 
-    VRPSolution createRoutes(VRPSolution solution, List<Saving> savings,VRPProblem problem) {
+    //Parallel version
+    VRPSolution createRoutes(VRPSolution solution, List<Saving> savings, VRPProblem problem) {
         logInfo "Obliczanie tras..."
         //solution.routes = []
         savings.each { saving ->
 
-            VRPCustomer customer1 = problem.customers[saving.i-1]
-            VRPCustomer customer2 = problem.customers[saving.j-1]
+            VRPCustomer customer1 = problem.customers[saving.i - 1]
+            VRPCustomer customer2 = problem.customers[saving.j - 1]
 
-            def rI = findRoute(solution.routes,customer1)
-            def rJ = findRoute(solution.routes,customer2)
+            def rI = findRoute(solution.routes, customer1)
+            def rJ = findRoute(solution.routes, customer2)
 
-            if(!rI && !rJ){
+            if (!rI && !rJ) {
                 //Jeżeli żaden z punktów (i,j) nie został dodany do ścieżki to tworzymy nową zawierającą i oraz j
-                VRPRoute createdRoute = createRoute(problem.depot,problem.depot,customer1,customer2)
-                if(validateCapacity(createdRoute,problem.maxCapacity)){
+                VRPRoute createdRoute = createRoute(problem.depot, problem.depot, customer1, customer2)
+                if (validateCapacity(createdRoute, problem.maxCapacity)) {
                     solution.routes += createdRoute
                 }
                 log.info "Tworzenie nowej trasy..."
-            }else if(!rI && !isInner(rJ, customer2)){
+            } else if (!rI && !isInner(rJ, customer2)) {
                 log.info "Dodawanie do drugiej trasy..."
-                addCustomerToRoute(rJ,customer2,customer1,problem)
-            }else if(!rJ && !isInner(rI, customer1)){
+                addCustomerToRoute(rJ, customer2, customer1, problem)
+            } else if (!rJ && !isInner(rI, customer1)) {
                 log.info "Dodawanie do pierwszej trasy..."
-                addCustomerToRoute(rI,customer1,customer2,problem)
-            }else if((rJ != rI) && rJ && rI && !isInner(rJ,customer2) && !isInner(rI,customer1)){
+                addCustomerToRoute(rI, customer1, customer2, problem)
+            } else if ((rJ != rI) && rJ && rI && !isInner(rJ, customer2) && !isInner(rI, customer1)) {
                 log.info "Laczenie dwoch tras..."
-                VRPRoute merged = mergeRoutes(rI,customer1,rJ,customer2)
-                if(merged && validateCapacity(merged,problem.maxCapacity)) {
+                VRPRoute merged = mergeRoutes(rI, customer1, rJ, customer2)
+                if (merged && validateCapacity(merged, problem.maxCapacity)) {
                     removeRoute(solution.routes, rI)
                     removeRoute(solution.routes, rJ)
                     solution.routes += merged
                 }
-            }else{
+            } else {
                 //log.info "Nie moge nic zrobic z oszczednoscia: ${saving}"
             }
         }
-        calculateRoute(problem,solution)
+        calculateRoute(problem, solution)
         solution
+    }
+
+    //Sequential version
+    VRPSolution sequentialCreateRoutes(VRPSolution solution, List<Saving> savings, VRPProblem problem) {
+        logInfo "Obliczanie tras..."
+        //solution.routes = []
+        List<Saving> leftSavings = []
+
+        VRPRoute currentRoute = null
+
+        savings.each { saving ->
+
+            VRPCustomer customer1 = problem.customers[saving.i - 1]
+            VRPCustomer customer2 = problem.customers[saving.j - 1]
+
+            def rI = findRoute(solution.routes, customer1)
+            def rJ = findRoute(solution.routes, customer2)
+
+            if (!rI && !rJ) {
+                if(currentRoute == null) {
+                    //Jeżeli żaden z punktów (i,j) nie został dodany do ścieżki to tworzymy nową zawierającą i oraz j
+                    VRPRoute createdRoute = createRoute(problem.depot, problem.depot, customer1, customer2)
+                    if (validateCapacity(createdRoute, problem.maxCapacity)) {
+                        solution.routes += createdRoute
+                        currentRoute = createdRoute
+                        log.info "Tworzenie nowej trasy..."
+                    }
+                }else{
+                    leftSavings.push(saving)
+                }
+            } else if (!rI && rJ == currentRoute && !isInner(rJ, customer2)) {
+                log.info "Dodawanie do drugiej trasy..."
+                if (!addCustomerToRoute(rJ, customer2, customer1, problem)) {
+                    leftSavings.push(saving)
+                }
+            } else if (!rJ && rI == currentRoute && !isInner(rI, customer1)) {
+                log.info "Dodawanie do pierwszej trasy..."
+                if (!addCustomerToRoute(rI, customer1, customer2, problem)) {
+                    leftSavings.push(saving)
+                }
+            } else {
+                //
+            }
+        }
+
+        if (!leftSavings.isEmpty()) {
+            return sequentialCreateRoutes(solution, leftSavings, problem)
+        } else {
+            calculateRoute(problem, solution)
+            return solution
+        }
     }
 
     boolean validateCapacity(VRPRoute route, double maxCapacity) {
@@ -82,14 +141,14 @@ class SavingsVRPSolverService extends VRPSolverService  {
         VRPRoute merged = new VRPRoute()
         merged.start = v1.start
         merged.end = v2.end
-        if(isLast(v1,c1)){
-            if(isLast(v2,c2) && v2.points.size() > 1) {
+        if (isLast(v1, c1)) {
+            if (isLast(v2, c2) && v2.points.size() > 1) {
                 log.info "Nie mozna polazyc sciezek"
                 return null
             }
             merged.points = v1.points + v2.points
-        }else{
-            if(isFirst(v2,c2)&& v2.points.size() > 1){
+        } else {
+            if (isFirst(v2, c2) && v2.points.size() > 1) {
                 log.info "Nie mozna polazyc sciezek"
                 return null
             }
@@ -98,27 +157,29 @@ class SavingsVRPSolverService extends VRPSolverService  {
         return merged
     }
 
-    def addCustomerToRoute(VRPRoute route, VRPCustomer c1, VRPCustomer c2,VRPProblem problem) {
-        if(validateCapacity(route,problem.maxCapacity-c2.demand)) {
+    boolean addCustomerToRoute(VRPRoute route, VRPCustomer c1, VRPCustomer c2, VRPProblem problem) {
+        if (validateCapacity(route, problem.maxCapacity - c2.demand)) {
             if (isLast(route, c1)) {
                 route.points += c2
             } else {
                 route.points.plus(0, c2)
             }
-        }else{
+        } else {
             log.info "Nie mozna dodac punktu, przekroczona pojemnosc"
+            return false
         }
+        return true
     }
 
     def isInner(VRPRoute route, VRPCustomer customer) {
-        return !(isLast(route,customer) || isFirst(route,customer))
+        return !(isLast(route, customer) || isFirst(route, customer))
     }
 
     boolean isLast(VRPRoute route, VRPCustomer customer) {
         return route.points.last().id == customer.id
     }
 
-    boolean  isFirst(VRPRoute route, VRPCustomer customer) {
+    boolean isFirst(VRPRoute route, VRPCustomer customer) {
         return route.points.first().id == customer.id
     }
 
@@ -134,7 +195,7 @@ class SavingsVRPSolverService extends VRPSolverService  {
     //Wyszukuje trasę do której już nalezy podany odbiorca (jezeli taka nie istnieje zwracany jest null)
     VRPRoute findRoute(List<VRPRoute> routes, VRPCustomer customer) {
         return routes.find { r ->
-            r.points.any{ p ->
+            r.points.any { p ->
                 p.id == customer.id
             }
         }
@@ -145,13 +206,13 @@ class SavingsVRPSolverService extends VRPSolverService  {
         List<Saving> savings = []
         for (int i = 1; i < distances.length; i++) {
             for (int j = 1; j < distances.length; j++) {
-                if(i!=j) {
+                if (i != j) {
                     double saving = distances[i][0] + distances[0][j] - distances[i][j]
                     savings.add Saving.create(i, j, saving)
                 }
             }
         }
-        savings = savings.sort{ -1 * it.v }
+        savings = savings.sort { -1 * it.v }
         log.debug "Obliczone oszczednosci:"
         log.debug "\n" + JsonOutput.prettyPrint(JsonOutput.toJson(savings))
         return savings
@@ -173,13 +234,13 @@ class SavingsVRPSolverService extends VRPSolverService  {
 }
 
 @ToString
-class Saving{
+class Saving {
 
     int i
     int j
     double v
 
     static Saving create(int i, int j, double v) {
-        new Saving(i:i,j:j,v:v)
+        new Saving(i: i, j: j, v: v)
     }
 }
