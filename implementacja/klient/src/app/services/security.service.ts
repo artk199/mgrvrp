@@ -1,14 +1,17 @@
 import {Injectable} from '@angular/core';
 import {User} from '../domain/User';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {MatSnackBar} from '@angular/material';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class SecurityService {
 
   authenticatedUser: User;
+  profile: BehaviorSubject<User> = new BehaviorSubject<User>(null);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private snackBar: MatSnackBar, private router: Router) {
   }
 
   authenticate(username: string, password: string) {
@@ -31,12 +34,36 @@ export class SecurityService {
 
 
   logout() {
-
+    let request = this.http.post('http://localhost:9090/logoff', null,
+      {
+        headers: new HttpHeaders({
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        ),
+        responseType: 'text',
+        withCredentials: true
+      });
+    request.subscribe(
+      data => {
+        this.snackBar.open('Logged out.', 'OK', {
+          duration: 5000,
+        });
+        this.router.navigate(['/login']);
+      }
+    );
   }
 
-  getProfile() {
-
+  getAuthenticatedUser() {
+    this.profile.getValue();
   }
+
+  getProfile(): BehaviorSubject<User> {
+    if (this.getAuthenticatedUser() == null) {
+      this.loadProfile();
+    }
+    return this.profile;
+  }
+
 
   loadProfile() {
     let request = this.http.get(
@@ -50,9 +77,18 @@ export class SecurityService {
       }
     );
     request.subscribe(data => {
-      console.log(data);
-    });
-    return request;
+        let user: User = new User();
+        user.username = data['username'];
+        this.profile.next(user);
+      },
+      error => {
+        if (error.status != 401) {
+          this.snackBar.open('Cannot connect to server.', 'OK', {
+            duration: 5000,
+          });
+        }
+      }
+    );
   }
 
 }

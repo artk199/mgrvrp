@@ -24,7 +24,6 @@ export class LoginComponent implements OnInit {
     //Change button to loade
     let cmp = this;
     this.securityService.authenticate(this.username, this.password).subscribe((data) => {
-        console.log('data');
         if (data['success']) {
           this.router.navigate(['']);
           this.snackBar.open('Successfully log in.', 'OK', {

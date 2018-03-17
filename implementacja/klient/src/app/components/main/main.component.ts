@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {SecurityService} from '../../services/security.service';
+import {User} from '../../domain/User';
 
 @Component({
   selector: 'vrp-main',
@@ -9,16 +10,22 @@ import {SecurityService} from '../../services/security.service';
 export class MainComponent implements OnInit {
 
   loading: boolean = true;
+  profile: User;
 
   constructor(private securityService: SecurityService) {
   }
 
   ngOnInit(): void {
-    let cmp = this;
-    this.securityService.loadProfile().subscribe(data => {
-      console.log(data);
-      cmp.loading = false;
+    this.securityService.getProfile().subscribe(data => {
+      this.profile = data;
+      if (this.profile) {
+        this.loading = false;
+      }
     });
+  }
+
+  logout(){
+    this.securityService.logout();
   }
 
 
