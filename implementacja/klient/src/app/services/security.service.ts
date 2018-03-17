@@ -91,4 +91,22 @@ export class SecurityService {
     );
   }
 
+  register(username: string, password: string, confirmPassword: string) {
+    const formData: FormData = new FormData();
+
+    formData.append('username', username);
+    formData.append('password', password);
+    formData.append('confirmPassword', confirmPassword);
+
+    return this.http.post(
+      'http://localhost:9090/user/register', formData,
+      {
+        headers: new HttpHeaders({
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        ),
+        withCredentials: true
+      }
+    );
+  }
 }

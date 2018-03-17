@@ -3,11 +3,12 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/do';
 import {Router} from '@angular/router';
+import {MatSnackBar} from '@angular/material';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private snackBar: MatSnackBar) {
 
   }
 
@@ -16,8 +17,11 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(req).do(event => {
     }, err => {
       if (err instanceof HttpErrorResponse && err.status == 401) {
-        console.log('401 ERROR');
         this.router.navigate(['/login']);
+      } else {
+        this.snackBar.open('Unknown network error. ', 'OK', {
+          duration: 1000,
+        });
       }
     });
   }

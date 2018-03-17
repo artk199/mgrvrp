@@ -20,9 +20,6 @@ export class LoginComponent implements OnInit {
   }
 
   login(): void {
-    //disableButton
-    //Change button to loade
-    let cmp = this;
     this.securityService.authenticate(this.username, this.password).subscribe((data) => {
         if (data['success']) {
           this.router.navigate(['']);
@@ -32,11 +29,7 @@ export class LoginComponent implements OnInit {
         } else {
           this.errorMessage = data['error'];
         }
-        console.log(data);
-      },
-      (err) => this.snackBar.open('Unknown error. ', 'OK', {
-        duration: 1000,
-      }));
+      });
   }
 
 }
