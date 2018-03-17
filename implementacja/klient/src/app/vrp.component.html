@@ -1,7 +1,22 @@
 <div class="container">
-  <vrp-map></vrp-map>
-  <vrp-main-menu></vrp-main-menu>
+  <div id="top-bar">
+    <mat-toolbar color="primary">
+      <span>CVRP Solver</span>
+    </mat-toolbar>
+  </div>
+  <div id="main-view">
+    <div id="main-menu-view">
+      <vrp-main-menu></vrp-main-menu>
+    </div>
+    <div id="map-view">
+      <vrp-map></vrp-map>
+    </div>
+  </div>
+  <div id="bottom-view">
+    <vrp-routes></vrp-routes>
+  </div>
 </div>
+
 <div id="loading-screen">
   <div class="loading-spinner-container">
     <mat-spinner class="loading-spinner"></mat-spinner>

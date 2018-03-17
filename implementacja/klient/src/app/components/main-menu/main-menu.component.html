@@ -1,14 +1,4 @@
-<div class="main-menu">
-
-  <mat-card class="top-bar">
-    <h2 style="margin-top: 20px;">CVRP Solver</h2>
-    <span class="spacer"></span>
-    <mat-button-toggle (change)="toggleInfoPanel()" class="panel-button">Info panel</mat-button-toggle>
-    <mat-button-toggle (change)="toggleRoutesPanel()" class="panel-button">Routes panel</mat-button-toggle>
-  </mat-card>
-
-  <mat-card *ngIf="!infoPanelHidden" class="tabs-card main-panel">
-
+<div style="height: 100%;">
     <mat-tab-group class="tabs-content">
       <mat-tab>
         <ng-template mat-tab-label>
@@ -35,11 +25,5 @@
         <vrp-problems></vrp-problems>
       </mat-tab>
     </mat-tab-group>
-
-  </mat-card>
-
-  <mat-card *ngIf="!routesPanelHidden" class="route-bar">
-    <vrp-routes></vrp-routes>
-  </mat-card>
 </div>
 

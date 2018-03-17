@@ -43,6 +43,7 @@ export class VRPProblem {
     this.depots = [];
     this.solutions = [];
     this.paneType = PaneType.EARTH;
+    this.algorithm = VRPAlgorithm.algorithms[0];
   }
 
   public addCustomer(customer: VRPCustomer) {

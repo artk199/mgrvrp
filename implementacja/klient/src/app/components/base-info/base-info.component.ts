@@ -45,7 +45,6 @@ export class BaseInfoComponent implements OnInit {
   }
 
   changePaneType() {
-    console.log('JEDEN JEDEN JEDEN');
     if (this.currentProblem.paneType == PaneType.SIMPLE) {
       this.distancesAllowed = false;
       this.currentProblem.settings.distance = 'simple';

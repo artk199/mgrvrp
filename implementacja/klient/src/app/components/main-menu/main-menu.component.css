@@ -2,12 +2,6 @@ mat-card {
   margin: 10px;
 }
 
-.top-bar {
-  display: flex;
-  align-items: center;
-  height: 35px;
-}
-
 .spacer {
   flex: 1 1 auto;
 }
@@ -16,60 +10,13 @@ mat-card {
   margin: 0 14px;
 }
 
-.main-menu {
-  position: absolute;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 0;
-  height: 0;
-}
-
-.main-panel {
-  overflow-y: auto;
-}
-
-.tabs-content {
-  width: calc(100% + 48px);
-  margin: 0 -24px 16px -24px;
-  margin-top: -24px !important;
-}
-
-@media (min-width: 1023px) {
-  .top-bar {
-    width: 30vw;
-  }
-
-  .main-panel {
-    width: 30vw;
-    height: calc(100vh - 225px - 250px);
-  }
-
-}
-
-@media (max-width: 1024px) {
-
-  .top-bar {
-    width: calc(100vw - 80px);
-    height: 40px;
-  }
-
-  .main-panel {
-    width: calc(100vw - 80px);
-    height: calc(100vh - 225px - 250px);
-  }
-}
-
-.route-bar {
-  width: calc(100vw - 20px);
-  height: 250px;
-  padding: 0;
-  overflow-y: auto;
-}
-
 .small-icon {
   font-size: 18px;
   height: 18px;
   width: 18px;
+}
+
+.tabs-content{
+  height: 100%;
 }
 

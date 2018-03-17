@@ -25,10 +25,31 @@
 }
 
 #loading-info {
-  font-family: Roboto,"Helvetica Neue",sans-serif;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   font-size: 16px;
   font-weight: 500;
   padding: 10px;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 13px;
+}
+
+#top-bar {
+  height: 64px;
+}
+
+#main-view{
+  display:flex;
+  height: calc(70vh - 64px);
+}
+
+#main-menu-view {
+  width: 30vw;
+}
+
+#map-view {
+  width: 70vw;
+}
+
+#bottom-view{
+  height: 30vh;
 }

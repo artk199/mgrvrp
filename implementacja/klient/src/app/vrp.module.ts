@@ -27,7 +27,7 @@ import {DialogFactoryService} from './services/dialog.factory.service';
 import {CustomerDialogComponent} from './components/map/modals/customer.dialog';
 
 export function socketProvider() {
-  return new SockJS('http://localhost:9090/stomp');
+  return new SockJS('http://147.135.210.1:8080/stomp');
 }
 
 const stompConfig: StompConfig = {

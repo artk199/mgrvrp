@@ -178,7 +178,9 @@ export class VRPService {
    */
   forceRefresh(){
     this.mapService.setupMap(this.currentProblemValue.paneType);
-    this.refreshMap();
+    if(this.mapService.isMapInitialized()) {
+      this.refreshMap();
+    }
   }
 
   /**

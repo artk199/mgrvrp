@@ -40,6 +40,12 @@ export class MapService {
   }
 
   public setupMap(mapType: string = PaneType.EARTH) {
+
+    if(!document.getElementById(this.MAP_ID)){
+      console.log("Nie można znaleźć elementu mapy!");
+      return
+    }
+
     if (this._map) {
       this.paths = [];
       this.markers = [];
@@ -101,6 +107,13 @@ export class MapService {
     L.control.zoom({
       position: 'topright'
     }).addTo(this._map);
+
+    let s = this;
+    this._map.on('click', function (e) {
+      if (s.ENABLED_EDITING) {
+        s._clickEvent(e);
+      }
+    });
 
     let options = {
       interval: 20,
@@ -288,6 +301,10 @@ export class MapService {
     for (let m of this.markers) {
       m.dragging.enable();
     }
+  }
+
+  isMapInitialized() {
+    return this._map != null
   }
 
 }
