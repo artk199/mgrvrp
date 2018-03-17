@@ -1,9 +1,8 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'vrp-root',
-  templateUrl: './vrp.component.html',
-  styleUrls: ['./vrp.component.css']
+  template: '<router-outlet></router-outlet>'
 })
 export class VrpComponent {
 }

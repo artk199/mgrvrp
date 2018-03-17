@@ -4,7 +4,6 @@ import {VRPCustomer} from '../../domain/VRPCustomer';
 import {DataSource} from '@angular/cdk/collections';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
-import {MapService} from '../../services/map.service';
 
 @Component({
   selector: 'vrp-customers-list',

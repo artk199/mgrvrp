@@ -25,6 +25,10 @@ import * as SockJS from 'sockjs-client';
 import {RouteDialogComponent} from './components/map/modals/route.dialog';
 import {DialogFactoryService} from './services/dialog.factory.service';
 import {CustomerDialogComponent} from './components/map/modals/customer.dialog';
+import {RouterModule, Routes} from '@angular/router';
+import {LoginComponent} from './components/login/login.component';
+import {RegisterComponent} from './components/register/register.component';
+import {MainComponent} from './components/main/main.component';
 
 export function socketProvider() {
   return new SockJS('http://147.135.210.1:8080/stomp');
@@ -39,6 +43,12 @@ const stompConfig: StompConfig = {
   debug: false
 };
 
+const appRoutes: Routes = [
+  {path: 'login', component: LoginComponent},
+  {path: 'register', component: RegisterComponent},
+  {path: '**', component: MainComponent}
+];
+
 @NgModule({
   declarations: [
     VrpComponent,
@@ -51,9 +61,13 @@ const stompConfig: StompConfig = {
     SolutionsComponent,
     RoutesComponent,
     RouteDialogComponent,
-    CustomerDialogComponent
+    CustomerDialogComponent,
+    LoginComponent,
+    RegisterComponent,
+    MainComponent
   ],
   imports: [
+    RouterModule.forRoot(appRoutes),
     BrowserModule,
     FormsModule,
     MatGridListModule,

@@ -25,3 +25,30 @@ body {
   padding-left: 2px;
   text-shadow: -2px 0 #FFFFFF, 0 2px #FFFFFF, 2px 0 #FFFFFF, 0 -2px #FFFFFF;
 }
+
+.login-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #fafafa;
+}
+
+.login-form {
+  min-width: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form > * {
+  width: 100%;
+}
+
+.mat-card-actions-spacer {
+  flex: 1 1 auto;
+}
+
+.mat-card-actions {
+  display: flex !important;
+}
+
