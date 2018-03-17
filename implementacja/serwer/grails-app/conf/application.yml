@@ -32,7 +32,7 @@ endpoints:
 grails:
     plugin:
         springsecurity:
-            active: false
+            active: true
     mime:
         types:
             all: '*/*'

@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {SecurityService} from '../../services/security.service';
 
 @Component({
   selector: 'vrp-main',
@@ -6,6 +7,19 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./main.component.css']
 })
 export class MainComponent implements OnInit {
-  ngOnInit(): void {
+
+  loading: boolean = true;
+
+  constructor(private securityService: SecurityService) {
   }
+
+  ngOnInit(): void {
+    let cmp = this;
+    this.securityService.loadProfile().subscribe(data => {
+      console.log(data);
+      cmp.loading = false;
+    });
+  }
+
+
 }

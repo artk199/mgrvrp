@@ -1,4 +1,5 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {SecurityService} from './services/security.service';
 
 @Component({
   selector: 'vrp-root',

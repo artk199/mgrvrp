@@ -29,6 +29,9 @@ import {RouterModule, Routes} from '@angular/router';
 import {LoginComponent} from './components/login/login.component';
 import {RegisterComponent} from './components/register/register.component';
 import {MainComponent} from './components/main/main.component';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {SecurityService} from './services/security.service';
+import {AuthInterceptor} from './interceptors/auth.interceptor';
 
 export function socketProvider() {
   return new SockJS('http://147.135.210.1:8080/stomp');
@@ -88,17 +91,23 @@ const appRoutes: Routes = [
     MatCheckboxModule,
     MatSortModule,
     MatButtonToggleModule,
-    MatToolbarModule
+    MatToolbarModule,
+    HttpClientModule
   ],
   entryComponents: [
     VrpAddDialogComponent,
     RouteDialogComponent,
     CustomerDialogComponent
   ],
-  providers: [VRPService, MapService, ImportService, StompService, DialogFactoryService,
+  providers: [VRPService, MapService, ImportService, StompService, DialogFactoryService, SecurityService,
     {
       provide: StompConfig,
       useValue: stompConfig
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
     }],
   bootstrap: [VrpComponent]
 })

@@ -7,10 +7,11 @@ class BootStrap {
     SpringSecurityService springSecurityService
 
     def init = { servletContext ->
-        Role.findOrSaveWhere(authority: 'ROLE_USER', description: 'User role')
+        Role role = Role.findOrSaveWhere(authority: 'ROLE_USER')
         def admin = User.findOrCreateWhere(username: 'admin')
         admin.password = 'admin'
         admin.save()
+        UserRole.findOrSaveWhere(user: admin, role: role)
     }
 
     def destroy = {
