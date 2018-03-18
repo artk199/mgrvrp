@@ -109,4 +109,23 @@ export class SecurityService {
       }
     );
   }
+
+  changePassword(oldPassword: string, newPassword: string, confirmPassword: string) {
+    const formData: FormData = new FormData();
+
+    formData.append('oldPassword', oldPassword);
+    formData.append('newPassword', newPassword);
+    formData.append('confirmPassword', confirmPassword);
+
+    return this.http.post(
+      'http://localhost:9090/user/changePassword', formData,
+      {
+        headers: new HttpHeaders({
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        ),
+        withCredentials: true
+      }
+    );
+  }
 }

@@ -48,4 +48,33 @@ class UserController {
             render([success: true, username: username] as JSON)
         }
     }
+
+    @Secured(["ROLE_USER"])
+    def changePassword() {
+
+        String oldPassword = params.get("oldPassword")
+        String newPassword = params.get("newPassword")
+        String confirmPassword = params.get("confirmPassword")
+
+        User user = User.findByUsername(springSecurityService.principal.username)
+        boolean isPasswordValid = springSecurityService.passwordEncoder.isPasswordValid(user.password, oldPassword, null)
+
+        String error
+        if (!isPasswordValid) {
+            error = messageSource.getMessage('springSecurity.errors.change.password.incorrect', null, "Incorrect current password.", request.locale)
+        } else if (newPassword != confirmPassword) {
+            error = messageSource.getMessage('springSecurity.errors.change.password.passwordMissmatch', null, "Password and confirm password does not match", request.locale)
+        } else if (!newPassword || newPassword.length() < 6) {
+            error = messageSource.getMessage('springSecurity.errors.change.password.passwordLength', null, "Password should have at least 6 characters", request.locale)
+        }
+
+        if (error) {
+            render([error: error] as JSON)
+        } else {
+            user.password = newPassword
+            user.save()
+            render([success: true, username: user.username] as JSON)
+        }
+
+    }
 }

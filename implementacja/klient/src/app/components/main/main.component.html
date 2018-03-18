@@ -8,10 +8,10 @@
         <mat-icon>more_vert</mat-icon>
       </button>
       <mat-menu #menu="matMenu">
-        <button mat-menu-item>
+        <a routerLink="/password" mat-menu-item>
           <mat-icon>lock</mat-icon>
           <span>Change password</span>
-        </button>
+        </a>
         <button (click)="logout()" mat-menu-item>
           <mat-icon>exit_to_app</mat-icon>
           <span>Logout</span>

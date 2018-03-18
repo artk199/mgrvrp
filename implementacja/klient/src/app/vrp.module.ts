@@ -32,6 +32,7 @@ import {MainComponent} from './components/main/main.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {SecurityService} from './services/security.service';
 import {AuthInterceptor} from './interceptors/auth.interceptor';
+import {ChangePasswordComponent} from './components/change-password/change-password.component';
 
 export function socketProvider() {
   return new SockJS('http://147.135.210.1:8080/stomp');
@@ -49,6 +50,7 @@ const stompConfig: StompConfig = {
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
+  {path: 'password', component: ChangePasswordComponent},
   {path: '**', component: MainComponent}
 ];
 
@@ -67,7 +69,8 @@ const appRoutes: Routes = [
     CustomerDialogComponent,
     LoginComponent,
     RegisterComponent,
-    MainComponent
+    MainComponent,
+    ChangePasswordComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes),
