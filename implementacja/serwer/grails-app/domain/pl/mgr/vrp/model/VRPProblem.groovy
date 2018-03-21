@@ -1,16 +1,17 @@
 package pl.mgr.vrp.model
 
-import grails.validation.Validateable
 import groovy.json.internal.LazyMap
 
-class VRPProblem implements Validateable {
+class VRPProblem {
 
-    String id
     String paneType
-    VRPAlgorithm algorithm
-    List<VRPDepot> depots
-    List<VRPCustomer> customers
-    Map settings
+    double capacity
+
+    static hasMany = [
+            depots   : VRPDepot,
+            customers: VRPCustomer,
+            solutions: VRPSolution
+    ]
 
     static VRPProblem create(def params) {
         VRPProblem problem = new VRPProblem(params)
@@ -30,19 +31,5 @@ class VRPProblem implements Validateable {
     VRPDepot getDepot() {
         return depots[0]
     }
-
-    double getMaxCapacity() {
-        return settings['capacity'] ?: Double.MAX_VALUE
-    }
-
-    String getDistanceType() {
-        return settings['distance'] ?: 'air'
-    }
-
-    static constraints = {
-        depots nullable: false, size: 1..10000000
-        customers nullable: false, size: 1..10000000
-    }
-
 
 }

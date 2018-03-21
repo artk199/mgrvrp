@@ -4,7 +4,6 @@ import {VRPService} from '../../services/vrp.service';
 import {VRPCustomer} from '../../domain/VRPCustomer';
 import {MapService} from '../../services/map.service';
 import {VRPDepot} from '../../domain/VRPDepot';
-import {Coordinate} from '../../domain/Coordinate';
 import {DialogFactoryService} from '../../services/dialog.factory.service';
 
 @Component({
@@ -22,7 +21,7 @@ export class MapComponent implements OnInit {
     const c = this;
     this.mapService.setupClickEvent(function (e) {
       c.dialog.open(VrpAddDialogComponent, {
-        data: {coordinate: new Coordinate(e.latlng.lat, e.latlng.lng)}
+        data: {x: e.latlng.lat, y: e.latlng.lng}
       });
     });
     this.vRPService.forceRefresh();
@@ -49,17 +48,12 @@ export class VrpAddDialogComponent {
   }
 
   addCustomer() {
-    try {
-      this.vRPService.addCustomer(new VRPCustomer(this.name, this.data.coordinate));
-      this.dialogRef.close();
-    } catch (e) {
-      console.error(e);
-      alert(e);
-    }
+    this.vRPService.addCustomer(new VRPCustomer(this.name, this.data.x, this.data.y));
+    this.dialogRef.close();
   }
 
   addDepot() {
-    this.vRPService.addDepot(new VRPDepot(this.name, this.data.coordinate));
+    this.vRPService.addDepot(new VRPDepot(this.name, this.data.x, this.data.y));
     this.dialogRef.close();
   }
 

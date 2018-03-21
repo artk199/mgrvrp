@@ -1,6 +1,8 @@
 package pl.mgr.vrp
 
+import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
+import pl.mgr.vrp.model.VRPSolution
 
 class BootStrap {
 

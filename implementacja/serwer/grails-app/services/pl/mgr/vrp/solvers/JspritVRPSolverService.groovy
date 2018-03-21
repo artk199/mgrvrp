@@ -12,6 +12,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl
 import com.graphhopper.jsprit.core.util.Solutions
 import grails.transaction.Transactional
 import pl.mgr.vrp.GraphHopperOSMService
+import pl.mgr.vrp.ProblemWithSettings
 import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPLocation
 import pl.mgr.vrp.model.VRPProblem
@@ -50,7 +51,7 @@ class JspritVRPSolverService extends VRPSolverService {
     }
 
     @Override
-    protected VRPSolution calculateSolution(VRPProblem problem) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problem) {
         logInfo("Searching for solution...")
 
         def depot = Location.newInstance(problem.depots[0].coordinates.x,problem.depots[0].coordinates.y)

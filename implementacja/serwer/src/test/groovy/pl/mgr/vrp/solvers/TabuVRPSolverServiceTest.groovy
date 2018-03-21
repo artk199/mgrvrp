@@ -1,7 +1,6 @@
 package pl.mgr.vrp.solvers
 
 import groovy.json.JsonSlurper
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import pl.mgr.vrp.GraphHopperOSMService
 import pl.mgr.vrp.RoutingUtilService
 import pl.mgr.vrp.model.VRPProblem

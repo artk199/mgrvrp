@@ -33,6 +33,8 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {SecurityService} from './services/security.service';
 import {AuthInterceptor} from './interceptors/auth.interceptor';
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
+import {WsVrpSolverService} from './services/vrp-solvers/ws-vrp-solver.service';
+import {XhrVrpSolverService} from './services/vrp-solvers/xhr-vrp-solver.service';
 
 export function socketProvider() {
   return new SockJS('http://147.135.210.1:8080/stomp');
@@ -103,7 +105,7 @@ const appRoutes: Routes = [
     RouteDialogComponent,
     CustomerDialogComponent
   ],
-  providers: [VRPService, MapService, ImportService, StompService, DialogFactoryService, SecurityService,
+  providers: [VRPService, MapService, ImportService, StompService, DialogFactoryService, SecurityService, WsVrpSolverService, XhrVrpSolverService,
     {
       provide: StompConfig,
       useValue: stompConfig

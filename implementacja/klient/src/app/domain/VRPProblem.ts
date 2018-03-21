@@ -1,6 +1,6 @@
 import {VRPDepot} from './VRPDepot';
 import {VRPCustomer} from './VRPCustomer';
-import {Type} from 'class-transformer';
+import {serialize, Type} from 'class-transformer';
 import {VRPSolution} from './VRPSolution';
 import {VRPAlgorithm} from './VRPAlgorithm';
 
@@ -10,14 +10,15 @@ import {VRPAlgorithm} from './VRPAlgorithm';
  */
 
 export class PaneType {
-  static EARTH = 'Earth';
-  static SIMPLE = 'Simple';
+  static EARTH = 'earth';
+  static SIMPLE = 'simple';
 }
 
 export class VRPProblem {
 
   id: string;
   paneType: string;
+  capacity: number = 200;
 
   algorithm: VRPAlgorithm;
 
@@ -29,13 +30,13 @@ export class VRPProblem {
 
   solutions: VRPSolution[];
 
-  settings = {
-    algorithm: 'savings',
-    distance: 'air',
-    geo_distance: 'spherical',
-    capacity: 200,
-    type: 'MAP'
-  };
+  settings = [
+    {code: 'algorithm', value: 'savings'},
+    {code: 'distance', value: 'air'},
+    {code: 'geo_distance', value: 'spherical'},
+    {code: 'capacity', value: 200},
+    {code: 'type', value: 'MAP'}
+  ];
 
   constructor(id: string) {
     this.id = id;
@@ -54,5 +55,7 @@ export class VRPProblem {
     this.depots = [depot];
   }
 
-
+  serializeWithoutSolutions() {
+    return serialize(this, {excludePrefixes: ['solutions']});
+  }
 }

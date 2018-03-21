@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {PaneType, VRPProblem} from '../../domain/VRPProblem';
 import {VRPService} from '../../services/vrp.service';
-import {Coordinate} from '../../domain/Coordinate';
 import {VRPDepot} from '../../domain/VRPDepot';
 import {VRPAlgorithm} from '../../domain/VRPAlgorithm';
-import {MapService} from '../../services/map.service';
+import {VRPAdditionalSetting} from '../../domain/VRPAdditionalSetting';
+import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
   selector: 'vrp-base-info',
@@ -19,15 +19,26 @@ export class BaseInfoComponent implements OnInit {
 
   algorithms: VRPAlgorithm[] = VRPAlgorithm.algorithms;
 
+  settings = {
+    algorithm: 'savings',
+    distanceType: 'air',
+    geo_distance: 'spherical'
+  };
+
+  editingDisabled = true;
+
+  additionalSettings = [];
+
   distances = [
     {code: 'road', description: 'Road'},
     {code: 'air', description: 'Air'}
   ];
 
-  constructor(private vRPService: VRPService, private mapService: MapService) {
+  constructor(private vRPService: VRPService) {
     this.vRPService.getCurrentProblem().subscribe(p => {
         this.currentProblem = p;
         this.changePaneType();
+        this.onAlgorithmChange();
       }
     );
     this.vRPService.getDepot().subscribe(depotList => this.depot = depotList[0]);
@@ -41,18 +52,25 @@ export class BaseInfoComponent implements OnInit {
   }
 
   solve() {
-    this.vRPService.solveCurrentProblem();
+    //Zmiana settingsów na obiekty vrp additional settings
+    let ads: VRPAdditionalSetting[] = [];
+    for (let setting of this.additionalSettings) {
+      ads.push(new VRPAdditionalSetting(setting['code'], setting['value']));
+    }
+    this.vRPService.solveCurrentProblem(this.settings.algorithm, this.settings.distanceType, ads);
   }
 
   changePaneType() {
-    if (this.currentProblem.paneType == PaneType.SIMPLE) {
-      this.distancesAllowed = false;
-      this.currentProblem.settings.distance = 'simple';
-    } else {
-      this.distancesAllowed = true;
-      this.currentProblem.settings.distance = 'road';
-    }
+    this.distancesAllowed = this.currentProblem.paneType != PaneType.SIMPLE;
     this.vRPService.forceRefresh();
+  }
+
+  canEditProblem(): boolean {
+    return false;
+  }
+
+  onAlgorithmChange() {
+    this.additionalSettings = VRPAlgorithm.algorithms.find(it => it.code == this.settings.algorithm).additionalSettings;
   }
 
 

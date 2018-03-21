@@ -8,7 +8,6 @@ import {Router} from '@angular/router';
 @Injectable()
 export class SecurityService {
 
-  authenticatedUser: User;
   profile: BehaviorSubject<User> = new BehaviorSubject<User>(null);
 
   constructor(private http: HttpClient, private snackBar: MatSnackBar, private router: Router) {

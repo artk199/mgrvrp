@@ -17,12 +17,13 @@ export class VRPAlgorithm {
         opts: [{v: 'parallel', k: 'Parallel'}, {v: 'sequential', k: 'Sequential'}]
       }]),
       new VRPAlgorithm('jsprit', 'JSprit? Metaheuristic', []),
-      new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', [{
-        code: 'attempts',
-        description: 'Attempts',
-        type: 'NUMBER',
-        value: 1
-      }]),
+      new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', [
+        {
+          code: 'attempts',
+          description: 'Attempts',
+          type: 'NUMBER',
+          value: 1
+        }]),
       new VRPAlgorithm('greedyFirst', 'Nearest Neighbor (NN)', []),
       new VRPAlgorithm('tabu', 'Tabu search', [
         {

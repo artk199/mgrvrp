@@ -1,19 +1,18 @@
-import {Coordinate} from './Coordinate';
 import {VRPLocation} from './VRPLocation';
-import {Type} from 'class-transformer';
 
 /**
  * Informacje na temat odbiorcy.
  */
-export class VRPCustomer extends VRPLocation{
+export class VRPCustomer extends VRPLocation {
 
   demand: number;
 
-  constructor(id: string, coordinates: Coordinate = new Coordinate(0, 0)) {
+  constructor(name: string, x: number, y: number) {
     super();
-    this.id = id;
+    this.name = name;
     this.demand = 50;
-    this.coordinates = coordinates;
+    this.x = x;
+    this.y = y;
   }
 
 }

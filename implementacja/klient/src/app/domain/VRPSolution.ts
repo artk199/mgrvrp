@@ -1,15 +1,16 @@
 import {VRPRoute} from './VRPRoute';
 import {Exclude, Type} from 'class-transformer';
 import {VRPSolutionStep} from './VRPSolutionStep';
-import {VRPAlgorithm} from './VRPAlgorithm';
+import {VRPAdditionalSetting} from './VRPAdditionalSetting';
 
 export class VRPSolution {
 
   @Type(() => VRPRoute)
   routes: VRPRoute[];
-  algorithm: VRPAlgorithm;
+  algorithm: string;
+  distanceType: string;
   routeLength: any;
-  settings: any;
+  additionalSettings: VRPAdditionalSetting[];
 
   @Exclude()
   public solutionsSteps: VRPSolutionStep[] = [];

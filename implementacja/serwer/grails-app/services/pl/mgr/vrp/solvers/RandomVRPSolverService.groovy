@@ -1,5 +1,6 @@
 package pl.mgr.vrp.solvers
 
+import pl.mgr.vrp.ProblemWithSettings
 import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPCustomer
 import pl.mgr.vrp.model.VRPProblem
@@ -9,7 +10,7 @@ import pl.mgr.vrp.model.VRPSolution
 class RandomVRPSolverService extends VRPSolverService {
 
     @Override
-    protected VRPSolution calculateSolution(VRPProblem problem) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problem) {
         VRPSolution best
         int MAX_ATTEMPTS = 1
         def attempts = problem.algorithm.findSetting('attempts')

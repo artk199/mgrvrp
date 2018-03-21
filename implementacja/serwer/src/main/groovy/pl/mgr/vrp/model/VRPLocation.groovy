@@ -8,13 +8,13 @@ class VRPLocation {
     VRPLocation() {}
 
     VRPLocation(double x, double y) {
-        coordinates = new Coordinate(x: x, y: y)
+        this.x = x
+        this.y = y
     }
 
     int _ID //kolejny numer
-
-    String id
-    Coordinate coordinates
+    String name
+    double x, y
 }
 
 

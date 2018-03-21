@@ -1,13 +1,18 @@
 package pl.mgr.vrp
 
+import grails.converters.JSON
+import grails.transaction.Transactional
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.handler.annotation.SendTo
+import pl.mgr.vrp.model.VRPAdditionalSetting
+import pl.mgr.vrp.model.VRPDrivePoint
 import pl.mgr.vrp.model.VRPProblem
+import pl.mgr.vrp.model.VRPRoute
+import pl.mgr.vrp.model.VRPSolution
 
 @Slf4j
-class VrpController{
+class VrpController {
 
     EntryVRPService entryVRPService
 
@@ -18,12 +23,34 @@ class VrpController{
         entryVRPService.prepareAndSolve(vrpProblem)
     }
 
-    @MessageMapping("/hello")
-    @SendTo("/topic/hello")
-    protected String hello(String world) {
-        println "world"
-        //brokerMessagingTemplate.convertAndSend "/topic/hello", world
-        return "hello from controller, ${world}!"
+    @Transactional
+    def vrp_xhr(ProblemWithSettings problemWithSettings) {
+        problemWithSettings.problem.save(failOnError: true)
+        VRPSolution solution = entryVRPService.prepareAndSolve(problemWithSettings)
+        solution.save(failOnError: true)
+        def ret = [
+                type     : "END",
+                message  : solution,
+                timestamp: new Date()
+        ]
+        JSON.use('deep') {
+            render ret as JSON
+        }
+    }
+
+}
+
+class ProblemWithSettings {
+
+    VRPProblem problem
+
+    String algorithm
+    String distanceType
+
+    List<VRPAdditionalSetting> additionalSettings
+
+    String getSetting(String code) {
+        return additionalSettings.find { it.code == code }?.value
     }
 
 }

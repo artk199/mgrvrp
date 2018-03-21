@@ -4,8 +4,6 @@ import groovy.transform.AutoClone
 
 @AutoClone
 class VRPCustomer extends VRPLocation {
-
-    Map restrictions
     double demand
-
+    static belongsTo = [problem: VRPProblem]
 }

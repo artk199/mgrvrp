@@ -61,6 +61,8 @@ dependencies {
 
     compile 'org.grails.plugins:quartz:2.0.12'
     compile 'org.grails.plugins:grails-spring-websocket:2.3.0'
+
+    runtime 'mysql:mysql-connector-java:5.1.36'
 }
 
 bootRun {

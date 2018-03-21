@@ -44,9 +44,6 @@ export class RoutesComponent implements OnInit {
     let sum = 0;
     for (let r of route.drivePoints) {
       sum += r.routeLength;
-      if (r.destination.id == point.id) {
-        break;
-      }
     }
     return '' + sum / route.routeLength * 100 + '%';
   }

@@ -1,6 +1,6 @@
 package pl.mgr.vrp.solvers
 
-import grails.transaction.Transactional
+import pl.mgr.vrp.ProblemWithSettings
 import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPProblem
 import pl.mgr.vrp.model.VRPRoute
@@ -9,7 +9,7 @@ import pl.mgr.vrp.model.VRPSolution
 class GreedyFirstVRPSolverService extends VRPSolverService {
 
     @Override
-    protected VRPSolution calculateSolution(VRPProblem problem) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problem) {
         VRPSolution solution = new VRPSolution();
         def allCustomers = []
         problem.customers.eachWithIndex { it, i ->

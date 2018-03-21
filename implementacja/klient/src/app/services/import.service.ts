@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {MapService} from './map.service';
 import {VRPService} from './vrp.service';
 import {VRPCustomer} from '../domain/VRPCustomer';
-import {Coordinate} from '../domain/Coordinate';
 import {VRPDepot} from '../domain/VRPDepot';
 import {PaneType, VRPProblem} from '../domain/VRPProblem';
 import {deserialize} from 'class-transformer';
@@ -79,15 +78,15 @@ export class ImportService {
 
     let problem = new VRPProblem(id);
 
-    problem.settings.capacity = parseInt(settings['CAPACITY']);
-    problem.settings.type = settings['EDGE_WEIGHT_TYPE'];
+    //problem.settings.capacity = parseInt(settings['CAPACITY']);
+    //problem.settings.type = settings['EDGE_WEIGHT_TYPE'];
 
     for (let node of nodes) {
       if (node.isDepot) {
-        let d = new VRPDepot(node.id, new Coordinate(node.x, node.y));
+        let d = new VRPDepot(node.id, node.x, node.y);
         problem.setDepot(d);
       } else {
-        let c = new VRPCustomer(node.id, new Coordinate(node.x, node.y));
+        let c = new VRPCustomer(node.id, node.x, node.y);
         c.demand = parseInt(node.demand);
         problem.addCustomer(c);
       }

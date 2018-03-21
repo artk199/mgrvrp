@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import * as L from 'leaflet';
-import {Coordinate} from '../domain/Coordinate';
 import {VRPCustomer} from '../domain/VRPCustomer';
 import {VRPDepot} from '../domain/VRPDepot';
 import {VRPSolution} from '../domain/VRPSolution';
@@ -41,9 +40,9 @@ export class MapService {
 
   public setupMap(mapType: string = PaneType.EARTH) {
 
-    if(!document.getElementById(this.MAP_ID)){
-      console.log("Nie można znaleźć elementu mapy!");
-      return
+    if (!document.getElementById(this.MAP_ID)) {
+      console.log('Nie można znaleźć elementu mapy!');
+      return;
     }
 
     if (this._map) {
@@ -153,7 +152,7 @@ export class MapService {
       imagePath: 'assets/leaflet/images/',
       iconUrl: 'marker-icon-3.png',
     });
-    let marker = this.addMarker(customer.coordinates, customerIcon, customer.id);
+    let marker = this.addMarker(customer, customerIcon, customer.name);
     let srv = this;
     marker.on('click', function (event) {
       srv.dialogFactoryService.showCustomerDialog(customer);
@@ -168,10 +167,10 @@ export class MapService {
       imagePath: 'assets/leaflet/images/',
       iconUrl: 'marker-icon-4.png',
     });
-    this.addMarker(depot.coordinates, depotIcon, depot.id);
+    this.addMarker(depot, depotIcon, depot.name);
   }
 
-  private addMarker(coordinates: Coordinate, icon, name) {
+  private addMarker(coordinates, icon, name) {
     const opts = {
       draggable: true,
       icon: icon,
@@ -212,13 +211,13 @@ export class MapService {
 
   private createPathFromDrivePoints(drivePoints: VRPDrivePoints, color: any, route: VRPRoute) {
     let paths = [];
-    let from = drivePoints.from;
+    let from = drivePoints.points[0];
     for (let to of drivePoints.points) {
       let path = MapService.generatePolylinePath(
-        from.coordinates.x,
-        from.coordinates.y,
-        to.coordinates.x,
-        to.coordinates.y,
+        from.x,
+        from.y,
+        to.x,
+        to.y,
         color
       );
       paths.push(path);
@@ -304,7 +303,7 @@ export class MapService {
   }
 
   isMapInitialized() {
-    return this._map != null
+    return this._map != null;
   }
 
 }

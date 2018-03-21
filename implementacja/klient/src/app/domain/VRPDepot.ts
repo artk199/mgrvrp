@@ -1,13 +1,12 @@
-import {Coordinate} from './Coordinate';
 import {VRPLocation} from './VRPLocation';
-import {Type} from 'class-transformer';
 
-export class VRPDepot extends VRPLocation{
+export class VRPDepot extends VRPLocation {
 
-  constructor(id: string, coordinates: Coordinate) {
+  constructor(name: string, x: number = 0, y: number = 0) {
     super();
-    this.id = id;
-    this.coordinates = coordinates;
+    this.name = name;
+    this.x = x;
+    this.y = y;
   }
 
 }

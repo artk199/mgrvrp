@@ -2,6 +2,7 @@ package pl.mgr.vrp.solvers
 
 import groovy.json.JsonOutput
 import groovy.util.logging.Slf4j
+import pl.mgr.vrp.ProblemWithSettings
 import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPProblem
 import pl.mgr.vrp.model.VRPRoute
@@ -13,7 +14,7 @@ class TabuVRPSolverService extends VRPSolverService {
     RandomVRPSolverService randomVRPSolverService
 
     @Override
-    protected VRPSolution calculateSolution(VRPProblem problem) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problem) {
 
         int MAX_ITERATIONS = 100
         def iterationsSetting = problem.algorithm.findSetting('iterations')

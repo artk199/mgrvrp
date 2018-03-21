@@ -2,54 +2,55 @@
 
   <mat-toolbar *ngIf="!depot">You need to add depot on map</mat-toolbar>
 
-  <div *ngIf="depot">
-    <h5>Depot position:</h5>
-    <div style="display: flex; justify-content: space-between">
-      <div style="width: 50%">
-        <pre>x: {{depot.coordinates.x | number:'1.5-5'}}</pre>
-      </div>
-      <div style="width: 50%">
-        <pre>y: {{depot.coordinates.y | number:'1.5-5'}}</pre>
-      </div>
+  <div *ngIf="depot" class="depot-container">
+    <div><h5>Depot position:</h5></div>
+    <div>
+      <pre>x: {{depot.x | number:'1.5-5'}}</pre>
     </div>
-    <hr/>
+    <div>
+      <pre>y: {{depot.y | number:'1.5-5'}}</pre>
+    </div>
   </div>
+
+  <hr>
 
   <mat-list dense>
     <mat-list-item>
       <mat-form-field class="full-width">
         <mat-select placeholder="Surface type"
                     (selectionChange)="changePaneType()"
+                    [disabled]="canEditProblem()"
                     (change)="changePaneType()"
                     [(ngModel)]="currentProblem.paneType">
-          <mat-option value="Simple">Simple</mat-option>
-          <mat-option value="Earth">Earth</mat-option>
+          <mat-option value="simple">Simple</mat-option>
+          <mat-option value="earth">Earth</mat-option>
         </mat-select>
       </mat-form-field>
     </mat-list-item>
     <mat-list-item>
-
       <mat-form-field class="full-width">
-        <mat-select placeholder="Algorithm" [(ngModel)]="currentProblem.algorithm">
+        <input [disabled]="canEditProblem()" matInput type="number" placeholder="Truck capacity"
+               [(ngModel)]="currentProblem.capacity">
+      </mat-form-field>
+    </mat-list-item>
+    <hr>
+    <mat-list-item>
+      <mat-form-field class="full-width">
+        <mat-select placeholder="Algorithm" (change)="onAlgorithmChange()" [(ngModel)]="settings.algorithm">
           <mat-option *ngFor="let algorithm of algorithms"
-                      [value]="algorithm">{{ algorithm.description }}
+                      [value]="algorithm.code">{{ algorithm.description }}
           </mat-option>
         </mat-select>
       </mat-form-field>
     </mat-list-item>
     <mat-list-item *ngIf="distancesAllowed">
       <mat-form-field class="full-width">
-        <mat-select placeholder="Distance calculation type" [(ngModel)]="currentProblem.settings.distance">
+        <mat-select placeholder="Distance calculation type" [(ngModel)]="settings.distanceType">
           <mat-option *ngFor="let distance of distances"
                       [value]="distance.code">
             {{ distance.description }}
           </mat-option>
         </mat-select>
-      </mat-form-field>
-    </mat-list-item>
-    <mat-list-item>
-      <mat-form-field class="full-width">
-        <input matInput type="number" placeholder="Truck capacity" [(ngModel)]="currentProblem.settings.capacity">
       </mat-form-field>
     </mat-list-item>
   </mat-list>
@@ -58,7 +59,7 @@
     <hr/>
 
     <mat-list dense>
-      <mat-list-item *ngFor="let setting of currentProblem.algorithm.additionalSettings"
+      <mat-list-item *ngFor="let setting of additionalSettings"
                      [ngSwitch]="setting.type">
         <mat-form-field class="full-width" *ngSwitchCase="'NUMBER'">
           <input matInput type="number" placeholder="{{setting.description}}" [(ngModel)]="setting.value">

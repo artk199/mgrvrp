@@ -5,13 +5,14 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {VRPDepot} from '../domain/VRPDepot';
 import {VRPProblem} from '../domain/VRPProblem';
 import {MapService} from './map.service';
-import {StompService, StompState} from '@stomp/ng2-stompjs';
-import {Message} from '@stomp/stompjs';
 import {deserialize, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
-import {VRPRoute} from '../domain/VRPRoute';
 import {MatSnackBar} from '@angular/material';
 import {VRPSolutionStep} from '../domain/VRPSolutionStep';
+import {WsVrpSolverService} from './vrp-solvers/ws-vrp-solver.service';
+import {XhrVrpSolverService} from './vrp-solvers/xhr-vrp-solver.service';
+import {VRPSolutionEvent, VRPSolutionEventType, VrpSolverService} from './vrp-solvers/vrp-solver.service';
+import {VRPAdditionalSetting} from '../domain/VRPAdditionalSetting';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -28,7 +29,7 @@ export class VRPService {
 
   private PROBLEMS_KEY: string = 'problems';
 
-  constructor(private mapService: MapService, private _stompService: StompService, private snackBar: MatSnackBar) {
+  constructor(private mapService: MapService, private snackBar: MatSnackBar, private wsVrpSolverService: WsVrpSolverService, private xhrVrpSolverService: XhrVrpSolverService) {
     //Wczytywanie zapisanych problemow do storeage
     let p: VRPProblem[] = deserializeArray(VRPProblem, window.localStorage.getItem(this.PROBLEMS_KEY));
     if (p) {
@@ -72,7 +73,8 @@ export class VRPService {
    * @param {VRPCustomer} customer - odbiorca która ma zostać dodany
    */
   addCustomer(customer: VRPCustomer) {
-    if (this.currentProblemValue.customers.some(x => x.id == customer.id)) {
+    console.log(customer);
+    if (this.currentProblemValue.customers.some(x => x.name == customer.name)) {
       throw new Error('Customer with given name already exists.');
     }
     this.currentProblemValue.addCustomer(customer);
@@ -176,9 +178,9 @@ export class VRPService {
   /**
    * Calkowicie usuwa mape i od nowa rysuje aktualny problem
    */
-  forceRefresh(){
+  forceRefresh() {
     this.mapService.setupMap(this.currentProblemValue.paneType);
-    if(this.mapService.isMapInitialized()) {
+    if (this.mapService.isMapInitialized()) {
       this.refreshMap();
     }
   }
@@ -200,55 +202,46 @@ export class VRPService {
   /**
    * Wysyla problem do serwera ktory zwraca wynik.
    */
-  solveCurrentProblem() {
-    let currentState = this._stompService.state.value;
-    if(currentState === StompState.CLOSED){
-      this.snackBar.open('Cannot connect to solving service.');
-      return;
-    }
-    VRPService.startLoading();
-    let stomp_subscription = this._stompService.subscribe('/topic/hello');
-
+  solveCurrentProblem(algorithmName: string, distanceType: string, additionalSettings: VRPAdditionalSetting[]) {
+    VRPService.showLoadingSpinner();
     let steps = [];
-
-    let obs = stomp_subscription.map((message: Message) => {
-      return message.body;
-    }).subscribe((msg: string) => {
-      let m = JSON.parse(msg);
-      let messageType = m.content ? m.content.type : '';
-      console.log("Dostaje wiadomosc");
-      console.log(messageType);
-      switch (messageType) {
-        case 'STEP':
-          let s: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
-          let solutionStep = new VRPSolutionStep();
-          solutionStep.data = s;
-          steps.push(solutionStep);
-          VRPService.setColors(s);
-          this.loadSolution(s);
-          break;
-        case 'END':
-          let solution: VRPSolution = deserialize(VRPSolution, JSON.stringify(m.content.message));
-          console.log(solution);
-          solution.solutionsSteps = steps;
-          this.addSolution(solution);
-          VRPService.stopLoading();
-          obs.unsubscribe();
-          break;
-        case 'INFO':
-          VRPService.setLoadingMessage(m.content.message);
-          console.log(m.content.message);
-          break;
-        case 'RUNTIME_ERROR':
-          this.snackBar.open('Unknown error.', 'OK', {
-            duration: 5000,
-          });
-          VRPService.stopLoading();
-          break;
+    this.getVRPSolverService().solve(this.currentProblemValue, additionalSettings, algorithmName, distanceType).subscribe(
+      (event: VRPSolutionEvent) => {
+        switch (event.type) {
+          case VRPSolutionEventType.STEP:
+            let solutionStep = new VRPSolutionStep();
+            solutionStep.data = event.solution;
+            steps.push(solutionStep);
+            VRPService.setColors(solutionStep.data);
+            this.loadSolution(solutionStep.data);
+            break;
+          case VRPSolutionEventType.END:
+            let solution: VRPSolution = event.solution;
+            solution.solutionsSteps = steps;
+            this.addSolution(solution);
+            VRPService.hideLoadingSpinner();
+            break;
+          case VRPSolutionEventType.INFO:
+            VRPService.setLoadingMessage(event.message);
+            break;
+          case VRPSolutionEventType.RUNTIME_ERROR:
+            this.snackBar.open('Unknown error on server side.', 'OK', {
+              duration: 5000,
+            });
+            VRPService.hideLoadingSpinner();
+            break;
+          default:
+            console.log('Unknown solution event!');
+        }
+      },
+      error => {
+        console.log(error);
+        this.snackBar.open('Unknown communication error.', 'OK', {
+          duration: 5000,
+        });
+        VRPService.hideLoadingSpinner();
       }
-    });
-
-    this._stompService.publish('/app/vrp', serialize(this.currentProblemValue, {excludePrefixes: ['solutions']}));
+    );
   }
 
   /**
@@ -349,14 +342,14 @@ export class VRPService {
   /**
    * Wyłącza ekran ładowania
    */
-  private static stopLoading() {
+  private static hideLoadingSpinner() {
     document.getElementById('loading-screen').style.display = 'none';
   }
 
   /**
    * Włącza ekran ładownaia
    */
-  private static startLoading() {
+  private static showLoadingSpinner() {
     document.getElementById('loading-screen').style.display = 'block';
   }
 
@@ -368,4 +361,7 @@ export class VRPService {
     document.getElementById('loading-info').innerText = message;
   }
 
+  private getVRPSolverService(): VrpSolverService {
+    return this.xhrVrpSolverService;
+  }
 }

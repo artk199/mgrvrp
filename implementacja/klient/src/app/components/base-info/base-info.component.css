@@ -9,3 +9,9 @@
 .add-panel {
   float: right;
 }
+
+.depot-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
