@@ -1,12 +1,11 @@
 package pl.mgr.vrp
 
 import groovy.json.JsonBuilder
-import groovy.json.JsonOutput
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import pl.mgr.vrp.model.VRPDrivePoint
+import pl.mgr.vrp.model.VRPLocation
 import pl.mgr.vrp.model.VRPPoint
 import pl.mgr.vrp.model.VRPProblem
 import pl.mgr.vrp.model.VRPSolution
@@ -29,10 +28,6 @@ abstract class VRPSolverService {
         try {
             validateVRPProblem(problemWithSettings.problem)
             VRPSolution solution = calculateSolution(problemWithSettings)
-            solution.algorithm = problemWithSettings.algorithm
-            solution.distanceType = problemWithSettings.distanceType
-            solution.problem = problemWithSettings.problem
-            solution.settings.addAll(problemWithSettings.additionalSettings)
             calculateRoute(solution, problemWithSettings.distanceType)
             sendEndSignal(solution)
             return solution
@@ -116,7 +111,7 @@ abstract class VRPSolverService {
 
     def calculateRoadRoute(VRPSolution solution) {
         solution.routes.each { route ->
-            def lastPoint = route.points.first()
+            VRPLocation lastPoint = solution.problem.depot
             route.drivePoints = []
             route.points.each { point ->
                 List<VRPPoint> points = graphHopperOSMService.calculateRoute(lastPoint, point)
@@ -127,7 +122,7 @@ abstract class VRPSolverService {
                 route.addToDrivePoints drivePoint
                 lastPoint = point
             }
-            VRPDrivePoint drivePoint = new VRPDrivePoint(graphHopperOSMService.calculateRoute(lastPoint, route.points.last()))
+            VRPDrivePoint drivePoint = new VRPDrivePoint(graphHopperOSMService.calculateRoute(lastPoint, solution.problem.depot))
             for (int i = 1; i < drivePoint.points.size(); i++) {
                 drivePoint.routeLength += routingUtilService.calculateDistanceForSphericalEarth(drivePoint.points[i - 1], drivePoint.points[i])
             }
@@ -144,7 +139,7 @@ abstract class VRPSolverService {
 
     def calculateAirRoute(VRPSolution solution) {
         solution.routes.each { route ->
-            def lastPoint = route.points.first()
+            VRPLocation lastPoint = solution.problem.depot
             route.drivePoints = []
             route.points.each { point ->
                 def drivePoint = new VRPDrivePoint([
@@ -157,9 +152,10 @@ abstract class VRPSolverService {
                 route.addToDrivePoints drivePoint
                 lastPoint = point
             }
+
             def drivePoint = new VRPDrivePoint([
                     new VRPPoint(lastPoint.x, lastPoint.y),
-                    new VRPPoint(route.points.last().x, route.points.last().y)
+                    new VRPPoint(solution.problem.depot.x, solution.problem.depot.y)
             ])
             for (int i = 1; i < drivePoint.points.size(); i++) {
                 drivePoint.routeLength += routingUtilService.calculateDistanceForSphericalEarth(drivePoint.points[i - 1], drivePoint.points[i])

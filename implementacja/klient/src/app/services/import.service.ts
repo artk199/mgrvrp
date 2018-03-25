@@ -83,10 +83,10 @@ export class ImportService {
 
     for (let node of nodes) {
       if (node.isDepot) {
-        let d = new VRPDepot(node.id, node.x, node.y);
+        let d = new VRPDepot(node.id, parseFloat(node.x), parseFloat(node.y));
         problem.setDepot(d);
       } else {
-        let c = new VRPCustomer(node.id, node.x, node.y);
+        let c = new VRPCustomer(node.id, parseFloat(node.x), parseFloat(node.y));
         c.demand = parseInt(node.demand);
         problem.addCustomer(c);
       }

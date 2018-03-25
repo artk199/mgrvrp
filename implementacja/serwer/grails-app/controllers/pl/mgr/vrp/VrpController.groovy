@@ -5,10 +5,7 @@ import grails.transaction.Transactional
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import org.springframework.messaging.handler.annotation.MessageMapping
-import pl.mgr.vrp.model.VRPAdditionalSetting
-import pl.mgr.vrp.model.VRPDrivePoint
 import pl.mgr.vrp.model.VRPProblem
-import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPSolution
 
 @Slf4j
@@ -40,17 +37,3 @@ class VrpController {
 
 }
 
-class ProblemWithSettings {
-
-    VRPProblem problem
-
-    String algorithm
-    String distanceType
-
-    List<VRPAdditionalSetting> additionalSettings
-
-    String getSetting(String code) {
-        return additionalSettings.find { it.code == code }?.value
-    }
-
-}

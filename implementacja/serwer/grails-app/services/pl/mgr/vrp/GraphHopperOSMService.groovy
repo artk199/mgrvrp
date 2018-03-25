@@ -40,9 +40,9 @@ class GraphHopperOSMService {
 
     private PathWrapper getBestRoute(VRPLocation l1, VRPLocation l2) {
         GHRequest request = new GHRequest(
-                l1.coordinates.x,
-                l1.coordinates.y,
-                l2.coordinates.x, l2.coordinates.y
+                l1.x,
+                l1.y,
+                l2.x, l2.y
         )
         request.setWeighting("fastest")
         request.setVehicle("car")

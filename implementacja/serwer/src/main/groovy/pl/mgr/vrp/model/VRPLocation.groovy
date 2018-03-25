@@ -14,7 +14,8 @@ class VRPLocation {
 
     int _ID //kolejny numer
     String name
-    double x, y
+    Double x
+    Double y
 }
 
 

@@ -69,7 +69,7 @@ class JspritVRPSolverService extends VRPSolverService {
     }
 
     private VRPSolution translateSolution(VehicleRoutingProblemSolution s) {
-        VRPSolution solution = new VRPSolution()
+        VRPSolution solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
         s.routes.each { it ->
             VRPRoute r = new VRPRoute()
             r.start = new VRPLocation(

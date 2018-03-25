@@ -25,12 +25,10 @@ class SavingsVRPSolverService extends VRPSolverService {
         double[][] distances = calculateDistances(problemWithSettings.problem, problemWithSettings.getDistanceType())
         List<Saving> savings = calculateSavings(distances)
         if (problemWithSettings.getSetting('type') == 'sequential') {
-            solution = new VRPSolution()
-            calculateRoute(solution, problemWithSettings.distanceType)
+            solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
             sequentialCreateRoutes(solution, savings, problemWithSettings)
         } else {
-            solution = createInitialSolution(problem)
-            calculateRoute(solution, problemWithSettings.distanceType)
+            solution = createInitialSolution(problemWithSettings)
             createRoutes(solution, savings, problemWithSettings)
         }
         solution
@@ -51,7 +49,7 @@ class SavingsVRPSolverService extends VRPSolverService {
 
             if (!rI && !rJ) {
                 //Jeżeli żaden z punktów (i,j) nie został dodany do ścieżki to tworzymy nową zawierającą i oraz j
-                VRPRoute createdRoute = createRoute(problem.depot, problem.depot, customer1, customer2)
+                VRPRoute createdRoute = createRoute(customer1, customer2)
                 if (validateCapacity(createdRoute, problem.capacity)) {
                     solution.addToRoutes createdRoute
                 }
@@ -74,7 +72,6 @@ class SavingsVRPSolverService extends VRPSolverService {
                 //log.info "Nie moge nic zrobic z oszczednoscia: ${saving}"
             }
         }
-        calculateRoute(solution, problemWithSettings.distanceType)
         solution
     }
 
@@ -99,7 +96,7 @@ class SavingsVRPSolverService extends VRPSolverService {
             if (!rI && !rJ) {
                 if (currentRoute == null) {
                     //Jeżeli żaden z punktów (i,j) nie został dodany do ścieżki to tworzymy nową zawierającą i oraz j
-                    VRPRoute createdRoute = createRoute(problem.depot, problem.depot, customer1, customer2)
+                    VRPRoute createdRoute = createRoute(customer1, customer2)
                     if (validateCapacity(createdRoute, problem.capacity)) {
                         solution.addToRoutes createdRoute
                         currentRoute = createdRoute
@@ -126,7 +123,6 @@ class SavingsVRPSolverService extends VRPSolverService {
         if (!leftSavings.isEmpty()) {
             return sequentialCreateRoutes(solution, leftSavings, problemWithSettings)
         } else {
-            calculateRoute(solution, problemWithSettings.distanceType)
             return solution
         }
     }
@@ -189,7 +185,7 @@ class SavingsVRPSolverService extends VRPSolverService {
         return route.points.first().id == customer.id
     }
 
-    VRPRoute createRoute(start, stop, VRPCustomer customer1, VRPCustomer customer2) {
+    VRPRoute createRoute(VRPCustomer customer1, VRPCustomer customer2) {
         def route = new VRPRoute()
         route.points.add customer1
         route.points.add customer2
@@ -222,10 +218,10 @@ class SavingsVRPSolverService extends VRPSolverService {
         return savings
     }
 
-    private VRPSolution createInitialSolution(VRPProblem problem) {
+    private VRPSolution createInitialSolution(ProblemWithSettings problemWithSettings) {
         logInfo "Obliczam wstepne rozwiazanie..."
-        VRPSolution solution = new VRPSolution()
-        problem.customers.each {
+        VRPSolution solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
+        problemWithSettings.problem.customers.each {
             VRPRoute route = new VRPRoute()
             route.points.add it
             solution.addToRoutes route

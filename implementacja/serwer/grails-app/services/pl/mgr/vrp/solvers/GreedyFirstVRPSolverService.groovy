@@ -1,58 +1,60 @@
 package pl.mgr.vrp.solvers
 
+import groovy.transform.CompileStatic
 import pl.mgr.vrp.ProblemWithSettings
 import pl.mgr.vrp.VRPSolverService
+import pl.mgr.vrp.model.VRPCustomer
 import pl.mgr.vrp.model.VRPProblem
 import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPSolution
 
+@CompileStatic
 class GreedyFirstVRPSolverService extends VRPSolverService {
 
     @Override
-    protected VRPSolution calculateSolution(ProblemWithSettings problem) {
-        VRPSolution solution = new VRPSolution();
-        def allCustomers = []
-        problem.customers.eachWithIndex { it, i ->
-            allCustomers.push([id: i, demand: it.demand])
-        }
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
+        VRPSolution solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
+        VRPProblem problem = problemWithSettings.problem
+        this.assignIDs(problem)
+        List<VRPCustomer> allCustomers = problem.customers.collect()
 
-        def leftCustomers = allCustomers.toSorted { a, b -> (a.demand <=> b.demand) * -1 }
+        List<VRPCustomer> leftCustomers = allCustomers.toSorted { a, b -> (a.demand <=> b.demand) * -1 }
 
         def adjacentMatrix = routingUtilService.calculateAirDistanceMatrix(problem)
 
         while (leftCustomers.size() > 0) {
 
             VRPRoute route = new VRPRoute()
-            route.start = problem.depot
-            route.end = problem.depot
+            VRPCustomer customer = leftCustomers.pop()
 
-            def customer = leftCustomers.pop()
+            route.addToPoints customer
 
-            route.points.push(problem.customers[customer.id])
+            double leftDemand = problem.capacity - customer.demand
 
-            double leftDemand = problem.maxCapacity - customer.demand
-            def nearestNeighbour = 0
-            while (nearestNeighbour != -1) {
-                nearestNeighbour = findNearestNeighbour(adjacentMatrix, customer.id, leftDemand, leftCustomers)
-                if (nearestNeighbour != -1) {
-                    leftCustomers.removeAll { it.id == nearestNeighbour }
-                    leftDemand -= problem.customers[nearestNeighbour].demand
-                    route.points.push(problem.customers[nearestNeighbour])
+            VRPCustomer nearestNeighbour = null
+            boolean stop = false
+            while (!stop) {
+                nearestNeighbour = findNearestNeighbour(adjacentMatrix, customer._ID, leftDemand, leftCustomers)
+                if (nearestNeighbour != null) {
+                    leftCustomers.removeAll { it == nearestNeighbour }
+                    leftDemand -= nearestNeighbour.demand
+                    route.addToPoints nearestNeighbour
+                } else {
+                    stop = true
                 }
             }
-            solution.routes.add(route)
+            solution.addToRoutes route
         }
         return solution
     }
 
-    def findNearestNeighbour(def adjacencyMatrix, def id, def leftDemand, def leftCustomers) {
-        //TODO: Nie wiem czy [i][j] czy [j][i]...
-        int min = Double.MAX_VALUE
-        int result = -1
+    VRPCustomer findNearestNeighbour(double[][] adjacencyMatrix, int id, double leftDemand, List<VRPCustomer> leftCustomers) {
+        double min = Double.MAX_VALUE
+        VRPCustomer result = null
         leftCustomers.each { customer ->
-            if (min > adjacencyMatrix[id + 1][customer.id + 1] && customer.demand <= leftDemand) {
-                min = adjacencyMatrix[id + 1][customer.id + 1]
-                result = customer.id
+            if (min > adjacencyMatrix[id][customer._ID] && customer.demand <= leftDemand) {
+                min = adjacencyMatrix[id][customer._ID]
+                result = customer
             }
         }
         return result
