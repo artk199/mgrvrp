@@ -15,12 +15,12 @@ class GreedyFirstVRPSolverService extends VRPSolverService {
     protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
         VRPSolution solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
         VRPProblem problem = problemWithSettings.problem
-        this.assignIDs(problem)
-        List<VRPCustomer> allCustomers = problem.customers.collect()
 
+        List<VRPCustomer> allCustomers = problem.customers.collect()
         List<VRPCustomer> leftCustomers = allCustomers.toSorted { a, b -> (a.demand <=> b.demand) * -1 }
 
-        def adjacentMatrix = routingUtilService.calculateAirDistanceMatrix(problem)
+        this.assignIDs(problem)
+        def adjacentMatrix = this.calculateDistances(problem, problemWithSettings.distanceType)
 
         while (leftCustomers.size() > 0) {
 
@@ -34,7 +34,7 @@ class GreedyFirstVRPSolverService extends VRPSolverService {
             VRPCustomer nearestNeighbour = null
             boolean stop = false
             while (!stop) {
-                nearestNeighbour = findNearestNeighbour(adjacentMatrix, customer._ID, leftDemand, leftCustomers)
+                nearestNeighbour = findNearestNeighbour(adjacentMatrix, nearestNeighbour ? nearestNeighbour._ID : customer._ID, leftDemand, leftCustomers)
                 if (nearestNeighbour != null) {
                     leftCustomers.removeAll { it == nearestNeighbour }
                     leftDemand -= nearestNeighbour.demand
@@ -44,6 +44,7 @@ class GreedyFirstVRPSolverService extends VRPSolverService {
                 }
             }
             solution.addToRoutes route
+            this.logStep(solution)
         }
         return solution
     }
