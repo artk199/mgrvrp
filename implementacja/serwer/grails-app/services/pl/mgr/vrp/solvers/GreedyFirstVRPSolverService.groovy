@@ -25,7 +25,9 @@ class GreedyFirstVRPSolverService extends VRPSolverService {
         while (leftCustomers.size() > 0) {
 
             VRPRoute route = new VRPRoute()
-            VRPCustomer customer = leftCustomers.pop()
+
+            VRPCustomer customer = findNearestNeighbour(adjacentMatrix, 0 /* depot */, problem.capacity, leftCustomers)
+            leftCustomers.removeAll { it == customer }
 
             route.addToPoints customer
 
