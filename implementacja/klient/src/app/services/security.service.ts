@@ -4,6 +4,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {MatSnackBar} from '@angular/material';
 import {Router} from '@angular/router';
+import {Config} from '../config';
 
 @Injectable()
 export class SecurityService {
@@ -20,7 +21,7 @@ export class SecurityService {
     formData.append('password', password);
 
     return this.http.post(
-      'http://localhost:9090/login/authenticate', formData,
+      Config.API_URL + '/login/authenticate', formData,
       {
         headers: new HttpHeaders({
             'X-Requested-With': 'XMLHttpRequest'
@@ -33,7 +34,7 @@ export class SecurityService {
 
 
   logout() {
-    let request = this.http.post('http://localhost:9090/logoff', null,
+    let request = this.http.post(Config.API_URL + '/logoff', null,
       {
         headers: new HttpHeaders({
             'X-Requested-With': 'XMLHttpRequest'
@@ -66,7 +67,7 @@ export class SecurityService {
 
   loadProfile() {
     let request = this.http.get(
-      'http://localhost:9090/user/profile',
+      Config.API_URL + '/user/profile',
       {
         headers: new HttpHeaders({
             'X-Requested-With': 'XMLHttpRequest'
@@ -98,7 +99,7 @@ export class SecurityService {
     formData.append('confirmPassword', confirmPassword);
 
     return this.http.post(
-      'http://localhost:9090/user/register', formData,
+      Config.API_URL + '/user/register', formData,
       {
         headers: new HttpHeaders({
             'X-Requested-With': 'XMLHttpRequest'

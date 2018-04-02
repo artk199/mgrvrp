@@ -64,6 +64,8 @@ dependencies {
 
     runtime 'mysql:mysql-connector-java:5.1.36'
 
+    compile "org.grails.plugins:rxjava"
+
     compile files('libs/com.google.ortools.jar')
 }
 

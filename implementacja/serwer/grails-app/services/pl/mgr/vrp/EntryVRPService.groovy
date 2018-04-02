@@ -1,15 +1,19 @@
 package pl.mgr.vrp
 
+import rx.Observable;
 import grails.util.Holders
 import org.springframework.context.ApplicationContext
-import pl.mgr.vrp.model.VRPProblem
-import pl.mgr.vrp.model.VRPSolution
+import rx.Subscriber
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 
 class EntryVRPService {
 
     private final String DEFAULT_ALGORITHM = 'savings'
 
-    VRPSolution prepareAndSolve(ProblemWithSettings problemWithSettings) {
+    private Map<String, SolverSubject> activeSubjects = [:]
+
+    Observable<SolverEvent> prepareAndSolve(ProblemWithSettings problemWithSettings) {
         String algorithmName = getAlgorithmName(problemWithSettings)
         VRPSolverService solverService = findVRPSolverBean(algorithmName)
         return solverService.solve(problemWithSettings)
@@ -34,4 +38,52 @@ class EntryVRPService {
         return service
     }
 
+
+    String createSolverSubject(ProblemWithSettings problemWithSettings) {
+        String key = UUID.randomUUID().toString()
+        SolverSubject subject = new SolverSubject()
+
+        prepareAndSolve(problemWithSettings).subscribe(new Subscriber<SolverEvent>() {
+            @Override
+            void onCompleted() {
+                log.info("Solution ended.")
+            }
+
+            @Override
+            void onError(Throwable e) {
+                log.error("Not known error", e)
+                subject.eventsQueue.put(new SolverEvent(eventType: "ERROR", message: e.message))
+            }
+
+            @Override
+            void onNext(SolverEvent solverEvent) {
+                log.debug "Adding event to queue: ${solverEvent.eventType}"
+                subject.eventsQueue.put(solverEvent)
+            }
+        })
+
+        activeSubjects.put(key, subject)
+        return key
+    }
+
+    SolverEvent getSolverSubjectValue(String key, boolean blocking = true) {
+        SolverSubject subject = activeSubjects[key]
+        if (!subject) {
+            log.error "Cannot find subject for given key: $key"
+            return null
+        }
+        if (blocking)
+            return subject.eventsQueue.take()
+        else
+            return subject.eventsQueue.poll()
+    }
+
+    void removeSolverSubject(String key) {
+        activeSubjects.remove(key)
+    }
+
+}
+
+class SolverSubject {
+    BlockingQueue<SolverEvent> eventsQueue = new LinkedBlockingQueue<>()
 }

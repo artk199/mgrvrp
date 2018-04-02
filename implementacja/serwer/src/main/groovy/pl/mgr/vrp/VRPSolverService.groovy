@@ -1,5 +1,6 @@
 package pl.mgr.vrp
 
+import grails.transaction.Transactional
 import groovy.json.JsonBuilder
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,6 +10,10 @@ import pl.mgr.vrp.model.VRPLocation
 import pl.mgr.vrp.model.VRPPoint
 import pl.mgr.vrp.model.VRPProblem
 import pl.mgr.vrp.model.VRPSolution
+import rx.Observable
+import rx.Subscriber;
+import static grails.async.Promises.*
+import java.time.Clock
 
 @Slf4j
 abstract class VRPSolverService {
@@ -24,11 +29,26 @@ abstract class VRPSolverService {
 
     abstract protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings)
 
-    VRPSolution solve(ProblemWithSettings problemWithSettings) {
+    Observable<SolverEvent> solve(ProblemWithSettings problemWithSettings) {
+        return Observable.create([call: { Subscriber<SolverEvent> subscriber ->
+            problemWithSettings.subscriber = subscriber
+            task {
+                try {
+                    //validateVRPProblem(problemWithSettings.problem)
+                    VRPSolution solution = calculateSolution(problemWithSettings)
+                    calculateRoute(solution, problemWithSettings.distanceType)
+                    subscriber.onNext(new SolverEvent(message: "Solution ready!", eventType: SolverEventType.END, solution: solution))
+                    subscriber.onCompleted()
+                } catch (Exception e) {
+                    subscriber.onError(e)
+                }
+            }
+        }] as Observable.OnSubscribe<SolverEvent>)
+
+        /*
         try {
-            validateVRPProblem(problemWithSettings.problem)
-            VRPSolution solution = calculateSolution(problemWithSettings)
-            calculateRoute(solution, problemWithSettings.distanceType)
+
+
             sendEndSignal(solution)
             return solution
         } catch (IllegalArgumentException ex) {
@@ -39,6 +59,7 @@ abstract class VRPSolverService {
             logRuntimeError("Nieznany blad...")
         }
         return null
+        */
     }
 
     def assignIDs(VRPProblem problem) {
@@ -70,6 +91,7 @@ abstract class VRPSolverService {
         send(builder)
     }
 
+    @Transactional
     private void validateVRPProblem(VRPProblem vrpProblem) {
         if (!vrpProblem)
             throw new IllegalArgumentException("Brak podanego problemu")
@@ -103,6 +125,11 @@ abstract class VRPSolverService {
             timestamp new Date()
         }
         send(builder)
+    }
+
+    static void logStep(Subscriber<SolverEvent> subscriber, VRPSolution solution, String message = "") {
+        SolverEvent event = new SolverEvent(solution: solution, message: message)
+        subscriber.onNext(event)
     }
 
     void send(JsonBuilder jsonBuilder) {

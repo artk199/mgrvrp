@@ -10,10 +10,9 @@ export class VRPSolutionEvent {
 }
 
 export class VRPSolutionEventType {
-  static STEP = 'STEP';
-  static INFO = 'INFO';
+  static MESSAGE = 'MESSAGE';
   static END = 'END';
-  static RUNTIME_ERROR = 'RUNTIME_ERROR';
+  static ERROR = 'ERROR';
 }
 
 export abstract class VrpSolverService {

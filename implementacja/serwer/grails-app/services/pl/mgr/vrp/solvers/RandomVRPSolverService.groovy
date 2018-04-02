@@ -39,7 +39,7 @@ class RandomVRPSolverService extends VRPSolverService {
             }
             this.calculateRoute(solution, problemWithSettings.distanceType)
             if (!best || best.routeLength > solution.routeLength) {
-                this.logStep(solution)
+                this.logStep(problemWithSettings.subscriber, solution)
                 best = solution
             }
         }

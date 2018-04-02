@@ -213,8 +213,6 @@ class SavingsVRPSolverService extends VRPSolverService {
             }
         }
         savings = savings.sort { -1 * it.v }
-        log.debug "Obliczone oszczednosci:"
-        log.debug "\n" + JsonOutput.prettyPrint(JsonOutput.toJson(savings))
         return savings
     }
 

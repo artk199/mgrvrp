@@ -207,13 +207,18 @@ export class VRPService {
     let steps = [];
     this.getVRPSolverService().solve(this.currentProblemValue, additionalSettings, algorithmName, distanceType).subscribe(
       (event: VRPSolutionEvent) => {
+        console.log(event);
         switch (event.type) {
-          case VRPSolutionEventType.STEP:
-            let solutionStep = new VRPSolutionStep();
-            solutionStep.data = event.solution;
-            steps.push(solutionStep);
-            VRPService.setColors(solutionStep.data);
-            this.loadSolution(solutionStep.data);
+          case VRPSolutionEventType.MESSAGE:
+            if (event.solution) {
+              let solutionStep = new VRPSolutionStep();
+              solutionStep.data = event.solution;
+              steps.push(solutionStep);
+              VRPService.setColors(solutionStep.data);
+              this.loadSolution(solutionStep.data);
+            }
+            if (event.message != null && event.message.trim() != '')
+              VRPService.setLoadingMessage(event.message);
             break;
           case VRPSolutionEventType.END:
             let solution: VRPSolution = event.solution;
@@ -221,11 +226,8 @@ export class VRPService {
             this.addSolution(solution);
             VRPService.hideLoadingSpinner();
             break;
-          case VRPSolutionEventType.INFO:
-            VRPService.setLoadingMessage(event.message);
-            break;
-          case VRPSolutionEventType.RUNTIME_ERROR:
-            this.snackBar.open('Unknown error on server side.', 'OK', {
+          case VRPSolutionEventType.ERROR:
+            this.snackBar.open('Error: ' + event.message, 'OK', {
               duration: 5000,
             });
             VRPService.hideLoadingSpinner();
