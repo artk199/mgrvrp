@@ -20,8 +20,6 @@ import {ImportService} from './services/import.service';
 import {ProblemsComponent} from './components/problems/problems.component';
 import {SolutionsComponent} from './components/solutions/solutions.component';
 import {RoutesComponent} from './components/routes/routes.component';
-import {StompConfig, StompService} from '@stomp/ng2-stompjs';
-import * as SockJS from 'sockjs-client';
 import {RouteDialogComponent} from './components/map/modals/route.dialog';
 import {DialogFactoryService} from './services/dialog.factory.service';
 import {CustomerDialogComponent} from './components/map/modals/customer.dialog';
@@ -33,21 +31,7 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {SecurityService} from './services/security.service';
 import {AuthInterceptor} from './interceptors/auth.interceptor';
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
-import {WsVrpSolverService} from './services/vrp-solvers/ws-vrp-solver.service';
-import {XhrVrpSolverService} from './services/vrp-solvers/xhr-vrp-solver.service';
-
-export function socketProvider() {
-  return new SockJS('http://147.135.210.1:8080/stomp');
-}
-
-const stompConfig: StompConfig = {
-  url: socketProvider,
-  headers: {},
-  heartbeat_in: 0,
-  heartbeat_out: 20000,
-  reconnect_delay: 5000,
-  debug: false
-};
+import {VrpSolverService} from './services/vrp-solver.service';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -105,11 +89,7 @@ const appRoutes: Routes = [
     RouteDialogComponent,
     CustomerDialogComponent
   ],
-  providers: [VRPService, MapService, ImportService, StompService, DialogFactoryService, SecurityService, WsVrpSolverService, XhrVrpSolverService,
-    {
-      provide: StompConfig,
-      useValue: stompConfig
-    },
+  providers: [VRPService, MapService, ImportService, DialogFactoryService, SecurityService, VrpSolverService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

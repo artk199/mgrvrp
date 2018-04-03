@@ -1,20 +1,12 @@
 package pl.mgr.vrp
 
 import grails.async.web.AsyncGrailsWebRequest
-import grails.converters.JSON
-import grails.transaction.Transactional
-import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import org.grails.plugins.web.async.GrailsAsyncContext
 import org.grails.web.util.GrailsApplicationAttributes
-import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.web.context.request.async.AsyncWebRequest
 import org.springframework.web.context.request.async.WebAsyncManager
 import org.springframework.web.context.request.async.WebAsyncUtils
-import pl.mgr.vrp.model.VRPProblem
-import pl.mgr.vrp.model.VRPSolution
-import rx.Subscriber
-import rx.observables.BlockingObservable
 
 @Slf4j
 class VrpController {
@@ -23,30 +15,33 @@ class VrpController {
 
     EntryVRPService entryVRPService
 
-    @MessageMapping("/vrp")
-    protected def index(String problem) {
-        log.debug "Uruchomiono proces rozwiazywania VRP"
-        VRPProblem vrpProblem = VRPProblem.create(new JsonSlurper().parseText(problem))
-        entryVRPService.prepareAndSolve(vrpProblem)
-    }
-
+    /**
+     * Renders a unique code representing solving subject.
+     * @param problemWithSettings
+     * @return
+     */
     def solve(ProblemWithSettings problemWithSettings) {
         String solverCode = entryVRPService.createSolverSubject(problemWithSettings);
         render status: 200, text: solverCode
     }
 
-
-    @Transactional
+    /**
+     * Using XHR Comet waits for the solving event.
+     * @param code
+     * @return
+     */
     def xhrComet(String code) {
         SolverEvent solutionEvent = entryVRPService.getSolverSubjectValue(code)
         if (solutionEvent.eventType == SolverEventType.END)
             entryVRPService.removeSolverSubject(code)
-        JSON.use('deep') {
-            render solutionEvent as JSON
-        }
+        render solutionEvent.toJson()
     }
 
-
+    /**
+     * Check if solving event is available and if it does renders it otherwise sens an empty response.
+     * @param code
+     * @return
+     */
     def shortPolling(String code) {
         SolverEvent solutionEvent = entryVRPService.getSolverSubjectValue(code, false)
         if (!solutionEvent) {
@@ -55,15 +50,16 @@ class VrpController {
         }
         if (solutionEvent.eventType == SolverEventType.END)
             entryVRPService.removeSolverSubject(code)
-        JSON.use('deep') {
-            render solutionEvent as JSON
-        }
+        render solutionEvent.toJson()
     }
 
+    /**
+     * Send solution events via server-sent events.
+     * @param code
+     * @return
+     */
     def serverSentEvents(String code) {
-
         webRequest.setRenderView(false)
-
         WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request)
         AsyncWebRequest asyncWebRequest = new AsyncGrailsWebRequest(
                 request,
@@ -79,17 +75,10 @@ class VrpController {
         response.flushBuffer()
 
         asyncContext.start {
-
             boolean exitCondition = false
             while (!exitCondition) {
                 SolverEvent solutionEvent = entryVRPService.getSolverSubjectValue(code)
-                def json
-                JSON.use('deep') {
-                    json = solutionEvent as JSON
-                }
-                response << 'event: message\n'
-                response << "data: ${json.toString()}\n\n"
-                response.flushBuffer()
+                sendSolutionEventMessage(solutionEvent)
                 if (solutionEvent.eventType == SolverEventType.END) {
                     exitCondition = true
                     entryVRPService.removeSolverSubject(code)
@@ -97,6 +86,13 @@ class VrpController {
             }
             response.flushBuffer()
         }
+    }
+
+    private void sendSolutionEventMessage(SolverEvent solutionEvent) {
+        def json = solutionEvent.toJson()
+        response << 'event: message\n'
+        response << "data: ${json.toString()}\n\n"
+        response.flushBuffer()
     }
 
 }

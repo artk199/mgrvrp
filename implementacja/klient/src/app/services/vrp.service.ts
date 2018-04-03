@@ -9,9 +9,7 @@ import {deserialize, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
 import {MatSnackBar} from '@angular/material';
 import {VRPSolutionStep} from '../domain/VRPSolutionStep';
-import {WsVrpSolverService} from './vrp-solvers/ws-vrp-solver.service';
-import {XhrVrpSolverService} from './vrp-solvers/xhr-vrp-solver.service';
-import {VRPSolutionEvent, VRPSolutionEventType, VrpSolverService} from './vrp-solvers/vrp-solver.service';
+import {VRPSolutionEvent, VRPSolutionEventType, VrpSolverService} from './vrp-solver.service';
 import {VRPAdditionalSetting} from '../domain/VRPAdditionalSetting';
 
 /**
@@ -29,7 +27,7 @@ export class VRPService {
 
   private PROBLEMS_KEY: string = 'problems';
 
-  constructor(private mapService: MapService, private snackBar: MatSnackBar, private wsVrpSolverService: WsVrpSolverService, private xhrVrpSolverService: XhrVrpSolverService) {
+  constructor(private mapService: MapService, private snackBar: MatSnackBar, private vrpSolverService: VrpSolverService) {
     //Wczytywanie zapisanych problemow do storeage
     let p: VRPProblem[] = deserializeArray(VRPProblem, window.localStorage.getItem(this.PROBLEMS_KEY));
     if (p) {
@@ -73,7 +71,6 @@ export class VRPService {
    * @param {VRPCustomer} customer - odbiorca która ma zostać dodany
    */
   addCustomer(customer: VRPCustomer) {
-    console.log(customer);
     if (this.currentProblemValue.customers.some(x => x.name == customer.name)) {
       throw new Error('Customer with given name already exists.');
     }
@@ -92,7 +89,7 @@ export class VRPService {
       this.currentProblemValue.customers.splice(index, 1);
     }
     this.customers.next(this.currentProblemValue.customers);
-    this.refreshMap(); //TODO: Usunac tylko aktualny marker! jak? dunno.
+    this.refreshMap();
   }
 
   /**
@@ -364,6 +361,6 @@ export class VRPService {
   }
 
   private getVRPSolverService(): VrpSolverService {
-    return this.xhrVrpSolverService;
+    return this.vrpSolverService;
   }
 }
