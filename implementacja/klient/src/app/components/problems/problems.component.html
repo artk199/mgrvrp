@@ -17,7 +17,7 @@
       <mat-cell *matCellDef="let problem">
         <div class="button-row">
           <button color="primary" mat-icon-button (click)="exportProblem(problem)">
-            <mat-icon>save</mat-icon>
+            <mat-icon>file_download</mat-icon>
           </button>
           <button color="primary" mat-icon-button *ngIf="problem.id != currentProblem.id"
                   (click)="loadProblem(problem)">

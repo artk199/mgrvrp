@@ -4,9 +4,14 @@
       <mat-table #table [dataSource]="dataSource">
 
         <ng-container matColumnDef="actions">
-          <mat-header-cell *matHeaderCellDef width="10%"> Actions</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef width="15%"> Actions</mat-header-cell>
           <mat-cell *matCellDef="let route">
-            <mat-checkbox (change)="toggle(route)" checked="false"></mat-checkbox>
+            <div class="button-row">
+              <mat-checkbox (change)="toggle(route)"></mat-checkbox>
+              <button mat-icon-button color="primary" (click)="showInfo(route)">
+                <mat-icon>info</mat-icon>
+              </button>
+            </div>
           </mat-cell>
         </ng-container>
 
@@ -24,7 +29,7 @@
               <div class="bar-pointer"
                    *ngFor="let point of route.points;let i = index"
                    [ngStyle]="{ 'left': calculatePosition(route,i)}"
-                   matTooltip="{{point.id}}" matTooltipPosition="above">
+                   matTooltip="{{point.name}}" matTooltipPosition="above">
               </div>
             </div>
 

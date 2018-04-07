@@ -4,8 +4,8 @@ import {VRPSolution} from '../../domain/VRPSolution';
 import {DataSource} from '@angular/cdk/collections';
 import {Observable} from 'rxjs/Observable';
 import {VRPRoute} from '../../domain/VRPRoute';
-import {forEach} from '@angular/router/src/utils/collection';
 import {MapService} from '../../services/map.service';
+import {DialogFactoryService} from '../../services/dialog.factory.service';
 
 @Component({
   selector: 'vrp-routes',
@@ -22,7 +22,7 @@ export class RoutesComponent implements OnInit {
   maxLength = 0;
   currentSolution: VRPSolution;
 
-  constructor(private vRPService: VRPService, private mapService: MapService) {
+  constructor(private vRPService: VRPService, private mapService: MapService, private dialogFactoryService: DialogFactoryService) {
     let ctrl = this;
     this.dataSource = new ProblemDataSource(this.vRPService.currentSolution);
     vRPService.currentSolution.subscribe(sol => {
@@ -74,6 +74,10 @@ export class RoutesComponent implements OnInit {
 
   setNormal(route: VRPRoute) {
     //MapService.markAsNormal(route);
+  }
+
+  showInfo(route) {
+    this.dialogFactoryService.showRouteDialog(route);
   }
 
   onTabChanged(event) {

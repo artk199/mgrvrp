@@ -5,6 +5,7 @@ import {VRPLocation} from './VRPLocation';
  */
 export class VRPCustomer extends VRPLocation {
 
+  id: number;
   demand: number;
 
   constructor(name: string, x: number, y: number) {

@@ -18,6 +18,7 @@ export class SettingsDialogComponent {
 
     this.interval = Config.SHORT_POLL_INTERVAL;
     this.apiURL = Config.API_URL;
+    console.log(this.apiURL);
     this.communicationType = Config.getCommunicationType();
 
   }

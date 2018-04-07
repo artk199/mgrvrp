@@ -1,8 +1,8 @@
 <mat-toolbar *ngIf="!editEnabled">Editing disabled - problem has solutions</mat-toolbar>
 <mat-table #table [dataSource]="dataSource">
   <ng-container matColumnDef="id">
-    <mat-header-cell *matHeaderCellDef> ID</mat-header-cell>
-    <mat-cell *matCellDef="let customer"> {{customer.id}}</mat-cell>
+    <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+    <mat-cell *matCellDef="let customer"> {{customer.name}}</mat-cell>
   </ng-container>
 
   <ng-container matColumnDef="coords">
@@ -16,8 +16,8 @@ y: {{customer.y | number:'1.5-5'}}</pre>
   <ng-container matColumnDef="demand">
     <mat-header-cell *matHeaderCellDef> Demand</mat-header-cell>
     <mat-cell *matCellDef="let customer">
-      <mat-form-field *ngIf="editEnabled">
-        <input matInput type="number" [(ngModel)]="customer.demand">
+      <mat-form-field *ngIf="editEnabled" style="max-width: 50px">
+        <input matInput  type="number" [(ngModel)]="customer.demand">
       </mat-form-field>
       <span *ngIf="!editEnabled">
         {{customer.demand}}
@@ -40,3 +40,7 @@ y: {{customer.y | number:'1.5-5'}}</pre>
   <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
   <mat-row *matRowDef="let customer; columns: displayedColumns;"></mat-row>
 </mat-table>
+
+<!--<button color="warn" mat-icon-button (click)="loadFixedCustomers()">
+  <mat-icon>remove_circle</mat-icon>
+</button>-->
