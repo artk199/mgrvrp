@@ -72,10 +72,13 @@ class EntryVRPService {
             log.error "Cannot find subject for given key: $key"
             return null
         }
+        SolverEvent solverEvent
         if (blocking)
-            return subject.eventsQueue.take()
+            solverEvent = subject.eventsQueue.take()
         else
-            return subject.eventsQueue.poll()
+            solverEvent = subject.eventsQueue.poll()
+        log.info "Taking event ${solverEvent?.message}"
+        return solverEvent
     }
 
     void removeSolverSubject(String key) {

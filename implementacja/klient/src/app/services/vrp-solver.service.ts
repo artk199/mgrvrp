@@ -36,7 +36,7 @@ export class VrpSolverService {
 
   solve(problem: VRPProblem, additionalSettings: VRPAdditionalSetting[], algorithmName, distanceType): Observable<VRPSolutionEvent> {
 
-    let COMMUNICATION_TYPE = VRPCommunicationType.SSE;
+    let COMMUNICATION_TYPE = Config.getCommunicationType();
 
     let srv = this;
     let solveURL: string = Config.API_URL + 'vrp/solve';

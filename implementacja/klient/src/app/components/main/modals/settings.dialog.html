@@ -1,0 +1,22 @@
+<h3 mat-dialog-title>Settings</h3>
+<mat-dialog-content>
+  <mat-form-field class="full-width">
+    <input matInput type="number" (change)="changeInterval()" placeholder="Short polling interval"
+           [(ngModel)]="interval">
+  </mat-form-field>
+  <mat-form-field class="full-width">
+    <input matInput type="number" (change)="changeApiUrl()" placeholder="Api URL"
+           [(ngModel)]="interval">
+  </mat-form-field>
+  <mat-form-field class="full-width">
+    <mat-select placeholder="Communication type" (change)="changeCommunicationType()" [(ngModel)]="communicationType">
+      <mat-option value="SHORT_POLL">XHR Short Polling</mat-option>
+      <mat-option value="COMET">XHR Comet</mat-option>
+      <mat-option value="SSE" [disabled]="isSSEDisabled()">Server-Sent Events</mat-option>
+      <mat-option value="WEBSOCKET" [disabled]="isWebSocketDisabled()">WebSocket</mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

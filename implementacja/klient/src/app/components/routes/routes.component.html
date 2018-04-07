@@ -6,23 +6,24 @@
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef width="10%"> Actions</mat-header-cell>
           <mat-cell *matCellDef="let route">
-            <mat-checkbox (change)="toggle(route)" checked="true"></mat-checkbox>
+            <mat-checkbox (change)="toggle(route)" checked="false"></mat-checkbox>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="length">
           <mat-header-cell *matHeaderCellDef> Length</mat-header-cell>
-          <mat-cell *matCellDef="let route"> {{route.routeLength | number : '1.4-4' }}km</mat-cell>
+          <mat-cell *matCellDef="let route"> {{route.routeLength | number : '1.3-3' }} km</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="bar">
           <mat-header-cell *matHeaderCellDef>-</mat-header-cell>
           <mat-cell *matCellDef="let route">
             <div class="bar-container">
-              <div class="bar-slider" [ngStyle]="{ 'background': route.color}">
+              <div class="bar-slider" [ngStyle]="{ 'background': route.color, 'width': calculateWidth(route)}">
               </div>
-              <div class="bar-pointer" *ngFor="let point of route.points"
-                   [ngStyle]="{ 'left': calculatePosition(route,point)}"
+              <div class="bar-pointer"
+                   *ngFor="let point of route.points;let i = index"
+                   [ngStyle]="{ 'left': calculatePosition(route,i)}"
                    matTooltip="{{point.id}}" matTooltipPosition="above">
               </div>
             </div>

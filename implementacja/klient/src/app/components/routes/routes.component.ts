@@ -19,6 +19,7 @@ export class RoutesComponent implements OnInit {
   isLoadedStep;
   currentStep = 0;
   maxSteps = 0;
+  maxLength = 0;
   currentSolution: VRPSolution;
 
   constructor(private vRPService: VRPService, private mapService: MapService) {
@@ -26,12 +27,21 @@ export class RoutesComponent implements OnInit {
     this.dataSource = new ProblemDataSource(this.vRPService.currentSolution);
     vRPService.currentSolution.subscribe(sol => {
         ctrl.currentSolution = sol;
-        if (sol && sol.solutionsSteps) {
-          ctrl.maxSteps = sol.solutionsSteps.length;
-          ctrl.currentStep = ctrl.maxSteps;
-        }else{
-          ctrl.maxSteps = 0;
-          ctrl.currentStep = 0;
+        if (ctrl.currentSolution) {
+          ctrl.maxLength = 0;
+          ctrl.currentSolution.routes.forEach(function (el: VRPRoute) {
+            if (el.routeLength > ctrl.maxLength) {
+              ctrl.maxLength = el.routeLength;
+            }
+          });
+
+          if (sol.solutionsSteps) {
+            ctrl.maxSteps = sol.solutionsSteps.length;
+            ctrl.currentStep = ctrl.maxSteps;
+          } else {
+            ctrl.maxSteps = 0;
+            ctrl.currentStep = 0;
+          }
         }
       }
     );
@@ -40,12 +50,18 @@ export class RoutesComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  calculatePosition(route, point) {
+  calculatePosition(route, index) {
     let sum = 0;
+    let i = 0;
     for (let r of route.drivePoints) {
       sum += r.routeLength;
+      if (i >= index) {
+        break;
+      }
+      i = i + 1;
     }
-    return '' + sum / route.routeLength * 100 + '%';
+    let v = (sum / this.maxLength) * 100;
+    return '' + v + '%';
   }
 
   toggle(route: VRPRoute) {
@@ -53,11 +69,11 @@ export class RoutesComponent implements OnInit {
   }
 
   setActive(route: VRPRoute) {
-    MapService.markAsCurrent(route);
+    //MapService.markAsCurrent(route);
   }
 
   setNormal(route: VRPRoute) {
-    MapService.markAsNormal(route);
+    //MapService.markAsNormal(route);
   }
 
   onTabChanged(event) {
@@ -82,6 +98,11 @@ export class RoutesComponent implements OnInit {
       this.currentStep++;
       this.loadCurrentStep();
     }
+  }
+
+  calculateWidth(route: VRPRoute) {
+    let v = route.routeLength / this.maxLength * 100;
+    return '' + v + '%';
   }
 
   private loadCurrentStep() {

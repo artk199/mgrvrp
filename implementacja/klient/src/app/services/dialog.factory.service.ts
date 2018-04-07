@@ -1,8 +1,5 @@
 import {
-  ComponentFactoryResolver,
   Injectable,
-  Inject,
-  ReflectiveInjector
 } from '@angular/core';
 
 import {RouteDialogComponent} from '../components/map/modals/route.dialog';
@@ -10,6 +7,7 @@ import {MatDialog} from '@angular/material';
 import {VRPRoute} from '../domain/VRPRoute';
 import {VRPCustomer} from '../domain/VRPCustomer';
 import {CustomerDialogComponent} from '../components/map/modals/customer.dialog';
+import {SettingsDialogComponent} from '../components/main/modals/settings.dialog';
 
 @Injectable()
 export class DialogFactoryService {
@@ -30,4 +28,9 @@ export class DialogFactoryService {
   showCustomerDialog(customer: VRPCustomer) {
     this.rootViewContainer.dialog.open(CustomerDialogComponent, {data: {customer: customer}});
   }
+
+  showSettingsDialog() {
+    this.rootViewContainer.dialog.open(SettingsDialogComponent, {});
+  }
+
 }

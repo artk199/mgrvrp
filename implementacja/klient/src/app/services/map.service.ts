@@ -253,7 +253,7 @@ export class MapService {
   }
 
   public showPaths(mapPaths: any) {
-    this._map.addLayer(mapPaths);
+    //this._map.addLayer(mapPaths);
     this.paths.push(mapPaths);
   }
 

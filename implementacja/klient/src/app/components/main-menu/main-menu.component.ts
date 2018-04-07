@@ -7,20 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MainMenuComponent implements OnInit {
 
-  private infoPanelHidden: boolean = false;
-  private routesPanelHidden: boolean = false;
-
   constructor() { }
 
   ngOnInit() {
-  }
-
-  toggleInfoPanel(){
-    this.infoPanelHidden = !this.infoPanelHidden;
-  }
-
-  toggleRoutesPanel(){
-    this.routesPanelHidden = !this.routesPanelHidden;
   }
 
 }

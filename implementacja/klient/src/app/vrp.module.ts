@@ -32,6 +32,7 @@ import {SecurityService} from './services/security.service';
 import {AuthInterceptor} from './interceptors/auth.interceptor';
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {VrpSolverService} from './services/vrp-solver.service';
+import {SettingsDialogComponent} from './components/main/modals/settings.dialog';
 
 const appRoutes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -53,6 +54,7 @@ const appRoutes: Routes = [
     RoutesComponent,
     RouteDialogComponent,
     CustomerDialogComponent,
+    SettingsDialogComponent,
     LoginComponent,
     RegisterComponent,
     MainComponent,
@@ -87,7 +89,8 @@ const appRoutes: Routes = [
   entryComponents: [
     VrpAddDialogComponent,
     RouteDialogComponent,
-    CustomerDialogComponent
+    CustomerDialogComponent,
+    SettingsDialogComponent
   ],
   providers: [VRPService, MapService, ImportService, DialogFactoryService, SecurityService, VrpSolverService,
     {
