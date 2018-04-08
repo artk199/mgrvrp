@@ -28,11 +28,14 @@ class VrpController {
     @Transactional
     def saveAll(ProblemsList problemsList) {
         User user = springSecurityService.currentUser
-        VRPProblem.findAllByOwner(user).collect().each { p ->
-            p.delete()
-        }
         problemsList.problems.each { VRPProblem problem ->
             fixRoutes(problem)
+        }
+        VRPProblem.findAllByOwner(user).collect().each { p ->
+            if (!problemsList.problems.any { it.id == p.id })
+                p.delete()
+        }
+        problemsList.problems.each { VRPProblem problem ->
             problem.owner = user
             problem.save(failOnError: true)
         }

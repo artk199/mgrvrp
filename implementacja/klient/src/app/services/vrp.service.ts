@@ -228,9 +228,10 @@ export class VRPService {
     let steps = [];
     let newInProgress = new VRPSolution();
     this.addSolutionInProgress(newInProgress);
+    this.snackBar.open('New solution started', 'OK', {duration: 5000});
     this.vrpSolverService.solve(this.currentProblemValue, additionalSettings, algorithmName, distanceType).subscribe(
       (event: VRPSolutionEvent) => {
-        switch (event.type) {
+        switch (event.type)  {
           case VRPSolutionEventType.MESSAGE:
             if (event.solution) {
               let solutionStep = new VRPSolutionStep();
