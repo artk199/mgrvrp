@@ -43,7 +43,7 @@ export class VrpSolverService {
     return new Observable((subscriber) => {
 
       this.http.post(solveURL, {
-        problem: classToPlain(problem, {excludePrefixes: ['solutions']}),
+        problem: classToPlain(problem, {excludePrefixes: ['solutions', 'id']}),
         distanceType: distanceType,
         algorithm: algorithmName,
         additionalSettings: additionalSettings

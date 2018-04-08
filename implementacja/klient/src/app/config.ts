@@ -6,6 +6,7 @@ export class Config {
 
   static API_URL = 'http://localhost:9090/';
   static SHORT_POLL_INTERVAL: number = 200;
+  static SAVE_TYPE = 'DATABASE';
 
   static getCommunicationType(): string {
     let type = window.localStorage.getItem(Config.COMMUNICATION_KEY);

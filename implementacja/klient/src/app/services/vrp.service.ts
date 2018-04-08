@@ -5,12 +5,14 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {VRPDepot} from '../domain/VRPDepot';
 import {VRPProblem} from '../domain/VRPProblem';
 import {MapService} from './map.service';
-import {deserialize, deserializeArray, serialize} from 'class-transformer';
+import {plainToClass, classToPlain, deserializeArray, serialize} from 'class-transformer';
 import {VRPSolution} from '../domain/VRPSolution';
 import {MatSnackBar} from '@angular/material';
 import {VRPSolutionStep} from '../domain/VRPSolutionStep';
 import {VRPSolutionEvent, VRPSolutionEventType, VrpSolverService} from './vrp-solver.service';
 import {VRPAdditionalSetting} from '../domain/VRPAdditionalSetting';
+import {Config} from '../config';
+import {HttpClient} from '@angular/common/http';
 
 /**
  * Serwis opowiedzialny za centralne zarządzanie aplikacją.
@@ -24,19 +26,11 @@ export class VRPService {
   private customers: BehaviorSubject<VRPCustomer[]> = new BehaviorSubject<VRPCustomer[]>([]);
   private depots: BehaviorSubject<VRPDepot[]> = new BehaviorSubject<VRPDepot[]>([]);
   private solutions: BehaviorSubject<VRPSolution[]> = new BehaviorSubject<VRPSolution[]>([]);
+  private solutionsInProgress: BehaviorSubject<VRPSolution[]> = new BehaviorSubject<VRPSolution[]>([]);
 
   private PROBLEMS_KEY: string = 'problems';
 
-  constructor(private mapService: MapService, private snackBar: MatSnackBar, private vrpSolverService: VrpSolverService) {
-    //Wczytywanie zapisanych problemow do storeage
-    let p: VRPProblem[] = deserializeArray(VRPProblem, window.localStorage.getItem(this.PROBLEMS_KEY));
-    if (p) {
-      this.problems.next(p);
-    } else {
-      this.problems.next([new VRPProblem('0')]);
-    }
-    this.loadProblem(this.problems.value[0].id);
-
+  constructor(private mapService: MapService, private snackBar: MatSnackBar, private vrpSolverService: VrpSolverService, private http: HttpClient) {
     this.solutions.subscribe((v) => {
       if (!v || v.length == 0) {
         this.mapService.enableEditing();
@@ -44,6 +38,36 @@ export class VRPService {
         this.mapService.disableEditing();
       }
     });
+  }
+
+  init() {
+    let srv = this;
+    return new Observable((subscriber) => {
+      if (Config.SAVE_TYPE == 'DATABASE') {
+        this.http.get(Config.API_URL + '/vrp/getAll', {
+          withCredentials: true
+        }).subscribe(next => {
+            let p: VRPProblem[] = plainToClass<VRPProblem, any>(VRPProblem, next);
+            srv.initProblems(p);
+            subscriber.next();
+          },
+          e => console.log('error')
+        );
+      } else {
+        let p: VRPProblem[] = deserializeArray(VRPProblem, window.localStorage.getItem(this.PROBLEMS_KEY));
+        srv.initProblems(p);
+        subscriber.next();
+      }
+    });
+  }
+
+  initProblems(p) {
+    if (p && p.length > 0) {
+      this.problems.next(p);
+    } else {
+      this.problems.next([new VRPProblem('0')]);
+    }
+    this.loadProblem(this.problems.value[0].id);
   }
 
   getCurrentProblem() {
@@ -200,34 +224,33 @@ export class VRPService {
    * Wysyla problem do serwera ktory zwraca wynik.
    */
   solveCurrentProblem(algorithmName: string, distanceType: string, additionalSettings: VRPAdditionalSetting[]) {
-    VRPService.showLoadingSpinner();
+    //VRPService.showLoadingSpinner();
     let steps = [];
-    this.getVRPSolverService().solve(this.currentProblemValue, additionalSettings, algorithmName, distanceType).subscribe(
+    let newInProgress = new VRPSolution();
+    this.addSolutionInProgress(newInProgress);
+    this.vrpSolverService.solve(this.currentProblemValue, additionalSettings, algorithmName, distanceType).subscribe(
       (event: VRPSolutionEvent) => {
-        console.log(event);
         switch (event.type) {
           case VRPSolutionEventType.MESSAGE:
             if (event.solution) {
               let solutionStep = new VRPSolutionStep();
               solutionStep.data = event.solution;
-              steps.push(solutionStep);
               VRPService.setColors(solutionStep.data);
-              this.loadSolution(solutionStep.data);
+              newInProgress.solutionsSteps.push(solutionStep);
+              this.snackBar.open('New solution step ' + event.message, 'OK', {duration: 1000});
             }
-            if (event.message != null && event.message.trim() != '')
-              VRPService.setLoadingMessage(event.message);
             break;
           case VRPSolutionEventType.END:
             let solution: VRPSolution = event.solution;
-            solution.solutionsSteps = steps;
+            solution.solutionsSteps = newInProgress.solutionsSteps;
             this.addSolution(solution);
-            VRPService.hideLoadingSpinner();
+            this.removeSolutionInProgress(newInProgress);
             break;
           case VRPSolutionEventType.ERROR:
             this.snackBar.open('Error: ' + event.message, 'OK', {
               duration: 5000,
             });
-            VRPService.hideLoadingSpinner();
+            this.removeSolutionInProgress(newInProgress);
             break;
           default:
             console.log('Unknown solution event!');
@@ -238,7 +261,6 @@ export class VRPService {
         this.snackBar.open('Unknown communication error.', 'OK', {
           duration: 5000,
         });
-        VRPService.hideLoadingSpinner();
       }
     );
   }
@@ -248,6 +270,34 @@ export class VRPService {
    */
   getSolutions() {
     return this.solutions;
+  }
+
+  /**
+   * Zwraca liste obliczanych solucji jako Observable
+   */
+  getSolutionsInProgress() {
+    return this.solutionsInProgress;
+  }
+
+  /**
+   * Dodaje solution in progress
+   */
+  addSolutionInProgress(solution) {
+    let copy = this.solutionsInProgress.value;
+    copy.push(solution);
+    this.solutionsInProgress.next(copy);
+  }
+
+  /**
+   * Usuwa solution in progress
+   */
+  removeSolutionInProgress(solution) {
+    let index = this.solutionsInProgress.value.indexOf(solution, 0);
+    if (index > -1) {
+      let copy = this.solutionsInProgress.value;
+      copy.splice(index, 1);
+      this.solutionsInProgress.next(copy);
+    }
   }
 
   /**
@@ -276,10 +326,32 @@ export class VRPService {
   }
 
   /**
-   * Zapisuje problemy do pamieci podrecznej przeglaradki co po odswiezeniu storny bedzie nadal taki jak jest
+   * Zapisuje problemy
    */
   saveProblemsToStorage() {
-    window.localStorage.setItem(this.PROBLEMS_KEY, serialize(this.problems.value));
+    const srv = this;
+    if (Config.SAVE_TYPE = 'DATABASE') {
+      this.http.post(Config.API_URL + '/vrp/saveAll', {
+        problems: classToPlain(this.problems.value)
+      }, {
+        responseType: 'text',
+        withCredentials: true
+      }).subscribe(next => {
+          srv.snackBar.open('Successfully saved to database.', 'OK', {
+            duration: 1000
+          });
+        },
+        e => {
+          srv.snackBar.open('Błąd podczas zapisywania danych.', 'OK', {
+            duration: 1000
+          });
+        });
+    } else {
+      window.localStorage.setItem(this.PROBLEMS_KEY, serialize(this.problems.value));
+      srv.snackBar.open('Successfully saved to local storage.', 'OK', {
+        duration: 1000
+      });
+    }
   }
 
   /**
@@ -338,29 +410,4 @@ export class VRPService {
     }
   }
 
-  /**
-   * Wyłącza ekran ładowania
-   */
-  private static hideLoadingSpinner() {
-    document.getElementById('loading-screen').style.display = 'none';
-  }
-
-  /**
-   * Włącza ekran ładownaia
-   */
-  private static showLoadingSpinner() {
-    document.getElementById('loading-screen').style.display = 'block';
-  }
-
-  /**
-   * Ustawia wiadomość na ekranie ładownaia
-   * @param message
-   */
-  private static setLoadingMessage(message) {
-    document.getElementById('loading-info').innerText = message;
-  }
-
-  private getVRPSolverService(): VrpSolverService {
-    return this.vrpSolverService;
-  }
 }

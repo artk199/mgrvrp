@@ -1,19 +1,65 @@
 package pl.mgr.vrp
 
 import grails.async.web.AsyncGrailsWebRequest
+import grails.converters.JSON
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import org.grails.plugins.web.async.GrailsAsyncContext
 import org.grails.web.util.GrailsApplicationAttributes
 import org.springframework.web.context.request.async.AsyncWebRequest
 import org.springframework.web.context.request.async.WebAsyncManager
 import org.springframework.web.context.request.async.WebAsyncUtils
+import pl.mgr.vrp.model.VRPProblem
+
 
 @Slf4j
+@Transactional
 class VrpController {
 
     public static final String CONTENT_TYPE_EVENT_STREAM = 'text/event-stream'
 
     EntryVRPService entryVRPService
+    SpringSecurityService springSecurityService
+
+    /**
+     * Saves all problems into the database
+     */
+    @Transactional
+    def saveAll(ProblemsList problemsList) {
+        User user = springSecurityService.currentUser
+        VRPProblem.findAllByOwner(user).collect().each { p ->
+            p.delete()
+        }
+        problemsList.problems.each { VRPProblem problem ->
+            fixRoutes(problem)
+            problem.owner = user
+            problem.save(failOnError: true)
+        }
+        render status: 200
+    }
+
+    def fixRoutes(VRPProblem vrpProblem) {
+        def correctCustomers = vrpProblem.customers.collect()
+        vrpProblem.solutions?.each { solution ->
+            solution.routes.each { r ->
+                def newPoints = []
+                r.points.each { customer ->
+                    newPoints.add correctCustomers.find { it.name == customer.name }
+                }
+                r.points = newPoints
+            }
+        }
+    }
+
+
+    def getAll() {
+        User user = springSecurityService.currentUser
+        def problems = VRPProblem.findAllByOwner(user);
+        JSON.use('deep') {
+            render problems as JSON
+        }
+    }
 
     /**
      * Renders a unique code representing solving subject.
@@ -97,3 +143,6 @@ class VrpController {
 
 }
 
+class ProblemsList {
+    List<VRPProblem> problems = []
+}

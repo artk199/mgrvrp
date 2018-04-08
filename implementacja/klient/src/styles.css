@@ -71,4 +71,8 @@ body {
   flex-basis: 70%;
 }
 
+.mat-dialog-content {
+  min-width: 300px;
+}
+
 

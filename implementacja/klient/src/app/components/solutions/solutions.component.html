@@ -29,4 +29,25 @@
 
   </mat-table>
 
+
+  <mat-table #table [dataSource]="inProgressDataSource" *ngIf="!inProgressDataSource.isEmpty()">
+
+    <ng-container matColumnDef="id">
+      <mat-header-cell *matHeaderCellDef> Algorithm</mat-header-cell>
+      <mat-cell *matCellDef="let solution"> asdas</mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef></mat-header-cell>
+      <mat-cell *matCellDef="let solution">
+        <div class="loading-icon"></div>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumnsInProgress"></mat-header-row>
+
+    <mat-row *matRowDef="let solution; columns: displayedColumnsInProgress;"></mat-row>
+
+  </mat-table>
+
 </div>

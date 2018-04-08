@@ -18,7 +18,9 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 export class SolutionsComponent implements OnInit {
 
   displayedColumns = ['id', 'length', 'actions'];
+  displayedColumnsInProgress = ['id', 'actions'];
   dataSource;
+  inProgressDataSource;
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -28,6 +30,7 @@ export class SolutionsComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSource = new SolutionsDataSource(this.vRPService.getSolutions(), this.sort);
+    this.inProgressDataSource = new InProgressCustomersDataSource(this.vRPService.getSolutionsInProgress());
   }
 
 
@@ -39,6 +42,30 @@ export class SolutionsComponent implements OnInit {
     this.vRPService.deleteSolution(solution);
   }
 
+}
+
+export class InProgressCustomersDataSource extends DataSource<any> {
+
+  empty: boolean;
+
+  constructor(private solutions: Observable<VRPSolution[]>) {
+    super();
+    let s = this;
+    solutions.subscribe(n => {
+      s.empty = n.length == 0;
+    });
+  }
+
+  connect(): Observable<VRPSolution[]> {
+    return this.solutions;
+  }
+
+  disconnect() {
+  }
+
+  isEmpty() {
+    return this.empty;
+  }
 }
 
 export class SolutionsDataSource extends DataSource<any> {

@@ -2,7 +2,8 @@ export class VRPAlgorithm {
 
   constructor(public code: string,
               public description: string,
-              public additionalSettings: any) {
+              public additionalSettings: any,
+              public active: boolean = true) {
   }
 
   public static algorithms: VRPAlgorithm[];
@@ -16,7 +17,6 @@ export class VRPAlgorithm {
         value: 'parallel',
         opts: [{v: 'parallel', k: 'Parallel'}, {v: 'sequential', k: 'Sequential'}]
       }]),
-      new VRPAlgorithm('jsprit', 'JSprit? Metaheuristic', []),
       new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', [
         {
           code: 'attempts',
@@ -32,7 +32,10 @@ export class VRPAlgorithm {
           type: 'NUMBER',
           value: 100
         }
-      ])
+      ]),
+      new VRPAlgorithm('jsprit', 'JSprit', [], false),
+      new VRPAlgorithm('googleOT', 'Google Optimization Tools', [], false),
+      new VRPAlgorithm('optaPlaner', 'OptaPlanner', [], false)
     ];
   }
 

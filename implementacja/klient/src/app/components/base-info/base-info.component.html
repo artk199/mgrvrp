@@ -38,6 +38,7 @@
       <mat-form-field class="full-width">
         <mat-select placeholder="Algorithm" (change)="onAlgorithmChange()" [(ngModel)]="settings.algorithm">
           <mat-option *ngFor="let algorithm of algorithms"
+                      [disabled]="!algorithm.active"
                       [value]="algorithm.code">{{ algorithm.description }}
           </mat-option>
         </mat-select>
@@ -82,6 +83,6 @@
   <hr/>
 
   <div class="button-row" class="add-panel">
-    <button mat-raised-button color="primary" (click)="solve()">Solve</button>
+    <button mat-raised-button color="primary" [disabled]="!depot" (click)="solve()">Solve</button>
   </div>
 </div>

@@ -8,6 +8,10 @@
         <mat-icon>more_vert</mat-icon>
       </button>
       <mat-menu #menu="matMenu">
+        <button (click)="saveAllProblems()" mat-menu-item>
+          <mat-icon>save</mat-icon>
+          <span>Save</span>
+        </button>
         <button (click)="openSettings()" mat-menu-item>
           <mat-icon>settings</mat-icon>
           <span>Settings</span>

@@ -1,10 +1,13 @@
 package pl.mgr.vrp.model
 
 import groovy.json.internal.LazyMap
+import pl.mgr.vrp.User
 
 class VRPProblem {
 
     String paneType
+    User owner
+
     double capacity
 
     static hasMany = [
