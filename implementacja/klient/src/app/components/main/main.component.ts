@@ -13,6 +13,7 @@ export class MainComponent implements OnInit {
 
   loading: boolean = true;
   profile: User;
+  editEnabled: boolean = false;
 
   constructor(private securityService: SecurityService, private dialogFactoryService: DialogFactoryService, private vrpService: VRPService) {
   }
@@ -29,6 +30,11 @@ export class MainComponent implements OnInit {
         );
       }
     });
+
+    this.vrpService.getSolutions().subscribe((v) => {
+      this.editEnabled = !v || v.length == 0;
+    });
+
   }
 
   logout() {

@@ -26,7 +26,6 @@ export class VRPService {
   private customers: BehaviorSubject<VRPCustomer[]> = new BehaviorSubject<VRPCustomer[]>([]);
   private depots: BehaviorSubject<VRPDepot[]> = new BehaviorSubject<VRPDepot[]>([]);
   private solutions: BehaviorSubject<VRPSolution[]> = new BehaviorSubject<VRPSolution[]>([]);
-  private solutionsInProgress: BehaviorSubject<VRPSolution[]> = new BehaviorSubject<VRPSolution[]>([]);
 
   private PROBLEMS_KEY: string = 'problems';
 
@@ -224,14 +223,14 @@ export class VRPService {
    * Wysyla problem do serwera ktory zwraca wynik.
    */
   solveCurrentProblem(algorithmName: string, distanceType: string, additionalSettings: VRPAdditionalSetting[]) {
-    //VRPService.showLoadingSpinner();
-    let steps = [];
-    let newInProgress = new VRPSolution();
-    this.addSolutionInProgress(newInProgress);
+
+    let newInProgress: VRPSolution = VRPSolution.createInProgress();
+    this.addSolution(newInProgress);
+
     this.snackBar.open('New solution started', 'OK', {duration: 5000});
     this.vrpSolverService.solve(this.currentProblemValue, additionalSettings, algorithmName, distanceType).subscribe(
       (event: VRPSolutionEvent) => {
-        switch (event.type)  {
+        switch (event.type) {
           case VRPSolutionEventType.MESSAGE:
             if (event.solution) {
               let solutionStep = new VRPSolutionStep();
@@ -244,14 +243,13 @@ export class VRPService {
           case VRPSolutionEventType.END:
             let solution: VRPSolution = event.solution;
             solution.solutionsSteps = newInProgress.solutionsSteps;
+            this.deleteSolution(newInProgress);
             this.addSolution(solution);
-            this.removeSolutionInProgress(newInProgress);
+
             break;
           case VRPSolutionEventType.ERROR:
-            this.snackBar.open('Error: ' + event.message, 'OK', {
-              duration: 5000,
-            });
-            this.removeSolutionInProgress(newInProgress);
+            this.snackBar.open('Error: ' + event.message, 'OK', {duration: 5000});
+            this.deleteSolution(solution);
             break;
           default:
             console.log('Unknown solution event!');
@@ -271,34 +269,6 @@ export class VRPService {
    */
   getSolutions() {
     return this.solutions;
-  }
-
-  /**
-   * Zwraca liste obliczanych solucji jako Observable
-   */
-  getSolutionsInProgress() {
-    return this.solutionsInProgress;
-  }
-
-  /**
-   * Dodaje solution in progress
-   */
-  addSolutionInProgress(solution) {
-    let copy = this.solutionsInProgress.value;
-    copy.push(solution);
-    this.solutionsInProgress.next(copy);
-  }
-
-  /**
-   * Usuwa solution in progress
-   */
-  removeSolutionInProgress(solution) {
-    let index = this.solutionsInProgress.value.indexOf(solution, 0);
-    if (index > -1) {
-      let copy = this.solutionsInProgress.value;
-      copy.splice(index, 1);
-      this.solutionsInProgress.next(copy);
-    }
   }
 
   /**

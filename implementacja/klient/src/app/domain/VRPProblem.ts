@@ -29,6 +29,7 @@ export class VRPProblem {
   depots: VRPDepot[];
 
   solutions: VRPSolution[];
+  solutionsInProgress: VRPSolution[];
 
   settings = [
     {code: 'algorithm', value: 'savings'},

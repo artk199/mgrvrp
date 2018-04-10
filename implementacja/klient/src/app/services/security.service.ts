@@ -118,7 +118,7 @@ export class SecurityService {
     formData.append('confirmPassword', confirmPassword);
 
     return this.http.post(
-      'http://localhost:9090/user/changePassword', formData,
+      Config.API_URL + '/changePassword', formData,
       {
         headers: new HttpHeaders({
             'X-Requested-With': 'XMLHttpRequest'

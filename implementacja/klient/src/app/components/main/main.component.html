@@ -3,6 +3,8 @@
     <mat-toolbar color="primary" class="top-bar">
       <span>CVRP Solver</span>
       <span class="spacer"></span>
+      <span *ngIf="!editEnabled"><small>Editing disabled - problem has solutions or solving in progress</small></span>
+      <span class="spacer"></span>
       <span>{{profile.username}}&nbsp;</span>
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
