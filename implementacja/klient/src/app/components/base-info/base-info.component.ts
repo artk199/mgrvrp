@@ -54,6 +54,7 @@ export class BaseInfoComponent implements OnInit {
   solve() {
     //Zmiana settingsów na obiekty vrp additional settings
     let ads: VRPAdditionalSetting[] = [];
+    console.log(this.additionalSettings);
     for (let setting of this.additionalSettings) {
       ads.push(new VRPAdditionalSetting(setting['code'], setting['value']));
     }

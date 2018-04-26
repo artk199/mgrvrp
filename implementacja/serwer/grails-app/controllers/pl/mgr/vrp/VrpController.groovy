@@ -122,7 +122,8 @@ class VrpController {
         GrailsAsyncContext asyncContext = new GrailsAsyncContext(asyncWebRequest.asyncContext, webRequest)
         response.setContentType(CONTENT_TYPE_EVENT_STREAM)
         response.flushBuffer()
-
+        response << "retry: 100000\n\n"
+        response.flushBuffer()
         asyncContext.start {
             boolean exitCondition = false
             while (!exitCondition) {

@@ -9,7 +9,7 @@ import {deserialize} from 'class-transformer';
 @Injectable()
 export class ImportService {
 
-  constructor(private vRPService: VRPService, private mapService: MapService) {
+  constructor(private vRPService: VRPService) {
 
   }
 
@@ -24,7 +24,7 @@ export class ImportService {
     let CURRENT_SECTION = 'START';
     for (let i = 0; i < lines.length; i++) {
       let x = lines[i];
-      x = x.split('\t').join(" ");
+      x = x.split('\t').join(' ');
       const startFound = START_SECTION.some((e) => {
         const ret = x.startsWith(e);
         if (ret === true) {
@@ -99,5 +99,19 @@ export class ImportService {
   public importFile(s) {
     let p: VRPProblem = deserialize(VRPProblem, s);
     this.vRPService.addProblem(p);
+  }
+
+  public importSimpleCustomers(importData: string, separator = ';') {
+    console.log(importData);
+    const lines = importData.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i] && lines[i].trim() != '') {
+        let x = lines[i];
+        let y = x.split(separator);
+        let c = new VRPCustomer(i.toString(), parseFloat(y[1].replace(',', '\.')), parseFloat(y[0].replace(',', '\.')));
+        c.demand = 10;
+        this.vRPService.addCustomer(c);
+      }
+    }
   }
 }

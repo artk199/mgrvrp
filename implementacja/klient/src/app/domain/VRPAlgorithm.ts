@@ -32,9 +32,9 @@ export class VRPAlgorithm {
           type: 'NUMBER',
           value: 100
         }
-      ]),
-      new VRPAlgorithm('jsprit', 'JSprit', [], false),
-      new VRPAlgorithm('googleOT', 'Google Optimization Tools', [], false),
+      ], false),
+      new VRPAlgorithm('jsprit', 'JSprit', []),
+      new VRPAlgorithm('googleOR', 'Google Optimization Tools', [], false),
       new VRPAlgorithm('optaPlaner', 'OptaPlanner', [], false)
     ];
   }

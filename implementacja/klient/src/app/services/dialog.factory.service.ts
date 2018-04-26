@@ -33,4 +33,9 @@ export class DialogFactoryService {
     this.rootViewContainer.dialog.open(SettingsDialogComponent, {});
   }
 
+/*
+  showCustomerImportDialog() {
+    this.rootViewContainer.dialog.open(CustomerImportDialog, {});
+  }
+*/
 }

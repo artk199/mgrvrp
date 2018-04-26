@@ -34,12 +34,14 @@ abstract class VRPSolverService {
             problemWithSettings.subscriber = subscriber
             task {
                 try {
+                    VRPSolution solution
                     //validateVRPProblem(problemWithSettings.problem)
-                    VRPSolution solution = calculateSolution(problemWithSettings)
+                    solution = calculateSolution(problemWithSettings)
                     calculateRoute(solution, problemWithSettings.distanceType)
                     subscriber.onNext(new SolverEvent(message: "Solution ready!", eventType: SolverEventType.END, solution: solution))
                     subscriber.onCompleted()
                 } catch (Exception e) {
+                    e.printStackTrace()
                     subscriber.onError(e)
                 }
             }

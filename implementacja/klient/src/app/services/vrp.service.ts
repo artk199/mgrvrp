@@ -243,6 +243,7 @@ export class VRPService {
           case VRPSolutionEventType.END:
             let solution: VRPSolution = event.solution;
             solution.solutionsSteps = newInProgress.solutionsSteps;
+            console.log(solution);
             this.deleteSolution(newInProgress);
             this.addSolution(solution);
 

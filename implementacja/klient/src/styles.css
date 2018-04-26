@@ -75,4 +75,12 @@ body {
   min-width: 300px;
 }
 
+.add-panel {
+  margin: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
 

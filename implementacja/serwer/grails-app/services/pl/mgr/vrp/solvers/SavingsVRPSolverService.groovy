@@ -178,11 +178,11 @@ class SavingsVRPSolverService extends VRPSolverService {
 
     boolean isLast(VRPRoute route, VRPCustomer customer) {
         VRPCustomer last = route.points.last()
-        return last.id == customer.id
+        return last.name == customer.name
     }
 
     boolean isFirst(VRPRoute route, VRPCustomer customer) {
-        return route.points.first().id == customer.id
+        return route.points.first().name == customer.name
     }
 
     VRPRoute createRoute(VRPCustomer customer1, VRPCustomer customer2) {
@@ -196,7 +196,7 @@ class SavingsVRPSolverService extends VRPSolverService {
     VRPRoute findRoute(Collection<VRPRoute> routes, VRPCustomer customer) {
         return routes.find { r ->
             r.points.any { p ->
-                p.id == customer.id
+                p.name == customer.name
             }
         }
     }

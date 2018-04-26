@@ -1,59 +1,89 @@
 package pl.mgr.vrp.solvers
 
-import com.google.ortools.linearsolver.MPObjective
-import com.google.ortools.linearsolver.MPSolver
-import com.google.ortools.linearsolver.MPVariable
+
 import grails.transaction.Transactional
-import org.hibernate.collection.internal.PersistentMap
+
+import pl.mgr.vrp.ProblemWithSettings
+import pl.mgr.vrp.VRPSolverService
+import pl.mgr.vrp.model.VRPDepot
+import pl.mgr.vrp.model.VRPSolution
+import pl.mgr.vrp.model.VRPCustomer
 
 @Transactional
-class GoogleORVRPSolverService {
+class GoogleORVRPSolverService extends VRPSolverService {
+
+/*    static {
+        System.loadLibrary("jniortools");
+    }
 
     private static MPSolver createSolver(String solverType) {
         return new MPSolver("my_program",
                 MPSolver.OptimizationProblemType.valueOf(solverType));
     }
 
-    private static void runmy_program(String solverType,
-                                      boolean printModel) {
-        MPSolver solver = createSolver(solverType);
-        MPVariable x = solver.makeNumVar(0.0, 1.0, "x");
-        MPVariable y = solver.makeNumVar(0.0, 2.0, "y");
-        MPObjective objective = solver.objective();
-        objective.setCoefficient(y, 1);
-        objective.setMaximization();
-        solver.solve();
-        System.out.println("Solution:");
-        System.out.println("x = " + x.solutionValue());
-        System.out.println("y = " + y.solutionValue());
+    @Override
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
+        int vehicleCapacity = problemWithSettings.problem.capacity
+        List<Pair<Double, Double>> locations = new ArrayList()
+        List<Double> orderDemands = new ArrayList()
+        int[] vehicleStarts = [0]
+        int[] vehicleEnds = [0]
+        double[][] distanceMatrix = this.calculateDistances(problemWithSettings.problem, problemWithSettings.distanceType)
+        VRPDepot depot = problemWithSettings.problem.depot
+        locations.add(new Pair<Double, Double>(depot.x, depot.y))
+        orderDemands.add(0)
+
+        problemWithSettings.problem.customers.each { VRPCustomer customer ->
+            locations.add(new Pair<Double, Double>(customer.x, customer.y))
+            orderDemands.add(customer.demand)
+        }
+
+        System.load("C:/Users/Artur/Downloads/A/lib/jniortools.dll")
+
+        int numberOfLocations = locations.size()
+        RoutingModel model = new RoutingModel(numberOfLocations, 5, 0)
+        NodeEvaluator2 manhattanCostCallback = new NodeEvaluator2() {
+            @Override
+            long run(int firstIndex, int secondIndex) {
+                return Double.valueOf(distanceMatrix[firstIndex][secondIndex] * 10000).toLong()
+            }
+        }
+        model.setArcCostEvaluatorOfAllVehicles(manhattanCostCallback)
+
+        NodeEvaluator2 demandCallback = new NodeEvaluator2() {
+            @Override
+            long run(int firstIndex, int secondIndex) {
+                return orderDemands.get(firstIndex)
+            }
+        };
+        model.addDimension(demandCallback, 0, vehicleCapacity, true, "demand")
+
+
+        def res = model.solveWithParameters(RoutingModel.defaultSearchParameters())
+
+
+        return null
+    }
+    */
+
+    @Override
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
+        return null
+    }
+}
+
+// A pair class
+
+class Pair<K, V> {
+    final K first;
+    final V second;
+
+    public static <K, V> Pair<K, V> of(K element0, V element1) {
+        return new Pair<K, V>(element0, element1);
     }
 
-    public static void main(String[] args) throws Exception {
-        runmy_program("GLOP_LINEAR_PROGRAMMING", false);
-    }
-
-
-    static void a() {
-        /*
-        routing = RoutingModel(num_locations, num_vehicles, depot)
-        search_parameters = pywrapcp.DefaultRoutingSearchParameters()
-
-
-        dist_between_locations = CreateDistanceCallback(locations)
-        dist_callback = dist_between_locations.Distance
-        routing.SetArcCostEvaluatorOfAllVehicles(dist_callback)
-
-        # PersistentMap.Put a callback to the demands.
-                demands_at_locations = CreateDemandCallback(demands)
-        demands_callback = demands_at_locations.Demand
-
-        # Add a dimension for demand.
-                slack_max = 0
-        vehicle_capacity = 100
-        fix_start_cumul_to_zero = True
-        demand = "Demand"
-        routing.AddDimension(demands_callback, slack_max, vehicle_capacity,
-                fix_start_cumul_to_zero, demand)
-                */
+    public Pair(K element0, V element1) {
+        this.first = element0;
+        this.second = element1;
     }
 }

@@ -40,6 +40,12 @@ y: {{customer.y | number:'1.5-5'}}</pre>
   <mat-row *matRowDef="let customer; columns: displayedColumns;"></mat-row>
 </mat-table>
 
-<!--<button color="warn" mat-icon-button (click)="loadFixedCustomers()">
-  <mat-icon>remove_circle</mat-icon>
-</button>-->
+
+<div class="button-row" class="add-panel">
+  <button mat-raised-button color="primary" (click)="openImportDialog()">
+    <mat-icon>add_circle</mat-icon>
+    <span>Import</span>
+  </button>
+</div>
+
+
