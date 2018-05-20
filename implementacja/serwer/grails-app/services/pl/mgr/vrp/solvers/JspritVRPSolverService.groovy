@@ -13,23 +13,18 @@ import com.graphhopper.jsprit.core.util.Coordinate
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts
 import com.graphhopper.jsprit.core.util.Solutions
-import grails.transaction.Transactional
-import pl.mgr.vrp.GraphHopperOSMService
 import pl.mgr.vrp.ProblemWithSettings
 import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPCustomer
 import pl.mgr.vrp.model.VRPDrivePoint
-import pl.mgr.vrp.model.VRPLocation
 import pl.mgr.vrp.model.VRPProblem
 import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPPoint
 import pl.mgr.vrp.model.VRPSolution
 
-@Transactional
 class JspritVRPSolverService extends VRPSolverService {
 
     final int WEIGHT_INDEX = 0
-    GraphHopperOSMService graphHopperOSMService
 
     private VehicleRoutingProblemSolution calculateRoutes(Location startLocation, List<Service> services, double maxCapacity, VehicleRoutingTransportCosts distanceMatrix) {
 
@@ -46,6 +41,7 @@ class JspritVRPSolverService extends VRPSolverService {
         VehicleRoutingProblem.Builder problemBuilder = VehicleRoutingProblem.Builder.newInstance()
         problemBuilder.addVehicle(vehicle)
         problemBuilder.addAllJobs(services)
+        problemBuilder.setRoutingCost(distanceMatrix)
         VehicleRoutingProblem problem = problemBuilder.build()
 
         VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(problem)
@@ -56,7 +52,7 @@ class JspritVRPSolverService extends VRPSolverService {
     }
 
     @Override
-    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings, double[][] distances = null) {
         logInfo("Searching for solution...")
         VRPProblem problem = problemWithSettings.problem
 
@@ -64,27 +60,28 @@ class JspritVRPSolverService extends VRPSolverService {
 
         List<Service> services = []
         for (def c in problem.customers) {
+            Location l = Location.Builder.newInstance().setId(c.name).setCoordinate(Coordinate.newInstance(c.x, c.y)).build()
             services += Service.Builder.newInstance("${c.name}")
                     .addSizeDimension(WEIGHT_INDEX, (int) c.demand)
-                    .setLocation(Location.newInstance(c.x, c.y))
+                    .setLocation(l)
                     .build()
         }
 
-        VehicleRoutingTransportCosts matrix = createDistanceMatrix(problemWithSettings)
+        VehicleRoutingTransportCosts matrix = createDistanceMatrix(problemWithSettings, distances)
         def solution = calculateRoutes(depot, services, problemWithSettings.problem.capacity, matrix)
 
         return translateSolution(solution, problemWithSettings)
     }
 
-    VehicleRoutingTransportCosts createDistanceMatrix(ProblemWithSettings problemWithSettings) {
+    VehicleRoutingTransportCosts createDistanceMatrix(ProblemWithSettings problemWithSettings, double[][] distanceMatrix) {
         VehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = VehicleRoutingTransportCostsMatrix.Builder.newInstance(false)
-        double[][] distanceMatrix = calculateDistances(problemWithSettings.problem, problemWithSettings.distanceType)
+        if (!distanceMatrix)
+            distanceMatrix = calculateDistances(problemWithSettings.problem, problemWithSettings.distanceType)
         problemWithSettings.problem.customers.eachWithIndex { VRPCustomer c1, int i ->
-            costMatrixBuilder.addTransportDistance(c1.name, "depot", distanceMatrix[0][i + 1])
-            costMatrixBuilder.addTransportDistance("depot", c1.name, distanceMatrix[i + 1][0])
+            costMatrixBuilder.addTransportDistance(c1.name, "depot", distanceMatrix[i + 1][0])
+            costMatrixBuilder.addTransportDistance("depot", c1.name, distanceMatrix[0][i + 1])
             problemWithSettings.problem.customers.eachWithIndex { VRPCustomer c2, int j ->
                 costMatrixBuilder.addTransportDistance(c1.name, c2.name, distanceMatrix[i + 1][j + 1])
-                costMatrixBuilder.addTransportTime(c1.name, c2.name, distanceMatrix[i + 1][j + 1])
             }
         }
 
@@ -104,12 +101,12 @@ class JspritVRPSolverService extends VRPSolverService {
                         activity.location.coordinate.x,
                         activity.location.coordinate.y
                 )
-                r.addToPoints(new VRPCustomer(x: activity.location.coordinate.x, y: activity.location.coordinate.y))
+                r.points.add(new VRPCustomer(x: activity.location.coordinate.x, y: activity.location.coordinate.y))
                 points += point
             }
             points += new VRPPoint(it.end.location.coordinate.x, it.end.location.coordinate.y)
-            r.addToDrivePoints new VRPDrivePoint(points)
-            solution.addToRoutes r
+            r.drivePoints.add new VRPDrivePoint(points)
+            solution.routes.add r
         }
         return solution
     }

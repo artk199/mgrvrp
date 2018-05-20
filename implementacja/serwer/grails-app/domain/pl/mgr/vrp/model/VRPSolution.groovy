@@ -9,6 +9,7 @@ class VRPSolution {
     double routeLength
     String algorithm
     String distanceType
+    VRPProblem problem
     Set<VRPRoute> routes = []
     Set<VRPAdditionalSetting> settings = []
 

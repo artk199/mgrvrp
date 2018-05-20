@@ -14,6 +14,7 @@ class BootStrap {
         admin.password = 'admin'
         admin.save()
         UserRole.findOrSaveWhere(user: admin, role: role)
+        RoutingDistanceUtil.init()
     }
 
     def destroy = {

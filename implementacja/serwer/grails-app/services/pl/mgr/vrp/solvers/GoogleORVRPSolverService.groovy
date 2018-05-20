@@ -1,20 +1,21 @@
 package pl.mgr.vrp.solvers
 
-
-import grails.transaction.Transactional
-
+import com.google.ortools.constraintsolver.Assignment
+import com.google.ortools.constraintsolver.FirstSolutionStrategy
+import com.google.ortools.constraintsolver.IntVar
+import com.google.ortools.constraintsolver.NodeEvaluator2
+import com.google.ortools.constraintsolver.RoutingModel
+import com.google.ortools.constraintsolver.RoutingSearchParameters
+import com.google.ortools.linearsolver.MPSolver
 import pl.mgr.vrp.ProblemWithSettings
 import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPDepot
+import pl.mgr.vrp.model.VRPPoint
+import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPSolution
 import pl.mgr.vrp.model.VRPCustomer
 
-@Transactional
 class GoogleORVRPSolverService extends VRPSolverService {
-
-/*    static {
-        System.loadLibrary("jniortools");
-    }
 
     private static MPSolver createSolver(String solverType) {
         return new MPSolver("my_program",
@@ -22,13 +23,12 @@ class GoogleORVRPSolverService extends VRPSolverService {
     }
 
     @Override
-    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
-        int vehicleCapacity = problemWithSettings.problem.capacity
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings, double[][] distances = null) {
+        int vehicleCapacity = problemWithSettings.problem.capacity.toInteger()
         List<Pair<Double, Double>> locations = new ArrayList()
         List<Double> orderDemands = new ArrayList()
-        int[] vehicleStarts = [0]
-        int[] vehicleEnds = [0]
-        double[][] distanceMatrix = this.calculateDistances(problemWithSettings.problem, problemWithSettings.distanceType)
+        if (!distances)
+            distances = calculateDistances(problemWithSettings.problem, problemWithSettings.distanceType)
         VRPDepot depot = problemWithSettings.problem.depot
         locations.add(new Pair<Double, Double>(depot.x, depot.y))
         orderDemands.add(0)
@@ -38,38 +38,72 @@ class GoogleORVRPSolverService extends VRPSolverService {
             orderDemands.add(customer.demand)
         }
 
-        System.load("C:/Users/Artur/Downloads/A/lib/jniortools.dll")
-
         int numberOfLocations = locations.size()
-        RoutingModel model = new RoutingModel(numberOfLocations, 5, 0)
+        int numberOfVehicles = numberOfLocations
+        int numberOfOrders = numberOfLocations
+
+        RoutingModel model = new RoutingModel(numberOfLocations, numberOfVehicles, 0);
+        def parameters = RoutingModel.defaultSearchParameters()
+
         NodeEvaluator2 manhattanCostCallback = new NodeEvaluator2() {
             @Override
-            long run(int firstIndex, int secondIndex) {
-                return Double.valueOf(distanceMatrix[firstIndex][secondIndex] * 10000).toLong()
+            public long run(int firstIndex, int secondIndex) {
+                return (distances[firstIndex][secondIndex] * 100).toInteger()
             }
-        }
+        };
         model.setArcCostEvaluatorOfAllVehicles(manhattanCostCallback)
 
         NodeEvaluator2 demandCallback = new NodeEvaluator2() {
             @Override
-            long run(int firstIndex, int secondIndex) {
-                return orderDemands.get(firstIndex)
+            public long run(int firstIndex, int secondIndex) {
+                return orderDemands[firstIndex]
             }
-        };
-        model.addDimension(demandCallback, 0, vehicleCapacity, true, "demand")
+        }
+        model.addDimension(demandCallback, 0, vehicleCapacity, true, "capacity");
 
+        def solution = model.solveWithParameters(parameters)
 
-        def res = model.solveWithParameters(RoutingModel.defaultSearchParameters())
+        def vrpSolution = VRPSolution.createForProblemWithSettings(problemWithSettings)
 
+        if (solution != null) {
+            String output = "Total cost: " + solution.objectiveValue() + "\n";
+            // Dropped orders
+            String dropped = "";
+            for (int order = 0; order < numberOfOrders; ++order) {
+                if (solution.value(model.nextVar(order)) == order) {
+                    dropped += " " + order;
+                }
+            }
+            if (dropped.length() > 0) {
+                output += "Dropped orders:" + dropped + "\n";
+            }
+            // Routes
+            for (int vehicle = 0; vehicle < numberOfVehicles; ++vehicle) {
+                String route = "Vehicle " + vehicle + ": ";
+                long order = model.start(vehicle);
+                if (model.isEnd(solution.value(model.nextVar(order)))) {
+                    route += "Empty";
+                } else {
+                    VRPRoute vrpRoute = new VRPRoute()
+                    for (;
+                            !model.isEnd(order);
+                            order = solution.value(model.nextVar(order))) {
+                        IntVar load = model.cumulVar(order, "capacity");
+                        if (order <= numberOfOrders)
+                            vrpRoute.points.add problemWithSettings.problem.customers[order.toInteger() - 1]
+                        route += order + " Load(" + solution.value(load) + ") ";
+                    }
+                    IntVar load = model.cumulVar(order, "capacity");
+                    route += order + " Load(" + solution.value(load) + ") ";
+                    vrpSolution.routes.add vrpRoute
+                }
+            }
+            println output
+        }
 
-        return null
+        return vrpSolution
     }
-    */
 
-    @Override
-    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
-        return null
-    }
 }
 
 // A pair class

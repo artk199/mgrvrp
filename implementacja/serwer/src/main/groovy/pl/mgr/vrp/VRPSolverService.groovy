@@ -1,7 +1,5 @@
 package pl.mgr.vrp
 
-import grails.transaction.Transactional
-import groovy.json.JsonBuilder
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -13,7 +11,6 @@ import pl.mgr.vrp.model.VRPSolution
 import rx.Observable
 import rx.Subscriber;
 import static grails.async.Promises.*
-import java.time.Clock
 
 @Slf4j
 abstract class VRPSolverService {
@@ -21,18 +18,13 @@ abstract class VRPSolverService {
     @Autowired
     SimpMessagingTemplate brokerMessagingTemplate
 
-    @Autowired
-    GraphHopperOSMService graphHopperOSMService
-
-    @Autowired
-    RoutingUtilService routingUtilService
-
-    abstract protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings)
+    abstract
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings, double[][] distances = null)
 
     Observable<SolverEvent> solve(ProblemWithSettings problemWithSettings) {
         return Observable.create([call: { Subscriber<SolverEvent> subscriber ->
             problemWithSettings.subscriber = subscriber
-            task {
+            //task {
                 try {
                     VRPSolution solution
                     //validateVRPProblem(problemWithSettings.problem)
@@ -44,27 +36,12 @@ abstract class VRPSolverService {
                     e.printStackTrace()
                     subscriber.onError(e)
                 }
-            }
+            //}
         }] as Observable.OnSubscribe<SolverEvent>)
 
-        /*
-        try {
-
-
-            sendEndSignal(solution)
-            return solution
-        } catch (IllegalArgumentException ex) {
-            log.error(ex.message)
-            logRuntimeError(ex.message)
-        } catch (Exception e) {
-            e.printStackTrace()
-            logRuntimeError("Nieznany blad...")
-        }
-        return null
-        */
     }
 
-    def assignIDs(VRPProblem problem) {
+    static def assignIDs(VRPProblem problem) {
         int i = 1
         problem.customers.each {
             it._ID = i
@@ -73,60 +50,8 @@ abstract class VRPSolverService {
         problem.depot._ID = 0
     }
 
-    def logRuntimeError(String _message) {
-        def builder = new JsonBuilder()
-        builder {
-            type "RUNTIME_ERROR"
-            message _message
-            timestamp new Date()
-        }
-        send(builder)
-    }
-
-    def sendEndSignal(VRPSolution solution) {
-        def builder = new JsonBuilder()
-        builder {
-            type "END"
-            message solution
-            timestamp new Date()
-        }
-        send(builder)
-    }
-
-    @Transactional
-    private void validateVRPProblem(VRPProblem vrpProblem) {
-        if (!vrpProblem)
-            throw new IllegalArgumentException("Brak podanego problemu")
-
-        if (!vrpProblem.validate()) {
-            String message = ""
-            vrpProblem.errors.fieldErrors.each {
-                message += "${it.field} : ${it.rejectedValue}\n"
-            }
-            log.error message
-            throw new IllegalArgumentException("Niepoprawny format problemu.")
-        }
-    }
-
-    void logInfo(String info) {
+    static void logInfo(String info) {
         log.info info
-        def builder = new JsonBuilder()
-        builder {
-            type "INFO"
-            message(info)
-            timestamp(new Date())
-        }
-        send(builder)
-    }
-
-    void logStep(VRPSolution solution) {
-        def builder = new JsonBuilder()
-        builder {
-            type "STEP"
-            message solution
-            timestamp new Date()
-        }
-        send(builder)
     }
 
     static void logStep(Subscriber<SolverEvent> subscriber, VRPSolution solution, String message = "") {
@@ -134,39 +59,25 @@ abstract class VRPSolverService {
         subscriber.onNext(event)
     }
 
-    void send(JsonBuilder jsonBuilder) {
-        //brokerMessagingTemplate.convertAndSend "/topic/hello", jsonBuilder
-    }
-
-    def calculateRoadRoute(VRPSolution solution) {
+    static def calculateRoadRoute(VRPSolution solution) {
         solution.routes.each { route ->
             VRPLocation lastPoint = solution.problem.depot
             route.drivePoints = []
             route.points.each { point ->
-                List<VRPPoint> points = graphHopperOSMService.calculateRoute(lastPoint, point)
-                VRPDrivePoint drivePoint = new VRPDrivePoint(points)
-                for (int i = 1; i < drivePoint.points.size(); i++) {
-                    drivePoint.routeLength += routingUtilService.calculateDistanceForSphericalEarth(drivePoint.points[i - 1], drivePoint.points[i])
-                }
-                route.addToDrivePoints drivePoint
+                VRPDrivePoint drivePoint = RoutingDistanceUtil.calculateRoute(lastPoint, point)
+                route.drivePoints.add drivePoint
                 lastPoint = point
             }
-            VRPDrivePoint drivePoint = new VRPDrivePoint(graphHopperOSMService.calculateRoute(lastPoint, solution.problem.depot))
-            for (int i = 1; i < drivePoint.points.size(); i++) {
-                drivePoint.routeLength += routingUtilService.calculateDistanceForSphericalEarth(drivePoint.points[i - 1], drivePoint.points[i])
-            }
-
-            route.addToDrivePoints drivePoint
+            VRPDrivePoint drivePoint = RoutingDistanceUtil.calculateRoute(lastPoint, solution.problem.depot)
+            route.drivePoints.add drivePoint
             route.routeLength = 0
             route.drivePoints.each {
                 route.routeLength += it.routeLength
             }
-
-            //logStep(solution)
         }
     }
 
-    def calculateAirRoute(VRPSolution solution) {
+    static def calculateAirRoute(VRPSolution solution) {
         solution.routes.each { route ->
             VRPLocation lastPoint = solution.problem.depot
             route.drivePoints = []
@@ -176,9 +87,9 @@ abstract class VRPSolverService {
                         new VRPPoint(point.x, point.y)
                 ])
                 for (int i = 1; i < drivePoint.points.size(); i++) {
-                    drivePoint.routeLength += routingUtilService.calculateDistanceForSphericalEarth(drivePoint.points[i - 1], drivePoint.points[i])
+                    drivePoint.routeLength += RoutingDistanceUtil.calculateDistanceForSphericalEarth(drivePoint.points[i - 1], drivePoint.points[i])
                 }
-                route.addToDrivePoints drivePoint
+                route.drivePoints.add drivePoint
                 lastPoint = point
             }
 
@@ -187,9 +98,9 @@ abstract class VRPSolverService {
                     new VRPPoint(solution.problem.depot.x, solution.problem.depot.y)
             ])
             for (int i = 1; i < drivePoint.points.size(); i++) {
-                drivePoint.routeLength += routingUtilService.calculateDistanceForSphericalEarth(drivePoint.points[i - 1], drivePoint.points[i])
+                drivePoint.routeLength += RoutingDistanceUtil.calculateDistanceForSphericalEarth(drivePoint.points[i - 1], drivePoint.points[i])
             }
-            route.addToDrivePoints drivePoint
+            route.drivePoints.add drivePoint
             route.routeLength = 0
             route.drivePoints.each {
                 route.routeLength += it.routeLength
@@ -198,7 +109,7 @@ abstract class VRPSolverService {
         //logStep(solution)
     }
 
-    def calculateSimpleRoute(VRPSolution solution) {
+    static def calculateSimpleRoute(VRPSolution solution) {
         solution.routes.each { route ->
             def lastPoint = route.points.first()
             route.drivePoints = []
@@ -208,7 +119,7 @@ abstract class VRPSolverService {
                         new VRPPoint(point.x, point.y)
                 ])
                 for (int i = 1; i < drivePoint.points.size(); i++) {
-                    drivePoint.routeLength += routingUtilService.calculateSimpleDistance(drivePoint.points[i - 1], drivePoint.points[i])
+                    drivePoint.routeLength += RoutingDistanceUtil.calculateSimpleDistance(drivePoint.points[i - 1], drivePoint.points[i])
                 }
                 route.addToDrivePoints drivePoint
                 lastPoint = point
@@ -218,7 +129,7 @@ abstract class VRPSolverService {
                     new VRPPoint(route.points.last().x, route.points.last().y)
             ])
             for (int i = 1; i < drivePoint.points.size(); i++) {
-                drivePoint.routeLength += routingUtilService.calculateSimpleDistance(drivePoint.points[i - 1], drivePoint.points[i])
+                drivePoint.routeLength += RoutingDistanceUtil.calculateSimpleDistance(drivePoint.points[i - 1], drivePoint.points[i])
             }
             route.addToDrivePoints drivePoint
             route.routeLength = 0
@@ -228,14 +139,14 @@ abstract class VRPSolverService {
         }
     }
 
-    double[][] calculateDistances(VRPProblem vrpProblem, String distanceType) {
+    static double[][] calculateDistances(VRPProblem vrpProblem, String distanceType) {
         logInfo "Obliczanie odleglosci..."
         def methodName = "calculate${distanceType?.capitalize()}DistanceMatrix"
-        return routingUtilService."$methodName"(vrpProblem)
+        return RoutingDistanceUtil."$methodName"(vrpProblem)
     }
 
     def calculateRoute(VRPSolution solution, String distanceType) {
-        this."calculate${distanceType.capitalize()}Route"(solution)
+        this.calculateRoadRoute(solution)
         solution.routeLength = 0
         solution.routes.each {
             solution.routeLength += it.routeLength

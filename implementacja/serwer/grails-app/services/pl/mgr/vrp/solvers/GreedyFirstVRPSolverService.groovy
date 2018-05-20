@@ -1,6 +1,5 @@
 package pl.mgr.vrp.solvers
 
-import groovy.transform.CompileStatic
 import pl.mgr.vrp.ProblemWithSettings
 import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPCustomer
@@ -8,19 +7,18 @@ import pl.mgr.vrp.model.VRPProblem
 import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPSolution
 
-@CompileStatic
 class GreedyFirstVRPSolverService extends VRPSolverService {
 
     @Override
-    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings, double[][] distances = null) {
         VRPSolution solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
         VRPProblem problem = problemWithSettings.problem
 
         List<VRPCustomer> allCustomers = problem.customers.collect()
         List<VRPCustomer> leftCustomers = allCustomers.toSorted { a, b -> (a.demand <=> b.demand) * -1 }
 
-        this.assignIDs(problem)
-        def adjacentMatrix = this.calculateDistances(problem, problemWithSettings.distanceType)
+        assignIDs(problem)
+        def adjacentMatrix = calculateDistances(problem, problemWithSettings.distanceType)
 
         while (leftCustomers.size() > 0) {
 
@@ -29,7 +27,7 @@ class GreedyFirstVRPSolverService extends VRPSolverService {
             VRPCustomer customer = findNearestNeighbour(adjacentMatrix, 0 /* depot */, problem.capacity, leftCustomers)
             leftCustomers.removeAll { it == customer }
 
-            route.addToPoints customer
+            route.points.add customer
 
             double leftDemand = problem.capacity - customer.demand
 
@@ -40,13 +38,12 @@ class GreedyFirstVRPSolverService extends VRPSolverService {
                 if (nearestNeighbour != null) {
                     leftCustomers.removeAll { it == nearestNeighbour }
                     leftDemand -= nearestNeighbour.demand
-                    route.addToPoints nearestNeighbour
+                    route.points.add nearestNeighbour
                 } else {
                     stop = true
                 }
             }
-            solution.addToRoutes route
-            this.logStep(solution)
+            solution.routes.add route
         }
         return solution
     }

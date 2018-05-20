@@ -1,11 +1,9 @@
 package pl.mgr.vrp.solvers
 
-import groovy.json.JsonOutput
-import groovy.transform.CompileStatic
 import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import pl.mgr.vrp.ProblemWithSettings
-import pl.mgr.vrp.RoutingUtilService
+import pl.mgr.vrp.RoutingDistanceUtil
 import pl.mgr.vrp.VRPSolverService
 import pl.mgr.vrp.model.VRPCustomer
 import pl.mgr.vrp.model.VRPProblem
@@ -13,29 +11,27 @@ import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPSolution
 
 @Slf4j
-@CompileStatic
 class SavingsVRPSolverService extends VRPSolverService {
 
-    RoutingUtilService routingUtilService
-
-    @Override
-    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings, double[][] distances = null) {
         VRPSolution solution
-        VRPProblem problem = problemWithSettings.problem
-        double[][] distances = calculateDistances(problemWithSettings.problem, problemWithSettings.getDistanceType())
+        if (!distances)
+            distances = calculateDistances(problemWithSettings.problem, problemWithSettings.getDistanceType())
+        assignIDs(problemWithSettings.problem)
         List<Saving> savings = calculateSavings(distances)
+        ArrayList<VRPRoute> routes = new ArrayList<>(problemWithSettings.problem.customers.size())
         if (problemWithSettings.getSetting('type') == 'sequential') {
             solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
             sequentialCreateRoutes(solution, savings, problemWithSettings)
         } else {
-            solution = createInitialSolution(problemWithSettings)
-            createRoutes(solution, savings, problemWithSettings)
+            solution = createInitialSolution(problemWithSettings, routes)
+            createRoutes(solution, savings, problemWithSettings, routes)
         }
         solution
     }
 
     //Parallel version
-    VRPSolution createRoutes(VRPSolution solution, List<Saving> savings, ProblemWithSettings problemWithSettings) {
+    VRPSolution createRoutes(VRPSolution solution, List<Saving> savings, ProblemWithSettings problemWithSettings, ArrayList<VRPRoute> routes) {
         logInfo "Obliczanie tras..."
         //solution.routes = []
         VRPProblem problem = problemWithSettings.problem
@@ -44,29 +40,38 @@ class SavingsVRPSolverService extends VRPSolverService {
             VRPCustomer customer1 = problem.customers[saving.i - 1]
             VRPCustomer customer2 = problem.customers[saving.j - 1]
 
-            def rI = findRoute(solution.routes, customer1)
-            def rJ = findRoute(solution.routes, customer2)
+            def rI = findRoute(routes, customer1)
+            def rJ = findRoute(routes, customer2)
 
             if (!rI && !rJ) {
                 //Jeżeli żaden z punktów (i,j) nie został dodany do ścieżki to tworzymy nową zawierającą i oraz j
                 VRPRoute createdRoute = createRoute(customer1, customer2)
                 if (validateCapacity(createdRoute, problem.capacity)) {
-                    solution.addToRoutes createdRoute
+                    routes[saving.j - 1] = createdRoute
+                    routes[saving.i - 1] = createdRoute
+                    solution.routes.add createdRoute
                 }
                 log.info "Tworzenie nowej trasy..."
             } else if (!rI && !isInner(rJ, customer2)) {
                 log.info "Dodawanie do drugiej trasy..."
-                addCustomerToRoute(rJ, customer2, customer1, problemWithSettings)
+                if (addCustomerToRoute(rJ, customer2, customer1, problemWithSettings)) {
+                    routes[saving.i - 1] = rJ
+                }
             } else if (!rJ && !isInner(rI, customer1)) {
                 log.info "Dodawanie do pierwszej trasy..."
-                addCustomerToRoute(rI, customer1, customer2, problemWithSettings)
+                if (addCustomerToRoute(rI, customer1, customer2, problemWithSettings)) {
+                    routes[saving.j - 1] = rJ
+                }
             } else if ((rJ != rI) && rJ && rI && !isInner(rJ, customer2) && !isInner(rI, customer1)) {
-                log.info "Laczenie dwoch tras..."
+                //log.info "Laczenie dwoch tras..."
                 VRPRoute merged = mergeRoutes(rI, customer1, rJ, customer2)
                 if (merged && validateCapacity(merged, problem.capacity)) {
+                    merged.points.each {
+                        routes[it._ID - 1] = merged
+                    }
                     removeRoute(solution.routes, rI)
                     removeRoute(solution.routes, rJ)
-                    solution.addToRoutes merged
+                    solution.routes.add merged
                 }
             } else {
                 //log.info "Nie moge nic zrobic z oszczednoscia: ${saving}"
@@ -75,7 +80,7 @@ class SavingsVRPSolverService extends VRPSolverService {
         solution
     }
 
-    //Sequential version
+    //Sequential version is currenly unavailable
     VRPSolution sequentialCreateRoutes(VRPSolution solution, List<Saving> savings, ProblemWithSettings problemWithSettings) {
         logInfo "Obliczanie tras..."
         //solution.routes = []
@@ -98,7 +103,7 @@ class SavingsVRPSolverService extends VRPSolverService {
                     //Jeżeli żaden z punktów (i,j) nie został dodany do ścieżki to tworzymy nową zawierającą i oraz j
                     VRPRoute createdRoute = createRoute(customer1, customer2)
                     if (validateCapacity(createdRoute, problem.capacity)) {
-                        solution.addToRoutes createdRoute
+                        solution.routes.add createdRoute
                         currentRoute = createdRoute
                         log.info "Tworzenie nowej trasy..."
                     }
@@ -144,13 +149,13 @@ class SavingsVRPSolverService extends VRPSolverService {
         VRPRoute merged = new VRPRoute()
         if (isLast(v1, c1)) {
             if (isLast(v2, c2) && v2.points.size() > 1) {
-                log.info "Nie mozna polazyc sciezek"
+                //log.info "Nie mozna polazyc sciezek"
                 return null
             }
             merged.points = v1.points + v2.points
         } else {
             if (isFirst(v2, c2) && v2.points.size() > 1) {
-                log.info "Nie mozna polazyc sciezek"
+                //log.info "Nie mozna polazyc sciezek"
                 return null
             }
             merged.points = v2.points + v1.points
@@ -193,12 +198,8 @@ class SavingsVRPSolverService extends VRPSolverService {
     }
 
     //Wyszukuje trasę do której już nalezy podany odbiorca (jezeli taka nie istnieje zwracany jest null)
-    VRPRoute findRoute(Collection<VRPRoute> routes, VRPCustomer customer) {
-        return routes.find { r ->
-            r.points.any { p ->
-                p.name == customer.name
-            }
-        }
+    VRPRoute findRoute(ArrayList<VRPRoute> routes, VRPCustomer customer) {
+        return routes[customer._ID - 1]
     }
 
     List<Saving> calculateSavings(double[][] distances) {
@@ -207,7 +208,7 @@ class SavingsVRPSolverService extends VRPSolverService {
         for (int i = 1; i < distances.length; i++) {
             for (int j = 1; j < distances.length; j++) {
                 if (i != j) {
-                    double saving = distances[i][0] + distances[0][j] - distances[i][j]
+                    double saving = distances[j][0] + distances[0][i] - distances[i][j]
                     savings.add Saving.create(i, j, saving)
                 }
             }
@@ -216,13 +217,15 @@ class SavingsVRPSolverService extends VRPSolverService {
         return savings
     }
 
-    private VRPSolution createInitialSolution(ProblemWithSettings problemWithSettings) {
+    private
+    static VRPSolution createInitialSolution(ProblemWithSettings problemWithSettings, ArrayList<VRPRoute> routes) {
         logInfo "Obliczam wstepne rozwiazanie..."
         VRPSolution solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
         problemWithSettings.problem.customers.each {
             VRPRoute route = new VRPRoute()
             route.points.add it
-            solution.addToRoutes route
+            solution.routes.add route
+            routes[it._ID - 1] = route
         }
         solution
     }

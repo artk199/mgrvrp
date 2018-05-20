@@ -8,14 +8,13 @@ import pl.mgr.vrp.model.VRPCustomer
 import pl.mgr.vrp.model.VRPRoute
 import pl.mgr.vrp.model.VRPSolution
 
-@CompileStatic
 class RandomVRPSolverService extends VRPSolverService {
 
     private static String ATTEPTS_SETTING_KEY = "attempts"
 
 
     @Override
-    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problemWithSettings, double[][] distances = null) {
         VRPSolution best
         int MAX_ATTEMPTS = 1
         def attempts = problemWithSettings.getSetting(ATTEPTS_SETTING_KEY)
@@ -25,7 +24,7 @@ class RandomVRPSolverService extends VRPSolverService {
         for (int i = 0; i < MAX_ATTEMPTS; i++) {
             logInfo("Randomizing solution #${i + 1}")
             VRPSolution solution = VRPSolution.createForProblemWithSettings(problemWithSettings)
-            List<VRPCustomer> customers = problemWithSettings.problem.customers.collect()
+            List<VRPCustomer> customers = new LinkedList(problemWithSettings.problem.customers.collect())
             Collections.shuffle(customers)
             VRPRoute route = new VRPRoute()
             solution.addToRoutes route

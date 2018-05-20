@@ -14,7 +14,7 @@ class TabuVRPSolverService extends VRPSolverService {
     RandomVRPSolverService randomVRPSolverService
 
     @Override
-    protected VRPSolution calculateSolution(ProblemWithSettings problem) {
+    protected VRPSolution calculateSolution(ProblemWithSettings problem, double[][] distances = null) {
 
         int MAX_ITERATIONS = 100
         def iterationsSetting = problem.algorithm.findSetting('iterations')

@@ -4,8 +4,8 @@ export class Config {
 
   static COMMUNICATION_KEY: string = 'COMMUNICATION_KEY';
 
-  static API_URL = 'http://147.135.210.1:8080/';
-  //static API_URL = 'http://localhost:9090/';
+  //static API_URL = 'http://147.135.210.1:8080/';
+  static API_URL = 'http://localhost:9090/';
   static SHORT_POLL_INTERVAL: number = 200;
   static SAVE_TYPE = 'DATABASE';
 

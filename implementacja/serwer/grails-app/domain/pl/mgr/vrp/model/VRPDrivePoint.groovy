@@ -9,7 +9,7 @@ class VRPDrivePoint {
 
     VRPDrivePoint(List<VRPPoint> points) {
         points.each { p ->
-            this.addToPoints(p)
+            this.points.add(p)
         }
     }
 

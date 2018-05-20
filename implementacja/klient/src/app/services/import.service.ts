@@ -60,8 +60,12 @@ export class ImportService {
           nodes[parseInt(splittedDemand[0]) - 1].demand = splittedDemand[1];
           break;
         case 'DEPOT_SECTION':
+          CURRENT_SECTION = 'START';
+
           let splittedDepot = x.trim().split(' ');
-          if (parseInt(splittedDepot[0]) > 0 && nodes.includes(parseInt(splittedDepot[0]) - 1)) {
+
+          if (parseInt(splittedDepot[0]) > 0) {
+            console.log(parseInt(splittedDepot[0]) - 1);
             nodes[parseInt(splittedDepot[0]) - 1].isDepot = true;
           } else {
             if (splittedDepot[0] != '-1')
@@ -77,6 +81,8 @@ export class ImportService {
     }
 
     let problem = new VRPProblem(id);
+
+
 
     //problem.settings.capacity = parseInt(settings['CAPACITY']);
     //problem.settings.type = settings['EDGE_WEIGHT_TYPE'];

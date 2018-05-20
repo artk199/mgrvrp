@@ -7,6 +7,9 @@ class VRPProblem {
 
     String paneType
     User owner
+    Set<VRPCustomer> customers
+    Set<VRPSolution> solutions
+    Set<VRPDepot> depots
 
     double capacity
 
@@ -16,23 +19,8 @@ class VRPProblem {
             solutions: VRPSolution
     ]
 
-    static VRPProblem create(def params) {
-        VRPProblem problem = new VRPProblem(params)
-        problem.customers = problem.customers.collect {
-            if (it instanceof LazyMap)
-                return new VRPCustomer(it)
-            it
-        }
-        problem.depots = problem.depots.collect {
-            if (it instanceof LazyMap)
-                return new VRPDepot(it)
-            it
-        }
-        problem
-    }
-
     VRPDepot getDepot() {
-        return depots[0]
+        return depots.first()
     }
 
 }

@@ -10,13 +10,6 @@ export class VRPAlgorithm {
 
   static initialize() {
     this.algorithms = [
-      new VRPAlgorithm('savings', 'Clarke and Wright (C & W)', [{
-        code: 'type',
-        description: 'Type',
-        type: 'SELECT',
-        value: 'parallel',
-        opts: [{v: 'parallel', k: 'Parallel'}, {v: 'sequential', k: 'Sequential'}]
-      }]),
       new VRPAlgorithm('random', 'Randomized Insertion (RandIns)', [
         {
           code: 'attempts',
@@ -24,6 +17,13 @@ export class VRPAlgorithm {
           type: 'NUMBER',
           value: 1
         }]),
+      new VRPAlgorithm('savings', 'Clarke and Wright (C & W)', [{
+        code: 'type',
+        description: 'Type',
+        type: 'SELECT',
+        value: 'parallel',
+        opts: [{v: 'parallel', k: 'Parallel'}, {v: 'sequential', k: 'Sequential'}]
+      }]),
       new VRPAlgorithm('greedyFirst', 'Nearest Neighbor (NN)', []),
       new VRPAlgorithm('tabu', 'Tabu search', [
         {
@@ -34,8 +34,7 @@ export class VRPAlgorithm {
         }
       ], false),
       new VRPAlgorithm('jsprit', 'JSprit', []),
-      new VRPAlgorithm('googleOR', 'Google Optimization Tools', [], false),
-      new VRPAlgorithm('optaPlaner', 'OptaPlanner', [], false)
+      new VRPAlgorithm('googleOR', 'Google Optimization Tools', []),
     ];
   }
 

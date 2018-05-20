@@ -24,6 +24,7 @@ appender('STDOUT', ConsoleAppender) {
 
 logger("mgrvrp.rest", ALL, ['STDOUT'], false)
 logger("pl.mgr.vrp", ALL, ['STDOUT'], false)
+//logger("com.graphhopper.jsprit.core.algorithm", ALL, ['STDOUT'], false)
 
 def targetDir = BuildSettings.TARGET_DIR
 if (Environment.isDevelopmentMode() && targetDir != null) {
