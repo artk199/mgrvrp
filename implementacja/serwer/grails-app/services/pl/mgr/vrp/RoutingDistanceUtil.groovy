@@ -26,7 +26,7 @@ class RoutingDistanceUtil {
         initGraphHopper(Holders.config.get("mappath") as String, Holders.config.get("mappathtmp") as String)
     }
 
-     static void initGraphHopper(String mapPath, String mapPathTmp) {
+    static void initGraphHopper(String mapPath, String mapPathTmp) {
         graphHopper = new GraphHopperOSM().forServer()
         graphHopper.setDataReaderFile(mapPath)
         graphHopper.setGraphHopperLocation(mapPathTmp)
@@ -97,7 +97,7 @@ class RoutingDistanceUtil {
         distances
     }
 
-    static  double[][] calculateSimpleDistanceMatrix(VRPProblem vrpProblem) {
+    static double[][] calculateSimpleDistanceMatrix(VRPProblem vrpProblem) {
         def distances = new double[vrpProblem.customers.size() + 1][vrpProblem.customers.size() + 1]
         vrpProblem.customers.eachWithIndex { VRPCustomer c, int i ->
             distances[i + 1][0] = calculateSimpleDistance(vrpProblem.depot, c)

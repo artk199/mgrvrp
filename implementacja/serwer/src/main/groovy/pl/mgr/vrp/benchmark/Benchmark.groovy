@@ -28,10 +28,10 @@ class Benchmark {
 
     static main(def args) {
 
-        20.times {
-            benchmarks = VRPFileUtils.loadBenchmarksWithSize((it + 1) * 10)
+        //20.times {
+            benchmarks = VRPFileUtils.loadBenchmarksWithSize(100)
             startAlgorithmTest()
-        }
+        //}
 
 
     }
@@ -63,7 +63,7 @@ class Benchmark {
         ])
 
         def distanceTypes = [VRPDistanceType.AIR/*, VRPDistanceType.ROAD*/]
-        def algorithms = [VRPAlgorithm.SAVINGS/*, VRPAlgorithm.NN, VRPAlgorithm.JSPRIT, VRPAlgorithm.GOOGLE_OR*/]
+        def algorithms = [/*VRPAlgorithm.SAVINGS, VRPAlgorithm.NN, VRPAlgorithm.JSPRIT,*/ VRPAlgorithm.GOOGLE_OR]
 
         benchmarks.each { suite ->
             out.append([suite.uuid, suite.customersCount])

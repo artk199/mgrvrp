@@ -124,5 +124,5 @@ environments:
             url: jdbc:mysql://localhost:3306/vrp
             driverClassName: com.mysql.jdbc.Driver
             dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-            username: admin
-            password:
+            username: root
+            password: 123456

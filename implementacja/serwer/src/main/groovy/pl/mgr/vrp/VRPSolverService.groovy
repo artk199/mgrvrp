@@ -64,6 +64,8 @@ abstract class VRPSolverService {
             VRPLocation lastPoint = solution.problem.depot
             route.drivePoints = []
             route.points.each { point ->
+                if(point == null  || lastPoint == null)
+                    println 'hm?'
                 VRPDrivePoint drivePoint = RoutingDistanceUtil.calculateRoute(lastPoint, point)
                 route.drivePoints.add drivePoint
                 lastPoint = point

@@ -45,6 +45,7 @@ class JspritVRPSolverService extends VRPSolverService {
         VehicleRoutingProblem problem = problemBuilder.build()
 
         VehicleRoutingAlgorithm algorithm = Jsprit.createAlgorithm(problem)
+        algorithm.setMaxIterations(10)
         Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions()
         VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions)
 

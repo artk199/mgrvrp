@@ -14,11 +14,11 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @Configuration
 @EnableWebSocket
 class Application extends GrailsAutoConfiguration implements WebSocketConfigurer {
-
+/*
     static {
         System.loadLibrary("jniortools");
     }
-
+*/
     @Bean
     public WebSocketHandler vrpWebSocketHandler() {
         return new PerConnectionWebSocketHandler(VRPWebSocketHandler.class)
